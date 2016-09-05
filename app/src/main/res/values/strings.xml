@@ -1,0 +1,22 @@
+<resources>
+    <string name="app_name">Work Alley</string>
+    <string name="username">Username</string>
+
+    <string name="font_roboto_regular">sans-serif</string>
+    <string name="font_roboto_light">sans-serif-light</string>
+    <string name="font_roboto_condensed">sans-serif-condensed</string>
+    <string name="font_roboto_thin">sans-serif-thin</string>
+    <string name="font_roboto_medium">sans-serif-medium</string>
+    <string name="password">Password</string>
+    <string name="login">Login</string>
+    <string name="forget_password">Forget Password?</string>
+    <string name="new_account">Create New Account</string>
+    <string name="signup">Sign Up</string>
+    <string name="email">Email</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="sign_up">Sign UP</string>
+    <string name="user">User</string>
+    <string name="host">Host</string>
+    <string name="host_name">Name</string>
+    <string name="contact_number">Mobile Number</string>
+</resources>

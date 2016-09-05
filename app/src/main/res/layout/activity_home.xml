@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/viewPager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/endlessView"
+        android:layout_toEndOf="@+id/placeHolder"
+        android:layout_toRightOf="@+id/placeHolder"
+        android:background="@color/colorPrimary" />
+
+    <View
+        android:id="@+id/placeHolder"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_alignParentBottom="true" />
+
+    <com.cleveroad.loopbar.widget.LoopBarView
+        android:id="@+id/endlessView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        app:enls_orientation="horizontal"
+        app:enls_overlaySize="5dp"
+        app:enls_placeholderId="@+id/placeHolder"
+        app:enls_selectionBackground="@color/colorAccent"
+        app:enls_selectionGravity="start"
+        app:enls_selectionMargin="10dp" />
+</RelativeLayout>
