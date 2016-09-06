@@ -72,6 +72,7 @@
                 android:layout_marginTop="@dimen/margin_20">
 
                 <EditText
+                    android:id="@+id/email"
                     style="@style/FloatingEditText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -86,10 +87,11 @@
                 android:layout_marginTop="@dimen/margin_20">
 
                 <EditText
+                    android:id="@+id/name"
                     style="@style/FloatingEditText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/password" />
+                    android:hint="@string/name" />
             </android.support.design.widget.TextInputLayout>
 
             <android.support.design.widget.TextInputLayout
@@ -100,13 +102,32 @@
                 android:layout_marginTop="@dimen/margin_20">
 
                 <EditText
+                    android:id="@+id/password"
                     style="@style/FloatingEditText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/confirm_password" />
+                    android:hint="@string/password"
+                    android:inputType="textPassword" />
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/margin_30"
+                android:layout_marginRight="@dimen/margin_30"
+                android:layout_marginTop="@dimen/margin_20">
+
+                <EditText
+                    android:id="@+id/confirmPassword"
+                    style="@style/FloatingEditText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/confirm_password"
+                    android:inputType="textPassword" />
             </android.support.design.widget.TextInputLayout>
 
             <Button
+                android:id="@+id/userSignup"
                 style="@style/ButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
