@@ -46,7 +46,7 @@ public class HomeActivity extends BaseActivity implements OnItemClickListener {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_home);
+        setContentView(R.layout.activity_home_user);
         loopBarView = (LoopBarView) findViewById(R.id.endlessView);
         viewPager = (ViewPager) findViewById(R.id.viewPager);
 
@@ -87,12 +87,6 @@ public class HomeActivity extends BaseActivity implements OnItemClickListener {
     }
 
 
-    public void onBtnGravityClicked(View btn) {
-        int nextGravity = endlessGravity == LoopBarView.SELECTION_GRAVITY_START ?
-                LoopBarView.SELECTION_GRAVITY_END : LoopBarView.SELECTION_GRAVITY_START;
-        endlessGravity = nextGravity;
-        loopBarView.setGravity(nextGravity);
-    }
 
     @Override
     public void onItemClicked(int position) {

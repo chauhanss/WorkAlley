@@ -230,12 +230,10 @@ public class Session {
         JsonObjectRequest myRequest = new JsonObjectRequest
                 (Request.Method.POST, getAbsoluteUrl(url), params, new com.android.volley.Response
                         .Listener<JSONObject>() {
-
                     @Override
                     public void onResponse(JSONObject response) {
                         Log.e(TAG, response + "");
                         runSuccessOnHandlerThread(task, response);
-
                     }
                 }, new com.android.volley.Response.ErrorListener() {
                     @Override
@@ -244,7 +242,6 @@ public class Session {
                         runErrorOnHandlerThread(task, error);
                     }
                 }) {
-
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 HashMap<String, String> headers = new HashMap<String, String>();
@@ -252,64 +249,16 @@ public class Session {
                 return headers;
             }
         };
-
-
-        /*StringRequest myRequest = new StringRequest(method, getAbsoluteUrl(url), new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-
-                Log.d("PayU", "SdkSession.postFetch: " + "success");
-                try {
-
-                    JSONObject object = new JSONObject(response);
-                    runSuccessOnHandlerThread(task, object);
-
-                } catch (JSONException e) {
-                    onFailure(e.getMessage(), e);
-                }
-            }
-
-            public void onFailure(String msg, Throwable e) {
-                runErrorOnHandlerThread(task, e);
-            }
-
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("PayU", "SdkSession.postFetch: " + "error");
-                runErrorOnHandlerThread(task, error);
-            }
-        }) {
-            @Override
-            protected Map<String, String> getParams() {
-                return params;
-            }
-
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> params = new HashMap<String, String>();
-                //params.put("User-Agent", "PayUMoneyAPP");
-                if (getToken() != null) {
-                    //params.put("Authorization", "Bearer " + getToken());
-                    params.put(Constants.ACCESS_TOKEN, getToken());
-                } else {
-                }
-                // params.put(Constants.DEVICE_ID, ThemedSpinnerAdapter.Helper.getAndroidID(mContext));
-                //params.put(Constants.DEVICE_TYPE, Constants.ANDROID);
-                params.put("Accept", "application/json");
-                return params;
-            }
-
-            @Override
-            public String getBodyContentType() {
-                return "application/json; charset=utf-8";
-            }
-        };*/
         myRequest.setShouldCache(false);
-        myRequest.setRetryPolicy(new DefaultRetryPolicy(
+        myRequest.setRetryPolicy(new
+
+                DefaultRetryPolicy(
                 30000,
                 DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT)
+
+        );
+
         addToRequestQueue(myRequest);
 
         start = System.currentTimeMillis();
