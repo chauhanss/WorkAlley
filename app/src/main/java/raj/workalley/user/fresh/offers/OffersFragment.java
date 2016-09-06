@@ -1,4 +1,4 @@
-package raj.workalley.user.offers;
+package raj.workalley.user.fresh.offers;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;

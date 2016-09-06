@@ -4,7 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
-import raj.workalley.user.offers.OfferActivity;
+import raj.workalley.user.fresh.offers.OfferActivity;
 
 /**
  * Created by vishal.raj on 9/2/16.

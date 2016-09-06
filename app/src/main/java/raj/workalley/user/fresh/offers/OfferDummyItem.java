@@ -1,4 +1,4 @@
-package raj.workalley.user.offers;
+package raj.workalley.user.fresh.offers;
 
 /**
  * Created by vishal.raj on 9/3/16.

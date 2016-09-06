@@ -25,6 +25,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
+        app:enls_listBackground="@color/colorAccentBackground"
         app:enls_orientation="horizontal"
         app:enls_overlaySize="5dp"
         app:enls_placeholderId="@+id/placeHolder"

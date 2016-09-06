@@ -1,7 +1,5 @@
 package raj.workalley.user.fresh;
 
-import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -13,12 +11,9 @@ import android.view.View;
 
 import com.cleveroad.loopbar.adapter.ICategoryItem;
 import com.cleveroad.loopbar.adapter.SimpleCategoriesAdapter;
-import com.cleveroad.loopbar.model.MockedItemsFactory;
 import com.cleveroad.loopbar.widget.LoopBarView;
 import com.cleveroad.loopbar.widget.OnItemClickListener;
 import com.cleveroad.loopbar.widget.Orientation;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +23,7 @@ import raj.workalley.R;
 import raj.workalley.user.fresh.account.AccountFragment;
 import raj.workalley.user.fresh.map.MapFragment;
 import raj.workalley.user.fresh.settings.SettingFragment;
-import raj.workalley.user.offers.OffersFragment;
+import raj.workalley.user.fresh.offers.OffersFragment;
 
 /**
  * Created by vishal.raj on 9/3/16.

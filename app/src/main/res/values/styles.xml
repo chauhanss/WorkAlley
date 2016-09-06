@@ -25,6 +25,22 @@
         <item name="android:fontFamily">@string/font_roboto_regular</item>
     </style>
 
+    <style name="Title" parent="@style/AppTheme">
+        <item name="android:gravity">center</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">@dimen/text_size_12</item>
+        <item name="android:layout_gravity">center_vertical|center_horizontal</item>
+        <item name="android:fontFamily">@string/font_roboto_light</item>
+    </style>
+
+    <style name="TextOnly" parent="@style/AppTheme">
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">@dimen/text_size_14</item>
+        <item name="android:gravity">center</item>
+        <item name="android:layout_gravity">center_vertical|center_horizontal</item>
+        <item name="android:fontFamily">@string/font_roboto_regular</item>
+    </style>
+
     <style name="FloatingEditText" parent="@style/AppTheme">
         <item name="android:background">@drawable/edit_text_bottom_line</item>
         <item name="android:fontFamily">@string/font_roboto_light</item>
@@ -37,4 +53,6 @@
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
+    <dimen name="text_size_12">12sp</dimen>
+    <dimen name="text_size_14">14sp</dimen>
 </resources>

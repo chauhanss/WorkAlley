@@ -19,4 +19,6 @@
     <string name="host">Host</string>
     <string name="host_name">Name</string>
     <string name="contact_number">Mobile Number</string>
+    <string name="monthly_subscription">Monthly Subscription</string>
+    <string name="recharge">Recharge</string>
 </resources>

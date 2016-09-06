@@ -1,4 +1,4 @@
-package raj.workalley.user.offers;
+package raj.workalley.user.fresh.offers;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;

@@ -3,6 +3,7 @@
     <color name="colorPrimary">#263238</color>
     <color name="colorPrimaryDark">#163238</color>
     <color name="colorAccent">#01BEE0</color>
+    <color name="colorAccentBackground">#EE946F</color>
 
     <color name="white">#ffffff</color>
     <color name="transparent">@android:color/transparent</color>

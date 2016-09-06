@@ -36,7 +36,8 @@
         </activity>
         <activity android:name=".SignUpActivity"></activity>
         <activity android:name=".user.fresh.HomeActivity"></activity>
-        <activity android:name=".user.offers.OfferActivity"></activity>
+        <activity android:name=".host.HomeActivity"></activity>
+        <activity android:name=".user.fresh.offers.OfferActivity"></activity>
     </application>
 
 </manifest>
