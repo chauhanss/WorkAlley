@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "820811264325",
+    "firebase_url": "https://work-alley.firebaseio.com",
+    "project_id": "work-alley",
+    "storage_bucket": "work-alley.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:820811264325:android:d6f8c0cb70ec9a00",
+        "android_client_info": {
+          "package_name": "raj.workalley"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "820811264325-kpccdqil0pc4qi8hscnppmnfr49llbpb.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "raj.workalley",
+            "certificate_hash": "B964DE07956A606862922AB8C6E2A92DCD35078B"
+          }
+        },
+        {
+          "client_id": "820811264325-efjihgqvth911s8eppr3h5f831uhkli0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBeOyV-_fUyolTH-1kEoD1eiKdkdztwny0"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "820811264325-efjihgqvth911s8eppr3h5f831uhkli0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
