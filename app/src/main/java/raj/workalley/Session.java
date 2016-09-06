@@ -3,6 +3,7 @@ package raj.workalley;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -233,19 +234,14 @@ public class Session {
                     @Override
                     public void onResponse(JSONObject response) {
                         Log.e(TAG, response + "");
-                        boolean isCallAble;
-                        try {
-                            isCallAble = response.getJSONObject("success").getJSONObject("data").getBoolean("callEnableIcon");
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            isCallAble = false;
-                        }
+                        runSuccessOnHandlerThread(task, response);
+
                     }
                 }, new com.android.volley.Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         Log.e(TAG, error.getMessage() + "");
-
+                        runErrorOnHandlerThread(task, error);
                     }
                 }) {
 
@@ -364,6 +360,42 @@ public class Session {
 
             }
         }, Request.Method.POST);
+    }
+
+    public void login(String userName, String password) {
+        JSONObject params = new JSONObject();
+        try {
+            params.put(Constants.EMAIL, userName);
+            params.put(Constants.PASSWORD, password);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        //final Map params = new HashMap<>();
+
+        postFetch("auth/login/local", params, new Task() {
+
+            @Override
+            public void onSuccess(JSONObject jsonObject) {
+                eventBus.post(new CobbocEvent(CobbocEvent.LOGIN, true, jsonObject));
+            }
+
+            @Override
+            public void onSuccess(String response) {
+
+            }
+
+            @Override
+            public void onError(Throwable throwable) {
+                eventBus.post(new CobbocEvent(CobbocEvent.LOGIN, false, "An error occurred while trying to login. Please try again later."));
+            }
+
+            @Override
+            public void onProgress(int percent) {
+
+            }
+        }, Request.Method.POST);
+
     }
 
 

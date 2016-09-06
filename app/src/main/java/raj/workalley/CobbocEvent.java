@@ -6,7 +6,6 @@ package raj.workalley;
 public class CobbocEvent {
     public static final int LOGIN = 1;
     public static final int SIGNUP = 2;
-    public static final int REPORT = 3;
 
     private boolean STATUS;
 

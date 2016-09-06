@@ -25,6 +25,7 @@
             float:fletPadding="@dimen/margin_5">
 
             <EditText
+                android:id="@+id/user_name"
                 style="@style/FloatingEditText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -38,6 +39,7 @@
             float:fletPadding="@dimen/margin_5">
 
             <EditText
+                android:id="@+id/password"
                 style="@style/FloatingEditText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -50,6 +52,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/margin_20"
+            android:enabled="false"
             android:text="@string/login" />
 
         <TextView
@@ -62,9 +65,9 @@
             android:paddingBottom="@dimen/margin_5"
             android:paddingLeft="@dimen/margin_5"
             android:paddingRight="@dimen/margin_5"
-            android:textSize="@dimen/text_size_10"
             android:text="@string/forget_password"
-            android:textColor="@color/white" />
+            android:textColor="@color/white"
+            android:textSize="@dimen/text_size_10" />
 
         <TextView
             android:id="@+id/create_new_account"
