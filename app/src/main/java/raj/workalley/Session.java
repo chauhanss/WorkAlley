@@ -3,6 +3,7 @@ package raj.workalley;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.v7.widget.ThemedSpinnerAdapter;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -17,12 +18,14 @@ import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
 
 import org.apache.http.conn.ConnectTimeoutException;
+import org.greenrobot.eventbus.EventBus;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.lang.reflect.Type;
 import java.net.SocketTimeoutException;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -32,6 +35,7 @@ public class Session {
 
     private static Session INSTANCE = null;
     private RequestQueue mRequestQueue;
+    private final EventBus eventBus;
     public static final String TAG = Session.class.getSimpleName();
     private final Context mContext;
     Long start = null, end = null, diff = null;
@@ -39,7 +43,6 @@ public class Session {
     private final SessionData mSessionData = new SessionData();
 
     public enum workAlleyModels {
-        CCUserProgressStage,
         CCUserInfo,
         CCUserPreferences,
         CCCSRFToken,
@@ -54,6 +57,7 @@ public class Session {
 
 
     private Session(Context context) {
+        eventBus = EventBus.getDefault();
         mContext = context;
         handler = new Handler(Looper.getMainLooper());
     }
@@ -67,28 +71,11 @@ public class Session {
 
     private class SessionData {
 
-        private boolean isPinAunthenticationCompleted = false;
-        private int pinLength = 0;
-        private String guId = null;
         private String userName, token, customerId = null;
-        private String cardIdentifier = null;
-        private String lastBillAmount, lastBillMinAmount = null;
-        private int userProgressStage = -1;
-        private JSONArray regexArray;
-        private int appPinUpdateStatus = -1;
-        private String appSessionId = null;
         private String mobile = null;
 
         public SessionData() {
             reset();
-        }
-
-        private void setRegexArray(JSONArray regexArr) {
-            this.regexArray = regexArr;
-        }
-
-        private JSONArray getRegexArray() {
-            return regexArray;
         }
 
         private String getUserName() {
@@ -115,97 +102,48 @@ public class Session {
             this.customerId = customerId;
         }
 
-        private String getGuID() {
-            return guId;
-        }
-
-        private boolean isPinAunthenticationCompleted() {
-            return isPinAunthenticationCompleted;
-        }
-
-        private void setIsPinAunthenticationCompleted(boolean isCompleted) {
-            this.isPinAunthenticationCompleted = isCompleted;
-        }
-
-        private void setGuId(String id) {
-            this.guId = id;
-        }
-
         private String getToken() {
             return token;
         }
 
-        private int getAppPinUpdateStatus() {
-            return appPinUpdateStatus;
+        private void setToken(String tokenValue) {
+            this.token = tokenValue;
         }
 
-        private void setAppPinUpdateStatus(int appPinUpdateStatus) {
-            this.appPinUpdateStatus = appPinUpdateStatus;
-        }
-
-        private String getLastBillAmount() {
-            return lastBillAmount;
-        }
-
-        private void setLastBillAmount(String lastBillAmount) {
-            this.lastBillAmount = lastBillAmount;
-        }
-
-
-        private String getLastBillMinAmount() {
-            return lastBillMinAmount;
-        }
-
-        private void setLastBillMinAmount(String lastBillMinAmount) {
-            this.lastBillMinAmount = lastBillMinAmount;
-        }
-
-        private void setToken(String token) {
-            this.token = token;
-        }
 
         private void reset() {
             token = null;
             customerId = null;
-            cardIdentifier = null;
         }
+    }
 
-        private void logOutReset() {
-            token = null;
-            guId = null;
-        }
+    public String getToken() {
+        return mSessionData.getToken();
+    }
 
-        private void setPinLength(int pinLength) {
-            this.pinLength = pinLength;
-        }
+    public void setUserId(String user) {
+        mSessionData.setUserName(user);
+    }
 
-        private int getPinLength() {
-            return pinLength;
-        }
+    public String getUserId() {
+        return mSessionData.getUserName();
+    }
 
-        private String getCardIdentifier() {
-            return cardIdentifier;
-        }
 
-        private void setCardIdentifier(String cardIdentifier) {
-            this.cardIdentifier = cardIdentifier;
-        }
+    /**
+     * Get the cached login state
+     */
+    public boolean isLoggedIn() {
+        return getToken() != null;
+    }
 
-        private int getUserProgressStage() {
-            return userProgressStage;
-        }
+    public void setToken(String token) {
+        mSessionData.setToken(token);
+    }
 
-        private void setUserProgressStage(int userProgressStage) {
-            this.userProgressStage = userProgressStage;
-        }
 
-        private String getAppSessionId() {
-            return appSessionId;
-        }
-
-        private void setAppSessionId(String appSessionId) {
-            this.appSessionId = appSessionId;
-        }
+    public void reset() {
+        mSessionData.reset();
     }
 
     public interface Task {
@@ -257,7 +195,6 @@ public class Session {
         }
     }
 
-
     public Object getParsedResponseFromGSON(JSONObject jsonObject, workAlleyModels type) {
 
         Type classType;
@@ -277,10 +214,6 @@ public class Session {
             return Constants.BASE_URL + relativeUrl;
     }
 
-    public void setAppSessionId(String id) {
-        mSessionData.setAppSessionId(id);
-    }
-
     private void runSuccessOnHandlerThread(final Task task, final JSONObject jsonObject) {
         handler.post(new Runnable() {
             @Override
@@ -293,64 +226,31 @@ public class Session {
     public void postFetch(final String url, final Map<String, String> params, final Task task, final int method) {
 
         if (Constants.DEBUG) {
-            Log.d(Session.TAG, "SdkSession.postFetch: " + url + " " + params + " " + method);
+            Log.d("PayU", "SdkSession.postFetch: " + url + " " + params + " " + method);
         }
-
         StringRequest myRequest = new StringRequest(method, getAbsoluteUrl(url), new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
 
-                diff = System.currentTimeMillis() - start;
-
-                //Log.i(CCSession.TAG, "URL=" + url + "Time=" + diff);
-
-                if (Constants.DEBUG) {
-                    Log.d(Session.TAG, "SdkSession.postFetch.onSuccess: " + url + " " + params + " " + method + ": " + response);
-                }
-
+                Log.d("PayU", "SdkSession.postFetch: " + "success");
                 try {
-                    JSONObject object = new JSONObject(response);
-                    if (object.has(Constants.APP_SESSION_ID) && object.isNull(Constants.APP_SESSION_ID)) {
-                        String sessionId = object.getString(Constants.APP_SESSION_ID);
-                        setAppSessionId(sessionId);
 
-                    }
-                    if (object.has("error")) {
-                        onFailure(object.getString("error"), new Throwable(object.getString("error")));
-                    } else {
-                        runSuccessOnHandlerThread(task, object);
-                    }
+                    JSONObject object = new JSONObject(response);
+                    runSuccessOnHandlerThread(task, object);
+
                 } catch (JSONException e) {
-                    // maybe this is a string?
                     onFailure(e.getMessage(), e);
                 }
             }
 
             public void onFailure(String msg, Throwable e) {
-                if (Constants.DEBUG) {
-                    Log.e(Session.TAG, "Session...new JsonHttpResponseHandler() {...}.onFailure: " + e.getMessage() + " " + msg);
-                }
-                if (msg.contains("401")) {
-                    /*not required in app*/
-
-                    // logout("force");
-                    cancelPendingRequests(TAG);
-
-                }
                 runErrorOnHandlerThread(task, e);
             }
 
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                if (Constants.DEBUG) {
-                    Log.e(Session.TAG, "Session...new JsonHttpResponseHandler() {...}.onFailure: " + error.getMessage());
-                }
-                if (error != null && error.networkResponse != null && error.networkResponse.statusCode == 401) {
-
-                    //  logout("force");
-
-                }
+                Log.d("PayU", "SdkSession.postFetch: " + "error");
                 runErrorOnHandlerThread(task, error);
             }
         }) {
@@ -361,23 +261,76 @@ public class Session {
 
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-
-
+                Map<String, String> params = new HashMap<String, String>();
+                //params.put("User-Agent", "PayUMoneyAPP");
+                if (getToken() != null) {
+                    //params.put("Authorization", "Bearer " + getToken());
+                    params.put(Constants.ACCESS_TOKEN, getToken());
+                } else {
+                    //params.put("Accept", "*/*;");
+                }
+                // params.put(Constants.DEVICE_ID, ThemedSpinnerAdapter.Helper.getAndroidID(mContext));
+                //params.put(Constants.DEVICE_TYPE, Constants.ANDROID);
+                params.put("Accept", "application/json");
                 return params;
             }
 
             @Override
-            public String getBodyContentType() {
-                return "application/x-www-form-urlencoded";
+            public String getBodyContentType()
+            {
+                return "application/json; charset=utf-8";
             }
         };
         myRequest.setShouldCache(false);
-        myRequest.setRetryPolicy(new DefaultRetryPolicy(100000,
+        myRequest.setRetryPolicy(new DefaultRetryPolicy(
+                30000,
                 DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         addToRequestQueue(myRequest);
+
         start = System.currentTimeMillis();
 
+    }
+
+
+    public void signUpUserApi(String email, String name, String password) {
+
+        final Map params = new HashMap<>();
+        params.put(Constants.EMAIL, email);
+        params.put(Constants.PASSWORD, password);
+        params.put(Constants.NAME, name);
+
+        postFetch("auth/signup", params, new Task() {
+
+            @Override
+            public void onSuccess(JSONObject jsonObject) {
+                try {
+                    int status = jsonObject.getInt(Constants.STATUS);
+                    if (status < 0) {
+                        eventBus.post(new CobbocEvent(CobbocEvent.SIGNUP, false, jsonObject));
+                    } else {
+                        eventBus.post(new CobbocEvent(CobbocEvent.SIGNUP, true, jsonObject));
+                    }
+                } catch (JSONException e) {
+                    eventBus.post(new CobbocEvent(CobbocEvent.SIGNUP, false));
+                }
+            }
+
+            @Override
+            public void onSuccess(String response) {
+
+            }
+
+            @Override
+            public void onError(Throwable throwable) {
+                eventBus.post(new CobbocEvent(CobbocEvent.SIGNUP, false, "An error occurred while trying to login. Please try again later."));
+            }
+
+            @Override
+            public void onProgress(int percent) {
+
+            }
+        }, Request.Method.POST);
     }
 
 }
