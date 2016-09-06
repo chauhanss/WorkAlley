@@ -3,7 +3,6 @@ package raj.workalley;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.v7.widget.ThemedSpinnerAdapter;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -11,15 +10,13 @@ import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
 
 import org.apache.http.conn.ConnectTimeoutException;
 import org.greenrobot.eventbus.EventBus;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -223,12 +220,45 @@ public class Session {
         });
     }
 
-    public void postFetch(final String url, final Map<String, String> params, final Task task, final int method) {
+    public void postFetch(final String url, JSONObject params, final Task task, final int method) {
 
         if (Constants.DEBUG) {
             Log.d("PayU", "SdkSession.postFetch: " + url + " " + params + " " + method);
         }
-        StringRequest myRequest = new StringRequest(method, getAbsoluteUrl(url), new Response.Listener<String>() {
+
+        JsonObjectRequest myRequest = new JsonObjectRequest
+                (Request.Method.POST, getAbsoluteUrl(url), params, new com.android.volley.Response
+                        .Listener<JSONObject>() {
+
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Log.e(TAG, response + "");
+                        boolean isCallAble;
+                        try {
+                            isCallAble = response.getJSONObject("success").getJSONObject("data").getBoolean("callEnableIcon");
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            isCallAble = false;
+                        }
+                    }
+                }, new com.android.volley.Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.e(TAG, error.getMessage() + "");
+
+                    }
+                }) {
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<String, String>();
+                headers.put("Content-Type", "application/json; charset=utf-8");
+                return headers;
+            }
+        };
+
+
+        /*StringRequest myRequest = new StringRequest(method, getAbsoluteUrl(url), new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
 
@@ -267,7 +297,6 @@ public class Session {
                     //params.put("Authorization", "Bearer " + getToken());
                     params.put(Constants.ACCESS_TOKEN, getToken());
                 } else {
-                    //params.put("Accept", "*/*;");
                 }
                 // params.put(Constants.DEVICE_ID, ThemedSpinnerAdapter.Helper.getAndroidID(mContext));
                 //params.put(Constants.DEVICE_TYPE, Constants.ANDROID);
@@ -276,11 +305,10 @@ public class Session {
             }
 
             @Override
-            public String getBodyContentType()
-            {
+            public String getBodyContentType() {
                 return "application/json; charset=utf-8";
             }
-        };
+        };*/
         myRequest.setShouldCache(false);
         myRequest.setRetryPolicy(new DefaultRetryPolicy(
                 30000,
@@ -294,11 +322,16 @@ public class Session {
 
 
     public void signUpUserApi(String email, String name, String password) {
+        JSONObject params = new JSONObject();
+        try {
+            params.put(Constants.EMAIL, email);
+            params.put(Constants.PASSWORD, password);
+            params.put(Constants.NAME, name);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
-        final Map params = new HashMap<>();
-        params.put(Constants.EMAIL, email);
-        params.put(Constants.PASSWORD, password);
-        params.put(Constants.NAME, name);
+        //final Map params = new HashMap<>();
 
         postFetch("auth/signup", params, new Task() {
 
@@ -332,5 +365,6 @@ public class Session {
             }
         }, Request.Method.POST);
     }
+
 
 }
