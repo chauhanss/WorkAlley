@@ -6,6 +6,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import raj.workalley.host.HomeActivity;
 import raj.workalley.user.fresh.offers.OfferActivity;
 
 /**
@@ -24,7 +25,7 @@ public class LoginActivity extends BaseActivity {
         mCreateNewAccount.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(LoginActivity.this, SignUpActivity.class);
+                Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
                 startActivity(intent);
             }
         });
