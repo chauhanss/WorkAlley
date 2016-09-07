@@ -82,7 +82,8 @@ public class HomeActivity extends BaseActivity implements OnItemClickListener {
 
     @Override
     public void onItemClicked(int position) {
-
+        ICategoryItem categoryItem = categoriesAdapter.getItem(position);
+        viewPager.setCurrentItem(position);
     }
 
 

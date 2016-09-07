@@ -38,25 +38,31 @@ public class LoginActivity extends BaseActivity {
         mSession = Session.getInstance(mContext);
 
         initializeLayouts();
-        mLogin = (Button) findViewById(R.id.login_button);
-        mCreateNewAccount = (TextView) findViewById(R.id.create_new_account);
-        mCreateNewAccount.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
-                startActivity(intent);
-            }
-        });
 
         mLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                if (isEmailFormat(mUserName) && Helper.isConnected(mContext)) {
-                    makeLoginCall();
+                if (mUserName.getText().toString().equalsIgnoreCase("user")) {
+                    Intent intent = new Intent(LoginActivity.this, raj.workalley.user.fresh.HomeActivity.class);
+                    startActivity(intent);
+                } else if (mUserName.getText().toString().equalsIgnoreCase("host")) {
+                    Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
+                    startActivity(intent);
                 }
+                /*if (isEmailFormat(mUserName) && Helper.isConnected(mContext)) {
+                    makeLoginCall();
+                }*/
             }
         });
+
+        mCreateNewAccount.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(LoginActivity.this, SignUpActivity.class);
+                startActivity(intent);
+            }
+        });
+
 
         mPassword.addTextChangedListener(new FieldTextWatcher());
         mUserName.addTextChangedListener(new FieldTextWatcher());
@@ -64,12 +70,13 @@ public class LoginActivity extends BaseActivity {
     }
 
     private void makeLoginCall() {
-
         Helper.showProgressDialogSpinner(mContext, "Please Wait", "Connecting to server", false);
         mSession.login(mUserName.getText().toString().trim(), mPassword.getText().toString().trim());
     }
 
     private void initializeLayouts() {
+         mLogin = (Button) findViewById(R.id.login_button);
+        mCreateNewAccount = (TextView) findViewById(R.id.create_new_account);
         mPassword = (EditText) findViewById(R.id.password);
         mUserName = (EditText) findViewById(R.id.user_name);
     }

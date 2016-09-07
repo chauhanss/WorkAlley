@@ -62,7 +62,7 @@ public class HomeActivity extends BaseActivity implements OnItemClickListener {
         loopBarView.addOnItemClickListener(this);
 
         List<Fragment> list = new ArrayList<>(3);
-        list.add(new MapFragment());
+        list.add(new MapFragment().newInstance());
         list.add(new OffersFragment());
         list.add(new SettingFragment());
         list.add(new AccountFragment());
@@ -85,7 +85,6 @@ public class HomeActivity extends BaseActivity implements OnItemClickListener {
         });
 
     }
-
 
 
     @Override

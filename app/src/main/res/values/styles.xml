@@ -43,12 +43,27 @@
 
     <style name="FloatingEditText" parent="@style/AppTheme">
         <item name="android:background">@drawable/edit_text_bottom_line</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">end</item>
         <item name="android:fontFamily">@string/font_roboto_light</item>
         <item name="android:paddingBottom">@dimen/margin_5</item>
         <item name="android:paddingLeft">@dimen/margin_30</item>
         <item name="android:textColorHint">@color/white</item>
         <item name="android:paddingTop">@dimen/margin_10</item>
         <item name="android:textCursorDrawable">@drawable/edit_text_cursor</item>
+    </style>
+
+    <style name="FloatingEditTextOppsite" parent="@style/AppTheme">
+        <item name="android:background">@drawable/edit_text_bottom_line_primary_color</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:fontFamily">@string/font_roboto_light</item>
+        <item name="android:paddingBottom">@dimen/margin_5</item>
+        <item name="android:paddingLeft">@dimen/margin_30</item>
+        <item name="android:textColorHint">@color/colorPrimary</item>
+        <item name="android:paddingTop">@dimen/margin_10</item>
+        <item name="android:textColor">@color/colorPrimaryDark</item>
+        <item name="android:textCursorDrawable">@drawable/edit_text_cursor_primary_color</item>
     </style>
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />

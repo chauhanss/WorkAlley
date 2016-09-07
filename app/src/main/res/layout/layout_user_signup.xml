@@ -5,9 +5,13 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <ScrollView
+    <android.support.v7.widget.CardView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/margin_20"
+        app:cardElevation="@dimen/margin_2"
+        app:cardCornerRadius="@dimen/margin_4"
+        app:cardUseCompatPadding="true">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -20,7 +24,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="@dimen/margin_80"
                 android:layout_marginRight="@dimen/margin_80"
-                android:src="@drawable/fb_connect" />
+                android:src="@drawable/fb_connect"
+                android:visibility="gone" />
 
             <ImageView
                 android:layout_width="wrap_content"
@@ -28,7 +33,8 @@
                 android:layout_marginLeft="@dimen/margin_80"
                 android:layout_marginRight="@dimen/margin_80"
                 android:layout_marginTop="-40dp"
-                android:src="@drawable/g_connect" />
+                android:src="@drawable/g_connect"
+                android:visibility="gone" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -37,7 +43,8 @@
                 android:layout_marginLeft="@dimen/margin_30"
                 android:layout_marginRight="@dimen/margin_30"
                 android:layout_marginTop="@dimen/margin_10"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:visibility="gone">
 
                 <View
                     android:layout_width="0dp"
@@ -67,8 +74,8 @@
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="@dimen/margin_30"
-                android:layout_marginRight="@dimen/margin_30"
+                android:layout_marginLeft="@dimen/margin_20"
+                android:layout_marginRight="@dimen/margin_20"
                 android:layout_marginTop="@dimen/margin_20">
 
                 <EditText
@@ -82,8 +89,8 @@
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="@dimen/margin_30"
-                android:layout_marginRight="@dimen/margin_30"
+                android:layout_marginLeft="@dimen/margin_20"
+                android:layout_marginRight="@dimen/margin_20"
                 android:layout_marginTop="@dimen/margin_20">
 
                 <EditText
@@ -97,8 +104,8 @@
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="@dimen/margin_30"
-                android:layout_marginRight="@dimen/margin_30"
+                android:layout_marginLeft="@dimen/margin_20"
+                android:layout_marginRight="@dimen/margin_20"
                 android:layout_marginTop="@dimen/margin_20">
 
                 <EditText
@@ -113,8 +120,8 @@
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="@dimen/margin_30"
-                android:layout_marginRight="@dimen/margin_30"
+                android:layout_marginLeft="@dimen/margin_20"
+                android:layout_marginRight="@dimen/margin_20"
                 android:layout_marginTop="@dimen/margin_20">
 
                 <EditText
@@ -129,11 +136,13 @@
             <Button
                 android:id="@+id/userSignup"
                 style="@style/ButtonStyle"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/margin_20"
+                android:layout_marginRight="@dimen/margin_20"
                 android:layout_marginBottom="@dimen/margin_30"
                 android:layout_marginTop="@dimen/margin_30"
                 android:text="@string/sign_up" />
         </LinearLayout>
-    </ScrollView>
+    </android.support.v7.widget.CardView>
 </LinearLayout>

@@ -1,6 +1,7 @@
 package raj.workalley;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -9,6 +10,8 @@ import android.widget.LinearLayout;
 import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import raj.workalley.host.signup.HostSignUpActivity;
 
 /**
  * Created by vishal.raj on 9/2/16.
@@ -32,6 +35,7 @@ public class SignUpActivity extends BaseActivity {
         hostSignUpLayout = (LinearLayout) findViewById(R.id.host_sign_up);
         mEmailUser = (EditText) userSignUpLayout.findViewById(R.id.email);
 
+        mSignUpHost = (Button) findViewById(R.id.hostSignup);
         mNameUser = (EditText) userSignUpLayout.findViewById(R.id.name);
         mPasswordUser = (EditText) userSignUpLayout.findViewById(R.id.password);
         mConfirmPasswordUser = (EditText) userSignUpLayout.findViewById(R.id.confirmPassword);
@@ -43,6 +47,13 @@ public class SignUpActivity extends BaseActivity {
                     proceedForUserSignUp();
                 else
                     Toast.makeText(mContext, "Confirm  password field didn't match with Password field", Toast.LENGTH_SHORT).show();
+            }
+        });
+        mSignUpHost.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(SignUpActivity.this, HostSignUpActivity.class);
+                startActivity(intent);
             }
         });
 

@@ -1,34 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <com.google.android.gms.maps.MapView
-        android:id="@+id/mapview"
+
+    <fragment
+        android:id="@+id/map_1"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <LinearLayout
+    <android.support.v7.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="@dimen/margin_50"
         android:layout_marginLeft="@dimen/margin_20"
         android:layout_marginRight="@dimen/margin_20"
         android:layout_marginTop="@dimen/margin_20"
-        android:background="@drawable/rectangle">
+        app:cardBackgroundColor="@color/white"
+        app:cardCornerRadius="4dp"
+        app:cardElevation="4dp">
 
 
         <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginLeft="@dimen/margin_20"
+            android:layout_marginLeft="@dimen/margin_10"
+            android:layout_marginRight="@dimen/margin_10"
             android:background="@color/transparent"
-            android:focusable="false"
+            android:focusableInTouchMode="true"
             android:fontFamily="@string/font_roboto_light"
-            android:hint="Search"
+            android:textSize="@dimen/text_size_16"
+            android:hint="Search your comfort zone"
             android:textColor="@color/colorPrimaryDark"
             android:textColorHint="@color/colorPrimary" />
-    </LinearLayout>
+    </android.support.v7.widget.CardView>
 
 </RelativeLayout>

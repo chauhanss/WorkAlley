@@ -6,7 +6,6 @@
     android:layout_margin="@dimen/margin_20"
     android:layout_marginLeft="@dimen/margin_50"
     android:layout_marginRight="@dimen/margin_50"
-    android:background="@drawable/rectangle"
     app:cardElevation="4dp"
     app:cardUseCompatPadding="true">
 
