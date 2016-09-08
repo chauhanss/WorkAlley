@@ -13,11 +13,17 @@ import raj.workalley.R;
  * Created by vishal.raj on 9/6/16.
  */
 public class DashboardFragment extends Fragment {
+
+    public static DashboardFragment newInstance() {
+        DashboardFragment fragment = new DashboardFragment();
+        return fragment;
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
-        View v = inflater.inflate(R.layout.activity_host_details, null);
+        View v = inflater.inflate(R.layout.fragment_host_dashboard, null);
         return v;
     }
 }

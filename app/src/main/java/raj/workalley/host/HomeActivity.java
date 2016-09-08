@@ -57,8 +57,8 @@ public class HomeActivity extends BaseActivity implements OnItemClickListener {
         loopBarView.addOnItemClickListener(this);
 
         List<Fragment> list = new ArrayList<>(2);
-        list.add(new SettingFragment());
-        list.add(new DashboardFragment());
+        list.add(SettingFragment.newInstance());
+        list.add(DashboardFragment.newInstance());
 
 
         pagerAdapter = new SimpleFragmentStatePagerAdapter(getSupportFragmentManager(), list);
