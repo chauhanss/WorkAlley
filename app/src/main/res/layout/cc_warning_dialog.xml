@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/transparent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/filter_dialog_background"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:id="@+id/filter_dummy"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/title"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/filter_dialog_heading_height"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true"
+                android:fontFamily="@string/font_roboto_medium"
+                android:gravity="center"
+                android:textAllCaps="true"
+                android:textColor="@color/colorPrimary"
+                android:textSize="@dimen/text_size_14" />
+
+            <ImageView
+                android:id="@+id/cancel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="@dimen/margin_20"
+                android:padding="@dimen/margin_10"
+                android:src="@drawable/cross_grey"
+                android:stateListAnimator="@null" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/margin_05"
+                android:layout_below="@+id/cancel"
+                android:layout_marginTop="@dimen/margin_30"
+                android:background="@color/colorPrimary" />
+
+        </RelativeLayout>
+
+        <FrameLayout
+            android:id="@+id/message"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/margin_20"
+            android:layout_marginRight="@dimen/margin_20"
+            android:layout_marginTop="@dimen/margin_20"
+            android:fontFamily="@string/font_roboto_regular"
+            android:gravity="center"
+            android:paddingBottom="@dimen/margin_2"
+            android:paddingTop="@dimen/margin_2"
+            android:textColor="@color/colorPrimary"
+            android:textSize="@dimen/text_size_12" />
+
+        <Button
+            android:id="@+id/single_ok_btn"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/margin_50"
+            android:layout_marginTop="@dimen/margin_30"
+            android:background="@drawable/button_left_and_right_cornered"
+            android:fontFamily="@string/font_roboto_light"
+            android:stateListAnimator="@null"
+            android:text="@string/ok"
+            android:textColor="@color/white"
+            android:textSize="@dimen/text_size_12" />
+
+        <LinearLayout
+            android:id="@+id/double_btn"
+            android:layout_width="match_parent"
+            android:layout_marginTop="@dimen/margin_30"
+            android:layout_height="@dimen/filter_action_button_height"
+            android:layout_alignParentBottom="true"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/cancel_btn"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/cc_button_left_corner_round"
+                android:fontFamily="@string/font_roboto_light"
+                android:gravity="center"
+                android:text="cancel"
+                android:textAllCaps="true"
+                android:textColor="@color/colorPrimary"
+                android:textSize="@dimen/text_size_12" />
+
+            <Button
+                android:id="@+id/double_ok_btn"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/cc_button_right_corner_round"
+                android:fontFamily="@string/font_roboto_light"
+                android:gravity="center"
+                android:text="proceed"
+                android:textAllCaps="true"
+                android:textColor="@color/colorAccent"
+                android:textSize="@dimen/text_size_12" />
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

@@ -16,11 +16,15 @@
         android:layout_height="wrap_content"
         android:background="@drawable/ic_ac" />
 
-    <TextView
+
+    <CheckBox
         android:id="@+id/amenities_name"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="center"
         android:gravity="center"
         android:text="AC"
         android:textColor="@color/colorPrimaryDark" />
+
+
 </LinearLayout>

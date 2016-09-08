@@ -4,9 +4,11 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import raj.workalley.R;
@@ -36,6 +38,7 @@ public class AmenitiesListAdapter extends RecyclerView.Adapter<AmenitiesListAdap
         HostSignUpActivity.AmenitiesItem amenities = amenitiesList.get(position);
         holder.name.setText(amenities.getAmenitiesName());
         holder.icon.setBackgroundResource(amenities.getAmenitiesIcon());
+
     }
 
     @Override
@@ -43,14 +46,29 @@ public class AmenitiesListAdapter extends RecyclerView.Adapter<AmenitiesListAdap
         return amenitiesList.size();
     }
 
-    public class AmenitiesViewHolder extends RecyclerView.ViewHolder {
-        public TextView name;
+    public class AmenitiesViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+        public CheckBox name;
         public ImageView icon;
 
         public AmenitiesViewHolder(View view) {
             super(view);
-            name = (TextView) view.findViewById(R.id.amenities_name);
+            name = (CheckBox) view.findViewById(R.id.amenities_name);
             icon = (ImageView) view.findViewById(R.id.amenities_icon);
+            name.setOnClickListener(this);
         }
+
+        @Override
+        public void onClick(View v) {
+            amenitiesList.get(getPosition()).setActive(name.isChecked());
+        }
+    }
+
+    public List<String> getSelectedItem() {
+        List<String> list = new ArrayList<>();
+        for (HostSignUpActivity.AmenitiesItem item : amenitiesList) {
+            if (item.isActive())
+                list.add(item.getAmenitiesName());
+        }
+        return list;
     }
 }

@@ -1,6 +1,7 @@
 package raj.workalley.util;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.pm.PackageInfo;
@@ -8,13 +9,19 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.SystemClock;
 import android.provider.Settings;
+import android.support.v7.app.AlertDialog;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import raj.workalley.Constants;
+import raj.workalley.R;
 
 
 /**
@@ -144,6 +151,67 @@ public class Helper {
         toast.setGravity(Gravity.BOTTOM, 0, 100);
         toast.setDuration(Toast.LENGTH_SHORT);
         toast.show();
+    }
+
+    public static class DialogAndButton {
+        public Dialog dialog;
+        public Button okBtn;
+    }
+
+    public static DialogAndButton showPopUpDialog(Context context, String[] buttonText, String title, String message) {
+        final AlertDialog.Builder alertDialog = new AlertDialog.Builder(context);
+        View dialogView = LayoutInflater.from(context).inflate(R.layout.cc_warning_dialog, null);
+        alertDialog.setView(dialogView);
+        alertDialog.setCancelable(false);
+        final AlertDialog dialog = alertDialog.show();
+        dialog.getWindow().setBackgroundDrawableResource(R.color.transparent);
+
+        TextView titleTv = (TextView) dialogView.findViewById(R.id.title);
+        TextView messageTv = (TextView) dialogView.findViewById(R.id.message);
+        ImageView cancel = (ImageView) dialogView.findViewById(R.id.cancel);
+        Button singleOk = (Button) dialogView.findViewById(R.id.single_ok_btn);
+        Button doubleOk = (Button) dialogView.findViewById(R.id.double_ok_btn);
+        Button cancelBtn = (Button) dialogView.findViewById(R.id.cancel_btn);
+
+
+        titleTv.setText(title);
+        messageTv.setText(message);
+
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+        cancelBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+
+        boolean isTwoButtonDialog = buttonText.length == 2 ? true : false;
+        DialogAndButton dialogAndButton = new DialogAndButton();
+        dialogAndButton.dialog = dialog;
+
+        if (isTwoButtonDialog) {
+            dialogView.findViewById(R.id.single_ok_btn).setVisibility(View.GONE);
+            dialogView.findViewById(R.id.double_btn).setVisibility(View.VISIBLE);
+            doubleOk.setText(buttonText[1]);
+            cancelBtn.setText(buttonText[0]);
+            dialogAndButton.okBtn = doubleOk;
+        } else {
+            dialogView.findViewById(R.id.single_ok_btn).setVisibility(View.VISIBLE);
+            dialogView.findViewById(R.id.double_btn).setVisibility(View.GONE);
+            singleOk.setText(buttonText[0]);
+            singleOk.setTag(Constants.POPUP_DIALOG_OK_BUTTON_TAG);
+            dialogAndButton.okBtn = singleOk;
+        }
+        //get R.id.single_ok_btn reference for ok button when single button dialog
+        // and R.id.double_ok_btn reference for ok button for two button dialog
+        dialog.show();
+
+        return dialogAndButton;
     }
 
     /*private Location getLastKnownLocation() {

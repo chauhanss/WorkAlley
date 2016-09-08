@@ -32,4 +32,5 @@
     <string name="pincode">Pincode</string>
     <string name="country">Country</string>
     <string name="continue_text">Continue</string>
+    <string name="ok">OK</string>
 </resources>
