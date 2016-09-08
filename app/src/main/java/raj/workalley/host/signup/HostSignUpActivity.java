@@ -46,12 +46,12 @@ public class HostSignUpActivity extends BaseActivity {
         amenitiesRecyclerView.setItemAnimator(new DefaultItemAnimator());
         amenitiesRecyclerView.setAdapter(mAdapter);
 
-        RecyclerView imageRecyclerView = (RecyclerView) findViewById(R.id.image_list);
+       /* RecyclerView imageRecyclerView = (RecyclerView) findViewById(R.id.image_list);
         List<ImageItem> imageList = getImageList();
         imageListAdapter = new ImageListAdapter(imageList);
         imageRecyclerView.setLayoutManager(mLayoutManager);
         imageRecyclerView.setItemAnimator(new DefaultItemAnimator());
-        imageRecyclerView.setAdapter(imageListAdapter);
+        imageRecyclerView.setAdapter(imageListAdapter);*/
 
 
         continueBtn.setOnClickListener(new View.OnClickListener() {
