@@ -42,7 +42,8 @@
                     android:id="@+id/user_sign_up"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:tag="USER_SIGN_UP">
 
                     <include layout="@layout/layout_user_signup" />
                 </LinearLayout>
@@ -51,7 +52,8 @@
                     android:id="@+id/host_sign_up"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:tag="HOST_SIGN_UP">
 
                     <include layout="@layout/layout_host_sign_up" />
                 </LinearLayout>

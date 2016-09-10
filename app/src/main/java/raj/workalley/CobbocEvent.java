@@ -6,6 +6,8 @@ package raj.workalley;
 public class CobbocEvent {
     public static final int LOGIN = 1;
     public static final int SIGNUP = 2;
+    public static final int GET_USER_DETAILS = 3;
+    public static final int GET_HOST_DETAILS = 4;
 
     private boolean STATUS;
 
@@ -36,7 +38,6 @@ public class CobbocEvent {
     public boolean getStatus() {
         return STATUS;
     }
-
 
 
     public int getType() {

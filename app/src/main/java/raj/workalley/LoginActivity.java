@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
+import org.json.JSONObject;
 
 import raj.workalley.host.HomeActivity;
 import raj.workalley.user.fresh.offers.OfferActivity;
@@ -42,16 +43,17 @@ public class LoginActivity extends BaseActivity {
         mLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mUserName.getText().toString().equalsIgnoreCase("user")) {
+             /*   if (mUserName.getText().toString().equalsIgnoreCase("user")) {
                     Intent intent = new Intent(LoginActivity.this, raj.workalley.user.fresh.HomeActivity.class);
                     startActivity(intent);
                 } else if (mUserName.getText().toString().equalsIgnoreCase("host")) {
                     Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
                     startActivity(intent);
-                }
-                /*if (isEmailFormat(mUserName) && Helper.isConnected(mContext)) {
+                }  */
+                if (isEmailFormat(mUserName) && Helper.isConnected(mContext)) {
                     makeLoginCall();
-                }*/
+                } else
+                    Toast.makeText(mContext, "No internet", Toast.LENGTH_LONG).show();
             }
         });
 
@@ -75,7 +77,7 @@ public class LoginActivity extends BaseActivity {
     }
 
     private void initializeLayouts() {
-         mLogin = (Button) findViewById(R.id.login_button);
+        mLogin = (Button) findViewById(R.id.login_button);
         mCreateNewAccount = (TextView) findViewById(R.id.create_new_account);
         mPassword = (EditText) findViewById(R.id.password);
         mUserName = (EditText) findViewById(R.id.user_name);
@@ -142,13 +144,19 @@ public class LoginActivity extends BaseActivity {
                 Helper.dismissProgressDialog();
                 if (event.getStatus()) {
 
+                    JSONObject jsonObject = (JSONObject) event.getValue();
+                    UserInfo parsedResponse = (UserInfo) Session.getInstance(mContext).getParsedResponseFromGSON(jsonObject, Session.workAlleyModels.UserInfo);
 
+                    Session.getInstance(mContext).setUser(parsedResponse);
+
+                    mSession.getUserWorkspaceData(mSession.getUser().get_id());
                     Intent intent = new Intent(LoginActivity.this, OfferActivity.class);
                     startActivity(intent);
                     finish();
                 } else {
                     Toast.makeText(mContext, "Not able to login. Please check your details.", Toast.LENGTH_LONG).show();
                 }
+                break;
         }
     }
 

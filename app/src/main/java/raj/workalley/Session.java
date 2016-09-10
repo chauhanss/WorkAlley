@@ -15,6 +15,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import org.apache.http.conn.ConnectTimeoutException;
 import org.greenrobot.eventbus.EventBus;
@@ -41,16 +42,7 @@ public class Session {
     private final SessionData mSessionData = new SessionData();
 
     public enum workAlleyModels {
-        CCUserInfo,
-        CCUserPreferences,
-        CCCSRFToken,
-        CCCardDetails,
-        CCTransactionHistoryDetails,
-        CCLastBillSummary,
-        CCUserLogin,
-        CCDashboardData,
-        CCNetBanking,
-        CCTransactionHistoryList
+        UserInfo,
     }
 
 
@@ -69,76 +61,32 @@ public class Session {
 
     private class SessionData {
 
-        private String userName, token, customerId = null;
-        private String mobile = null;
+        private UserInfo user;
 
         public SessionData() {
             reset();
         }
 
-        private String getUserName() {
-            return userName;
+        public UserInfo getUser() {
+            return user;
         }
 
-        private void setUserName(String name) {
-            this.userName = name;
+        public void setUser(UserInfo user) {
+            this.user = user;
         }
-
-        private String getMobile() {
-            return mobile;
-        }
-
-        private void setMobile(String mobileNumber) {
-            this.mobile = mobileNumber;
-        }
-
-        private String getCustomerId() {
-            return customerId;
-        }
-
-        private void setCustomerId(String customerId) {
-            this.customerId = customerId;
-        }
-
-        private String getToken() {
-            return token;
-        }
-
-        private void setToken(String tokenValue) {
-            this.token = tokenValue;
-        }
-
 
         private void reset() {
-            token = null;
-            customerId = null;
+            user = null;
         }
     }
 
-    public String getToken() {
-        return mSessionData.getToken();
+    public void setUser(UserInfo userInfo) {
+        mSessionData.setUser(userInfo);
     }
 
-    public void setUserId(String user) {
-        mSessionData.setUserName(user);
+    public UserInfo getUser() {
+        return mSessionData.getUser();
     }
-
-    public String getUserId() {
-        return mSessionData.getUserName();
-    }
-
-
-    /**
-     * Get the cached login state
-     */
-    public boolean isLoggedIn() {
-        return getToken() != null;
-    }
-
-    public void setToken(String token) {
-        mSessionData.setToken(token);
-    }
-
 
     public void reset() {
         mSessionData.reset();
@@ -199,7 +147,10 @@ public class Session {
         Gson gson = new Gson();
         Object fromJson = null;
         switch (type) {
-            case CCUserLogin:
+            case UserInfo:
+                classType = new TypeToken<UserInfo>() {
+                }.getType();
+                fromJson = (UserInfo) gson.fromJson(jsonObject.toString(), classType);
                 break;
         }
         return fromJson;
@@ -228,7 +179,48 @@ public class Session {
         }
 
         JsonObjectRequest myRequest = new JsonObjectRequest
-                (Request.Method.POST, getAbsoluteUrl(url), params, new com.android.volley.Response
+                (method, getAbsoluteUrl(url), params, new com.android.volley.Response
+                        .Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Log.e(TAG, response + "");
+                        runSuccessOnHandlerThread(task, response);
+                    }
+                }, new com.android.volley.Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.e(TAG, error.getMessage() + "");
+                        runErrorOnHandlerThread(task, error);
+                    }
+                }) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<String, String>();
+                headers.put("Content-Type", "application/json");
+                return headers;
+            }
+        };
+        myRequest.setShouldCache(false);
+        myRequest.setRetryPolicy(new DefaultRetryPolicy(30000,
+                        DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                        DefaultRetryPolicy.DEFAULT_BACKOFF_MULT)
+
+        );
+
+        addToRequestQueue(myRequest);
+
+        start = System.currentTimeMillis();
+
+    }
+
+    public void getFetch(final String url, String params, final Task task, final int method) {
+
+        if (Constants.DEBUG) {
+            Log.d("PayU", "SdkSession.postFetch: " + url + " " + params + " " + method);
+        }
+
+        JsonObjectRequest myRequest = new JsonObjectRequest
+                (method, getAbsoluteUrl(url), params, new com.android.volley.Response
                         .Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
@@ -250,12 +242,9 @@ public class Session {
             }
         };
         myRequest.setShouldCache(false);
-        myRequest.setRetryPolicy(new
-
-                DefaultRetryPolicy(
-                30000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT)
+        myRequest.setRetryPolicy(new DefaultRetryPolicy(30000,
+                        DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                        DefaultRetryPolicy.DEFAULT_BACKOFF_MULT)
 
         );
 
@@ -266,12 +255,15 @@ public class Session {
     }
 
 
-    public void signUpUserApi(String email, String name, String password) {
+    public void signUpApi(String email, String name, String password, final boolean isHost) {
         JSONObject params = new JSONObject();
         try {
             params.put(Constants.EMAIL, email);
             params.put(Constants.PASSWORD, password);
             params.put(Constants.NAME, name);
+
+            if (isHost)
+                params.put(Constants.ROLE, "PROVIDER");
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -283,12 +275,8 @@ public class Session {
             @Override
             public void onSuccess(JSONObject jsonObject) {
                 try {
-                    int status = jsonObject.getInt(Constants.STATUS);
-                    if (status < 0) {
-                        eventBus.post(new CobbocEvent(CobbocEvent.SIGNUP, false, jsonObject));
-                    } else {
-                        eventBus.post(new CobbocEvent(CobbocEvent.SIGNUP, true, jsonObject));
-                    }
+                    jsonObject.put("isProvider", isHost);
+                    eventBus.post(new CobbocEvent(CobbocEvent.SIGNUP, true, jsonObject));
                 } catch (JSONException e) {
                     eventBus.post(new CobbocEvent(CobbocEvent.SIGNUP, false));
                 }
@@ -345,6 +333,61 @@ public class Session {
             }
         }, Request.Method.POST);
 
+    }
+
+    public void getUserWorkspaceData(String userId) {
+
+        String getRequestUrl = "requests?user=" + userId;
+
+        getFetch(getRequestUrl, null, new Task() {
+
+            @Override
+            public void onSuccess(JSONObject jsonObject) {
+                eventBus.post(new CobbocEvent(CobbocEvent.GET_USER_DETAILS, true, jsonObject));
+            }
+
+            @Override
+            public void onSuccess(String response) {
+
+            }
+
+            @Override
+            public void onError(Throwable throwable) {
+                eventBus.post(new CobbocEvent(CobbocEvent.GET_USER_DETAILS, false, "An error occurred while trying to login. Please try again later."));
+            }
+
+            @Override
+            public void onProgress(int percent) {
+
+            }
+        }, Request.Method.GET);
+    }
+
+    public void getHostWorkspaceData(String userId) {
+        String getRequestUrl = "spaces?owner=" + userId;
+
+        getFetch(getRequestUrl, null, new Task() {
+
+            @Override
+            public void onSuccess(JSONObject jsonObject) {
+                eventBus.post(new CobbocEvent(CobbocEvent.GET_HOST_DETAILS, true, jsonObject));
+            }
+
+            @Override
+            public void onSuccess(String response) {
+
+            }
+
+            @Override
+            public void onError(Throwable throwable) {
+                eventBus.post(new CobbocEvent(CobbocEvent.GET_HOST_DETAILS, false, "An error occurred while trying to login. Please try again later."));
+            }
+
+            @Override
+            public void onProgress(int percent) {
+
+            }
+        }, Request.Method.GET);
     }
 
 
