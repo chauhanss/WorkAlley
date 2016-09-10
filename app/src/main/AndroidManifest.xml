@@ -44,6 +44,7 @@
         <activity android:name=".host.signup.HostSignUpActivity"></activity>
         <activity android:name=".user.fresh.offers.OfferActivity"></activity>
         <activity android:name=".user.fresh.host_details.HostDetailsActivity"></activity>
+        <activity android:name=".OTPActivity"></activity>
 
         <service android:name=".Notification.GcmTokenRefreshListenerService">
             <intent-filter>

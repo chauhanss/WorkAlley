@@ -11,8 +11,10 @@ import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
+import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -179,7 +181,7 @@ public class Session {
         }
 
         JsonObjectRequest myRequest = new JsonObjectRequest
-                (method, getAbsoluteUrl(url), params, new com.android.volley.Response
+                (Request.Method.POST, getAbsoluteUrl(url), params, new com.android.volley.Response
                         .Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
@@ -196,7 +198,7 @@ public class Session {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 HashMap<String, String> headers = new HashMap<String, String>();
-                headers.put("Content-Type", "application/json");
+                headers.put("Content-Type", "application/json; charset=utf-8");
                 return headers;
             }
         };
@@ -212,6 +214,59 @@ public class Session {
         start = System.currentTimeMillis();
 
     }
+
+    public void postFetch2(final String url, final Map<String, String> params, final Task task, final int method) {
+
+        if (Constants.DEBUG) {
+            Log.d(TAG, "SdkSession.postFetch: " + url + " " + params + " " + method);
+        }
+        StringRequest myRequest = new StringRequest(method, getAbsoluteUrl(url), new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+
+                Log.d(TAG, "SdkSession.postFetch: " + "success");
+                try {
+
+                    JSONObject object = new JSONObject(response);
+                    runSuccessOnHandlerThread(task, object);
+
+                } catch (JSONException e) {
+                    onFailure(e.getMessage(), e);
+                }
+            }
+
+            public void onFailure(String msg, Throwable e) {
+                runErrorOnHandlerThread(task, e);
+            }
+
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d(TAG, "SdkSession.postFetch: " + "error");
+                runErrorOnHandlerThread(task, error);
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() {
+                return params;
+            }
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<String, String>();
+                headers.put("Content-Type", "application/json; charset=utf-8");
+                return headers;
+            }
+        };
+        myRequest.setShouldCache(false);
+        myRequest.setRetryPolicy(new DefaultRetryPolicy(
+                30000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        addToRequestQueue(myRequest);
+
+    }
+
 
     public void getFetch(final String url, String params, final Task task, final int method) {
 

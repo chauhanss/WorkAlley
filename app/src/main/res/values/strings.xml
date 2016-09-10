@@ -33,4 +33,9 @@
     <string name="country">Country</string>
     <string name="continue_text">Continue</string>
     <string name="ok">OK</string>
+    <string name="otp_text">OTP is send to your email</string>
+    <string name="proceed">Proceed</string>
+    <string name="logout">Logout</string>
+    <string name="number_of_seat">Number of seat</string>
+    <string name="save">Save</string>
 </resources>

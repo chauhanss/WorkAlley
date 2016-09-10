@@ -14,11 +14,16 @@ import raj.workalley.R;
  */
 public class SettingFragment extends Fragment {
 
+    public static SettingFragment newInstance() {
+        SettingFragment fragment = new SettingFragment();
+        return fragment;
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
-        View v = inflater.inflate(R.layout.activity_host_details, null);
+        View v = inflater.inflate(R.layout.fragment_host_settings, null);
         return v;
     }
 }
