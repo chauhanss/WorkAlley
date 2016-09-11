@@ -3,7 +3,6 @@ package raj.workalley;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -46,7 +45,6 @@ public class Session {
     public enum workAlleyModels {
         UserInfo,
     }
-
 
     private Session(Context context) {
         eventBus = EventBus.getDefault();
@@ -174,14 +172,14 @@ public class Session {
         });
     }
 
-    public void postFetch(final String url, JSONObject params, final Task task, final int method) {
+    public void postFetch(final String url, HashMap params, final Task task, final int method) {
 
         if (Constants.DEBUG) {
             Log.d("PayU", "SdkSession.postFetch: " + url + " " + params + " " + method);
         }
 
         JsonObjectRequest myRequest = new JsonObjectRequest
-                (Request.Method.POST, getAbsoluteUrl(url), params, new com.android.volley.Response
+                (Request.Method.POST, getAbsoluteUrl(url), new JSONObject(params), new com.android.volley.Response
                         .Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
@@ -198,14 +196,15 @@ public class Session {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 HashMap<String, String> headers = new HashMap<String, String>();
-                headers.put("Content-Type", "application/json; charset=utf-8");
+                headers.put("Content-Type", "application/json");
                 return headers;
             }
+
         };
         myRequest.setShouldCache(false);
         myRequest.setRetryPolicy(new DefaultRetryPolicy(30000,
-                        DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                        DefaultRetryPolicy.DEFAULT_BACKOFF_MULT)
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT)
 
         );
 
@@ -298,8 +297,8 @@ public class Session {
         };
         myRequest.setShouldCache(false);
         myRequest.setRetryPolicy(new DefaultRetryPolicy(30000,
-                        DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                        DefaultRetryPolicy.DEFAULT_BACKOFF_MULT)
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT)
 
         );
 
@@ -311,17 +310,13 @@ public class Session {
 
 
     public void signUpApi(String email, String name, String password, final boolean isHost) {
-        JSONObject params = new JSONObject();
-        try {
+        HashMap<String,String> params = new HashMap<>();
             params.put(Constants.EMAIL, email);
             params.put(Constants.PASSWORD, password);
             params.put(Constants.NAME, name);
 
             if (isHost)
                 params.put(Constants.ROLE, "PROVIDER");
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
 
         //final Map params = new HashMap<>();
 
@@ -355,13 +350,9 @@ public class Session {
     }
 
     public void login(String userName, String password) {
-        JSONObject params = new JSONObject();
-        try {
-            params.put(Constants.EMAIL, userName);
-            params.put(Constants.PASSWORD, password);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        HashMap<String, String> params = new HashMap<>();
+        params.put(Constants.EMAIL, userName);
+        params.put(Constants.PASSWORD, password);
 
         //final Map params = new HashMap<>();
 
