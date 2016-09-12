@@ -3,15 +3,11 @@ package raj.workalley;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TabHost;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import org.greenrobot.eventbus.EventBus;
@@ -19,8 +15,12 @@ import org.greenrobot.eventbus.Subscribe;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+
 import raj.workalley.host.HomeActivity;
 import raj.workalley.host.signup.HostSignUpActivity;
+
+import raj.workalley.user.fresh.UserInfo;
+
 import raj.workalley.user.fresh.offers.OfferActivity;
 import raj.workalley.util.Helper;
 

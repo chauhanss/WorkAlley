@@ -32,10 +32,10 @@
             android:background="@color/transparent"
             android:focusableInTouchMode="true"
             android:fontFamily="@string/font_roboto_light"
-            android:textSize="@dimen/text_size_16"
             android:hint="Search your comfort zone"
             android:textColor="@color/colorPrimaryDark"
-            android:textColorHint="@color/colorPrimary" />
+            android:textColorHint="@color/colorPrimary"
+            android:textSize="@dimen/text_size_16" />
     </android.support.v7.widget.CardView>
 
 </RelativeLayout>

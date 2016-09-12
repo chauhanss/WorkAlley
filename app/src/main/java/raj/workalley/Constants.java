@@ -34,4 +34,6 @@ public class Constants {
     public static final String LOCATION = "loc";
     public static final String ADDRESS = "address";
     public static final String OWNER = "owner";
+
+    public static final String WORKSPACE_ID = "workspace_id";
 }

@@ -1,5 +1,6 @@
 package raj.workalley.host.signup;
 
+import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -11,6 +12,9 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 import org.greenrobot.eventbus.EventBus;
@@ -18,6 +22,7 @@ import org.greenrobot.eventbus.Subscribe;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import raj.workalley.BaseActivity;
@@ -25,7 +30,6 @@ import raj.workalley.CobbocEvent;
 import raj.workalley.Constants;
 import raj.workalley.R;
 import raj.workalley.Session;
-import raj.workalley.UserInfo;
 import raj.workalley.host.HomeActivity;
 import raj.workalley.user.fresh.offers.OfferActivity;
 import raj.workalley.user.fresh.offers.OfferDummyItem;
@@ -59,6 +63,44 @@ public class HostSignUpActivity extends BaseActivity {
         amenitiesRecyclerView.setItemAnimator(new DefaultItemAnimator());
         amenitiesRecyclerView.setAdapter(mAdapter);
 
+        findViewById(R.id.from_wrapper).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Calendar mcurrentTime = Calendar.getInstance();
+                int hour = mcurrentTime.get(Calendar.HOUR_OF_DAY);
+                int minute = mcurrentTime.get(Calendar.MINUTE);
+                TimePickerDialog mTimePicker;
+                mTimePicker = new TimePickerDialog(HostSignUpActivity.this, new TimePickerDialog.OnTimeSetListener() {
+                    @Override
+                    public void onTimeSet(TimePicker timePicker, int selectedHour, int selectedMinute) {
+                        ((TextView) findViewById(R.id.from_time)).setText(selectedHour + ":" + selectedMinute);
+                    }
+                }, hour, minute, true);//Yes 24 hour time
+                mTimePicker.setTitle("Select From Time");
+                mTimePicker.show();
+
+            }
+        });
+
+        findViewById(R.id.to_wrapper).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Calendar mcurrentTime = Calendar.getInstance();
+                int hour = mcurrentTime.get(Calendar.HOUR_OF_DAY);
+                int minute = mcurrentTime.get(Calendar.MINUTE);
+                TimePickerDialog mTimePicker;
+                mTimePicker = new TimePickerDialog(HostSignUpActivity.this, new TimePickerDialog.OnTimeSetListener() {
+                    @Override
+                    public void onTimeSet(TimePicker timePicker, int selectedHour, int selectedMinute) {
+                        ((TextView) findViewById(R.id.to_time)).setText(selectedHour + ":" + selectedMinute);
+                    }
+                }, hour, minute, true);//Yes 24 hour time
+                mTimePicker.setTitle("Select To Time");
+                mTimePicker.show();
+
+            }
+        });
+
        /* RecyclerView imageRecyclerView = (RecyclerView) findViewById(R.id.image_list);
         List<ImageItem> imageList = getImageList();
         imageListAdapter = new ImageListAdapter(imageList);
@@ -71,10 +113,47 @@ public class HostSignUpActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
                 //Toast.makeText(getApplicationContext(), mAdapter.getSelectedItem().size() + " ", Toast.LENGTH_LONG).show();
-                makeCreateWorkSpaceApiCall();
+                String[] address = getAddress();
+                List<String> amenities = mAdapter.getSelectedItem();
+                String to = ((TextView) findViewById(R.id.to_time)).getText().toString();
+                String from = ((TextView) findViewById(R.id.from_time)).getText().toString();
+                if (goodToGo(address, amenities))
+                    makeCreateWorkSpaceApiCall();
+                else
+                    Toast.makeText(getApplicationContext(), "Review Details", Toast.LENGTH_LONG).show();
             }
         });
 
+
+    }
+
+    private boolean goodToGo(String[] address, List<String> amenities) {
+        if (amenities.size() == 0)
+            return false;
+
+        if (((TextView) findViewById(R.id.workspace_name)).getText().toString().equals(""))
+            return false;
+
+        if (((TextView) findViewById(R.id.number_of_seat)).getText().toString().equals(""))
+            return false;
+
+        for (int i = 0; i < address.length; i++) {
+            if (address[i].equals(""))
+                return false;
+        }
+
+
+        return true;
+    }
+
+    private String[] getAddress() {
+        String[] address = new String[5];
+        address[0] = ((EditText) findViewById(R.id.address1)).getText().toString();
+        address[1] = ((EditText) findViewById(R.id.address2)).getText().toString();
+        address[2] = ((EditText) findViewById(R.id.state)).getText().toString();
+        address[3] = ((EditText) findViewById(R.id.city)).getText().toString();
+        address[4] = ((EditText) findViewById(R.id.pincode)).getText().toString();
+        return address;
     }
 
     @Override
