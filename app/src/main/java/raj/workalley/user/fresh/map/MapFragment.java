@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -18,9 +19,22 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.logging.Handler;
+
 import raj.workalley.BaseFragment;
+import raj.workalley.CobbocEvent;
+import raj.workalley.Constants;
 import raj.workalley.R;
+import raj.workalley.Session;
+import raj.workalley.WorkspaceList;
 import raj.workalley.user.fresh.host_details.HostDetailsActivity;
+import raj.workalley.util.Helper;
 
 /**
  * Created by vishal.raj on 9/5/16.
@@ -30,7 +44,9 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback, Loc
     Context mContext;
     private GoogleMap mMap;
     private String destination = "random";
-    private LatLng latLng = new LatLng(-34.8799074, 174.7565664);
+    private LatLng latLng = new LatLng(12.9539974, 77.6309394);
+    private Session mSession;
+    HashMap<String, String> mMarkersMap = new HashMap<String, String>();
 
     public static MapFragment newInstance() {
         MapFragment fragment = new MapFragment();
@@ -40,7 +56,6 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback, Loc
     @Override
     public void onStart() {
         super.onStart();
-        mContext = getActivity();
     }
 
     @Nullable
@@ -52,6 +67,12 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback, Loc
         SupportMapFragment mapFragment = (SupportMapFragment) this.getChildFragmentManager().findFragmentById(R.id.map_1);
         mapFragment.getMapAsync(this);
 
+        if (Helper.isConnected(mContext)) {
+            Helper.showProgressDialogSpinner(mContext, "Please Wait", "Connecting to server", false);
+            mSession.getAllActiveWorkspace();
+        } else
+            Toast.makeText(mContext, "No internet", Toast.LENGTH_LONG).show();
+
         return v;
     }
 
@@ -61,14 +82,67 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback, Loc
         mMap.getUiSettings().setMapToolbarEnabled(true);
         mMap.clear();
         mMap.setOnMarkerClickListener(this);
+        mMap.getUiSettings().setZoomControlsEnabled(true);
+        mMap.getUiSettings().setZoomGesturesEnabled(true);
+
+        mMap.setOnMarkerClickListener(this);
+
         if (latLng != null) {
-            if (destination != null && !destination.isEmpty()) {
-                mMap.addMarker(new MarkerOptions().position(latLng).title(destination));
-            }
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 14));
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 10));
         } else {
             //error
         }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (EventBus.getDefault().isRegistered(this)) {
+            EventBus.getDefault().unregister(this);
+        }
+    }
+
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (!EventBus.getDefault().isRegistered(this)) {
+            EventBus.getDefault().register(this);
+        }
+    }
+
+    private void setWorkspaceDataOnMap() {
+        mMap.clear();
+        WorkspaceList workspaceList = Session.getInstance(mContext).getWorkspaces();
+
+        if (workspaceList.getWorkspaceData() != null && workspaceList.getWorkspaceData().size() > 0) {
+            int i = 0;
+            for (final WorkspaceList.Workspace workspace : workspaceList.getWorkspaceData()) {
+
+                WorkspaceList.Address workspaceAddress = workspace.getAddress();
+                if (workspaceAddress != null && workspaceAddress.getLoc().size() == 2) {
+                    //          LatLng latLng = new LatLng(workspaceAddress.getLoc().get(0), workspaceAddress.getLoc().get(1));
+                    /**
+                     * get(0) field is longitude
+                     * get(1) filed is latitude
+                     */
+                    LatLng latLng = new LatLng(dummyLocationList().get(i).get(1), dummyLocationList().get(i).get(0));
+                    createMarker(dummyLocationList().get(i).get(0), dummyLocationList().get(i).get(1), workspace.getName(), workspace.getAddress().getState() + " " + workspace.getAddress().getCity(), workspace.get_id());
+                    i++;
+                }
+            }
+        }
+    }
+
+    public void createMarker(double latitude, double longitude, String title, String snippet, String workspaceId) {
+
+        Marker marker = mMap.addMarker(new MarkerOptions()
+                .position(new LatLng(latitude, longitude))
+                .anchor(0.5f, 0.5f)
+                .title(title)
+                .snippet(snippet));
+        marker.showInfoWindow();
+        mMarkersMap.put(marker.getId(), workspaceId);
     }
 
     @Override
@@ -77,11 +151,63 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback, Loc
     }
 
     @Override
-    public boolean onMarkerClick(Marker marker) {
-        if (marker.getTitle().equals(destination)) {
-            Intent intent = new Intent(getActivity(), HostDetailsActivity.class);
-            startActivity(intent);
-        }
+    public boolean onMarkerClick(final Marker marker) {
+
+        marker.showInfoWindow();
+
+        final android.os.Handler handler = new android.os.Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+
+                Intent intent = new Intent(getActivity(), HostDetailsActivity.class);
+                intent.putExtra(Constants.WORKSPACE_ID, mMarkersMap.get(marker.getId()));
+                startActivity(intent);
+            }
+        }, 500);
         return false;
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        mContext = context;
+        mSession = Session.getInstance(mContext);
+    }
+
+    @Subscribe
+    public void onEventMainThread(CobbocEvent event) {
+        switch (event.getType()) {
+            case CobbocEvent.GET_ALL_WORKSPACES: {
+                Helper.dismissProgressDialog();
+                if (event.getStatus()) {
+                    JSONObject jsonObject = (JSONObject) event.getValue();
+                    WorkspaceList parsedWorkspaceResponse = (WorkspaceList) Session.getInstance(mContext).getParsedResponseFromGSON(jsonObject, Session.workAlleyModels.Workspaces);
+                    mSession.setWorkspaces(parsedWorkspaceResponse);
+
+                    setWorkspaceDataOnMap();
+                    break;
+                }
+            }
+        }
+    }
+
+    public HashMap<Integer, ArrayList<Double>> dummyLocationList() {
+
+        HashMap<Integer, ArrayList<Double>> hashMap = new HashMap<>();
+
+        ArrayList<Double> arrayList = new ArrayList<>();
+        arrayList.add(12.9583888);
+        arrayList.add(77.6789617);
+
+        hashMap.put(0, arrayList);
+
+        ArrayList<Double> arrayList2 = new ArrayList<>();
+        arrayList2.add(13.0555923);
+        arrayList2.add(77.643937);
+
+        hashMap.put(1, arrayList2);
+
+        return hashMap;
     }
 }

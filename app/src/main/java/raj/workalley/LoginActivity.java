@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
-import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -16,7 +15,7 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.json.JSONObject;
 
-import raj.workalley.host.HomeActivity;
+import raj.workalley.user.fresh.UserInfo;
 import raj.workalley.user.fresh.offers.OfferActivity;
 import raj.workalley.util.Helper;
 
@@ -157,8 +156,15 @@ public class LoginActivity extends BaseActivity {
                     Toast.makeText(mContext, "Not able to login. Please check your details.", Toast.LENGTH_LONG).show();
                 }
                 break;
+            case CobbocEvent.GET_USER_DETAILS:
+                Helper.dismissProgressDialog();
+                if (event.getStatus()) {
+                    Toast.makeText(mContext, "Details fetched successfully.", Toast.LENGTH_LONG).show();
+
+                } else {
+                    Toast.makeText(mContext, "Details not fetched.", Toast.LENGTH_LONG).show();
+                }
+                break;
         }
     }
-
-
 }

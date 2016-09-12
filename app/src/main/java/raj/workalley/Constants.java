@@ -25,4 +25,5 @@ public class Constants {
     public static final String ROLE = "role";
     public static final String USER = "USER";
     public static final String PROVIDER = "PROVIDER";
+    public static final String WORKSPACE_ID = "workspace_id";
 }

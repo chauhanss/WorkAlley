@@ -28,6 +28,8 @@ import java.net.SocketTimeoutException;
 import java.util.HashMap;
 import java.util.Map;
 
+import raj.workalley.user.fresh.UserInfo;
+
 /**
  * Created by vishal.raj on 9/5/16.
  */
@@ -44,6 +46,7 @@ public class Session {
 
     public enum workAlleyModels {
         UserInfo,
+        Workspaces,
     }
 
     private Session(Context context) {
@@ -62,6 +65,7 @@ public class Session {
     private class SessionData {
 
         private UserInfo user;
+        private WorkspaceList workspaceList;
 
         public SessionData() {
             reset();
@@ -78,6 +82,14 @@ public class Session {
         private void reset() {
             user = null;
         }
+
+        public WorkspaceList getWorkspaceList() {
+            return workspaceList;
+        }
+
+        public void setWorkspaceList(WorkspaceList workspaceList) {
+            this.workspaceList = workspaceList;
+        }
     }
 
     public void setUser(UserInfo userInfo) {
@@ -86,6 +98,14 @@ public class Session {
 
     public UserInfo getUser() {
         return mSessionData.getUser();
+    }
+
+    public void setWorkspaces(WorkspaceList workpsace) {
+        mSessionData.setWorkspaceList(workpsace);
+    }
+
+    public WorkspaceList getWorkspaces() {
+        return mSessionData.getWorkspaceList();
     }
 
     public void reset() {
@@ -152,6 +172,11 @@ public class Session {
                 }.getType();
                 fromJson = (UserInfo) gson.fromJson(jsonObject.toString(), classType);
                 break;
+            case Workspaces:
+                classType = new TypeToken<WorkspaceList>() {
+                }.getType();
+                fromJson = (WorkspaceList) gson.fromJson(jsonObject.toString(), classType);
+                break;
         }
         return fromJson;
     }
@@ -202,9 +227,9 @@ public class Session {
 
         };
         myRequest.setShouldCache(false);
-        myRequest.setRetryPolicy(new DefaultRetryPolicy(30000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT)
+        myRequest.setRetryPolicy(new DefaultRetryPolicy(60000,
+                        DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                        DefaultRetryPolicy.DEFAULT_BACKOFF_MULT)
 
         );
 
@@ -297,8 +322,8 @@ public class Session {
         };
         myRequest.setShouldCache(false);
         myRequest.setRetryPolicy(new DefaultRetryPolicy(30000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT)
+                        DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                        DefaultRetryPolicy.DEFAULT_BACKOFF_MULT)
 
         );
 
@@ -310,13 +335,13 @@ public class Session {
 
 
     public void signUpApi(String email, String name, String password, final boolean isHost) {
-        HashMap<String,String> params = new HashMap<>();
-            params.put(Constants.EMAIL, email);
-            params.put(Constants.PASSWORD, password);
-            params.put(Constants.NAME, name);
+        HashMap<String, String> params = new HashMap<>();
+        params.put(Constants.EMAIL, email);
+        params.put(Constants.PASSWORD, password);
+        params.put(Constants.NAME, name);
 
-            if (isHost)
-                params.put(Constants.ROLE, "PROVIDER");
+        if (isHost)
+            params.put(Constants.ROLE, "PROVIDER");
 
         //final Map params = new HashMap<>();
 
@@ -436,5 +461,31 @@ public class Session {
         }, Request.Method.GET);
     }
 
+    public void getAllActiveWorkspace() {
+        String getRequestUrl = "spaces";
+
+        getFetch(getRequestUrl, null, new Task() {
+
+            @Override
+            public void onSuccess(JSONObject jsonObject) {
+                eventBus.post(new CobbocEvent(CobbocEvent.GET_ALL_WORKSPACES, true, jsonObject));
+            }
+
+            @Override
+            public void onSuccess(String response) {
+
+            }
+
+            @Override
+            public void onError(Throwable throwable) {
+                eventBus.post(new CobbocEvent(CobbocEvent.GET_ALL_WORKSPACES, false, "An error occurred while trying to login. Please try again later."));
+            }
+
+            @Override
+            public void onProgress(int percent) {
+
+            }
+        }, Request.Method.GET);
+    }
 
 }

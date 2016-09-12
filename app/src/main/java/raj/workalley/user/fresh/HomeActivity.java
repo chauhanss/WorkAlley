@@ -1,5 +1,6 @@
 package raj.workalley.user.fresh;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -8,6 +9,7 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import com.cleveroad.loopbar.adapter.ICategoryItem;
 import com.cleveroad.loopbar.adapter.SimpleCategoriesAdapter;
@@ -15,15 +17,23 @@ import com.cleveroad.loopbar.widget.LoopBarView;
 import com.cleveroad.loopbar.widget.OnItemClickListener;
 import com.cleveroad.loopbar.widget.Orientation;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import raj.workalley.BaseActivity;
+import raj.workalley.CobbocEvent;
 import raj.workalley.R;
+import raj.workalley.Session;
+import raj.workalley.WorkspaceList;
 import raj.workalley.user.fresh.account.AccountFragment;
 import raj.workalley.user.fresh.map.MapFragment;
 import raj.workalley.user.fresh.settings.SettingFragment;
 import raj.workalley.user.fresh.offers.OffersFragment;
+import raj.workalley.util.Helper;
 
 /**
  * Created by vishal.raj on 9/3/16.
@@ -36,6 +46,8 @@ public class HomeActivity extends BaseActivity implements OnItemClickListener {
     private SimpleFragmentStatePagerAdapter pagerAdapter;
 
     private ViewPager viewPager;
+    private Session mSession;
+    private Context mContext;
 
     @Orientation
     private int orientation;
@@ -49,6 +61,8 @@ public class HomeActivity extends BaseActivity implements OnItemClickListener {
         setContentView(R.layout.activity_home_user);
         loopBarView = (LoopBarView) findViewById(R.id.endlessView);
         viewPager = (ViewPager) findViewById(R.id.viewPager);
+        mContext = this;
+        mSession = Session.getInstance(this);
 
         List<ICategoryItem> items = new ArrayList<>();
         items.add(new CategoryItem(R.drawable.ic_map, "Map"));

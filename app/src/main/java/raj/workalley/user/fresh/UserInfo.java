@@ -1,4 +1,4 @@
-package raj.workalley;
+package raj.workalley.user.fresh;
 
 /**
  * Created by shruti.vig on 9/8/16.
