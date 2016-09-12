@@ -15,6 +15,7 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
 
+import raj.workalley.AmenitiesItem;
 import raj.workalley.BaseActivity;
 import raj.workalley.R;
 import raj.workalley.host.HomeActivity;
@@ -70,35 +71,6 @@ public class HostSignUpActivity extends BaseActivity {
     }
 
     public class ImageItem {
-    }
-
-
-    public class AmenitiesItem {
-        String amenitiesName;
-        int amenitiesIcon;
-        boolean active;
-
-        public AmenitiesItem(String amenitiesName, int amenitiesIcon, boolean active) {
-            this.amenitiesName = amenitiesName;
-            this.amenitiesIcon = amenitiesIcon;
-            this.active = active;
-        }
-
-        public String getAmenitiesName() {
-            return amenitiesName;
-        }
-
-        public int getAmenitiesIcon() {
-            return amenitiesIcon;
-        }
-
-        public boolean isActive() {
-            return active;
-        }
-
-        public void setActive(boolean active) {
-            this.active = active;
-        }
     }
 
 

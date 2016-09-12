@@ -19,6 +19,7 @@ public class WorkspaceList implements Serializable {
         String _id, name, owner;
         boolean available;
         Address address;
+        ArrayList<String> amenities;
 
         public String getName() {
             return name;
@@ -38,6 +39,10 @@ public class WorkspaceList implements Serializable {
 
         public Address getAddress() {
             return address;
+        }
+
+        public ArrayList<String> getAmenities() {
+            return amenities;
         }
     }
 
@@ -68,6 +73,11 @@ public class WorkspaceList implements Serializable {
 
         public String getState() {
             return state;
+        }
+
+        public String getFullAddress() {
+            StringBuilder address = new StringBuilder().append(line1).append(" ").append(locality).append(" ").append(city).append(" ").append(state).append(" ").append(pincode.toString());
+            return address.toString();
         }
     }
 

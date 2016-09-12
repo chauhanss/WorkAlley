@@ -11,6 +11,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
+import raj.workalley.AmenitiesItem;
 import raj.workalley.R;
 import raj.workalley.host.signup.HostSignUpActivity;
 import raj.workalley.user.fresh.offers.OfferDummyItem;
@@ -19,9 +20,9 @@ import raj.workalley.user.fresh.offers.OfferDummyItem;
  * Created by vishal.raj on 9/7/16.
  */
 public class AmenitiesListAdapter extends RecyclerView.Adapter<AmenitiesListAdapter.AmenitiesViewHolder> {
-    List<HostSignUpActivity.AmenitiesItem> amenitiesList;
+    List<AmenitiesItem> amenitiesList;
 
-    public AmenitiesListAdapter(List<HostSignUpActivity.AmenitiesItem> amenitiesList) {
+    public AmenitiesListAdapter(List<AmenitiesItem> amenitiesList) {
         this.amenitiesList = amenitiesList;
     }
 
@@ -35,7 +36,7 @@ public class AmenitiesListAdapter extends RecyclerView.Adapter<AmenitiesListAdap
 
     @Override
     public void onBindViewHolder(AmenitiesViewHolder holder, int position) {
-        HostSignUpActivity.AmenitiesItem amenities = amenitiesList.get(position);
+        AmenitiesItem amenities = amenitiesList.get(position);
         holder.name.setText(amenities.getAmenitiesName());
         holder.icon.setBackgroundResource(amenities.getAmenitiesIcon());
 
@@ -65,7 +66,7 @@ public class AmenitiesListAdapter extends RecyclerView.Adapter<AmenitiesListAdap
 
     public List<String> getSelectedItem() {
         List<String> list = new ArrayList<>();
-        for (HostSignUpActivity.AmenitiesItem item : amenitiesList) {
+        for (AmenitiesItem item : amenitiesList) {
             if (item.isActive())
                 list.add(item.getAmenitiesName());
         }
