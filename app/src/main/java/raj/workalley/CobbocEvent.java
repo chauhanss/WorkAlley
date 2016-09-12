@@ -8,7 +8,8 @@ public class CobbocEvent {
     public static final int SIGNUP = 2;
     public static final int GET_USER_DETAILS = 3;
     public static final int GET_HOST_DETAILS = 4;
-    public static final int GET_ALL_WORKSPACES = 5;
+    public static final int CREATE_WORKSPACE = 5;
+    public static final int GET_ALL_WORKSPACES = 6;
 
     private boolean STATUS;
 

@@ -20,6 +20,7 @@ import com.google.gson.reflect.TypeToken;
 
 import org.apache.http.conn.ConnectTimeoutException;
 import org.greenrobot.eventbus.EventBus;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -197,14 +198,14 @@ public class Session {
         });
     }
 
-    public void postFetch(final String url, HashMap params, final Task task, final int method) {
+    public void postFetch(final String url, JSONObject params, final Task task, final int method) {
 
         if (Constants.DEBUG) {
             Log.d("PayU", "SdkSession.postFetch: " + url + " " + params + " " + method);
         }
 
         JsonObjectRequest myRequest = new JsonObjectRequest
-                (Request.Method.POST, getAbsoluteUrl(url), new JSONObject(params), new com.android.volley.Response
+                (Request.Method.POST, getAbsoluteUrl(url), params, new com.android.volley.Response
                         .Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
@@ -228,8 +229,8 @@ public class Session {
         };
         myRequest.setShouldCache(false);
         myRequest.setRetryPolicy(new DefaultRetryPolicy(60000,
-                        DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                        DefaultRetryPolicy.DEFAULT_BACKOFF_MULT)
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT)
 
         );
 
@@ -322,8 +323,8 @@ public class Session {
         };
         myRequest.setShouldCache(false);
         myRequest.setRetryPolicy(new DefaultRetryPolicy(30000,
-                        DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                        DefaultRetryPolicy.DEFAULT_BACKOFF_MULT)
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT)
 
         );
 
@@ -335,13 +336,17 @@ public class Session {
 
 
     public void signUpApi(String email, String name, String password, final boolean isHost) {
-        HashMap<String, String> params = new HashMap<>();
-        params.put(Constants.EMAIL, email);
-        params.put(Constants.PASSWORD, password);
-        params.put(Constants.NAME, name);
+        JSONObject params = new JSONObject();
+        try {
+            params.put(Constants.EMAIL, email);
+            params.put(Constants.PASSWORD, password);
+            params.put(Constants.NAME, name);
+            if (isHost)
+                params.put(Constants.ROLE, "PROVIDER");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
-        if (isHost)
-            params.put(Constants.ROLE, "PROVIDER");
 
         //final Map params = new HashMap<>();
 
@@ -375,9 +380,14 @@ public class Session {
     }
 
     public void login(String userName, String password) {
-        HashMap<String, String> params = new HashMap<>();
-        params.put(Constants.EMAIL, userName);
-        params.put(Constants.PASSWORD, password);
+        JSONObject params = new JSONObject();
+        try {
+            params.put(Constants.EMAIL, userName);
+            params.put(Constants.PASSWORD, password);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
 
         //final Map params = new HashMap<>();
 
@@ -403,6 +413,51 @@ public class Session {
 
             }
         }, Request.Method.POST);
+
+    }
+
+    public void createWorkSpaceApi(String workspaceName, String[] address, int[] loc) {
+        JSONObject params = new JSONObject();
+        try {
+            params.put(Constants.WORKSPACE_NAME, workspaceName);
+
+            JSONObject jsonAddress = new JSONObject();
+            jsonAddress.put(Constants.LINE1, address[0]);
+            jsonAddress.put(Constants.LOCALITY, address[1]);
+            jsonAddress.put(Constants.STATE, address[2]);
+            jsonAddress.put(Constants.CITY, address[3]);
+            jsonAddress.put(Constants.PINCODE, address[4]);
+            jsonAddress.put(Constants.LOCATION, new JSONArray(loc));
+
+            params.put(Constants.ADDRESS, jsonAddress);
+            params.put(Constants.OWNER, getUser().get_id());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        postFetch("api/spaces", params, new Task() {
+
+            @Override
+            public void onSuccess(JSONObject jsonObject) {
+                eventBus.post(new CobbocEvent(CobbocEvent.CREATE_WORKSPACE, true, jsonObject));
+            }
+
+            @Override
+            public void onSuccess(String response) {
+
+            }
+
+            @Override
+            public void onError(Throwable throwable) {
+                eventBus.post(new CobbocEvent(CobbocEvent.CREATE_WORKSPACE, false, "An error occurred while creating workspace. Please try again later."));
+            }
+
+            @Override
+            public void onProgress(int percent) {
+
+            }
+        }, Request.Method.POST);
+
 
     }
 
