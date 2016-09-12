@@ -17,6 +17,7 @@ import org.greenrobot.eventbus.Subscribe;
 import org.json.JSONObject;
 
 import raj.workalley.host.HomeActivity;
+import raj.workalley.host.signup.HostSignUpActivity;
 import raj.workalley.user.fresh.offers.OfferActivity;
 import raj.workalley.util.Helper;
 
@@ -149,10 +150,17 @@ public class LoginActivity extends BaseActivity {
 
                     Session.getInstance(mContext).setUser(parsedResponse);
 
-                    mSession.getUserWorkspaceData(mSession.getUser().get_id());
-                    Intent intent = new Intent(LoginActivity.this, OfferActivity.class);
-                    startActivity(intent);
-                    finish();
+                    if (mSession.getUser().getRole().equalsIgnoreCase(Constants.USER)) {
+                        mSession.getUserWorkspaceData(mSession.getUser().get_id());
+                        Intent intent = new Intent(LoginActivity.this, OfferActivity.class);
+                        startActivity(intent);
+                        finish();
+                    } else if (mSession.getUser().getRole().equalsIgnoreCase(Constants.PROVIDER)) {
+                        mSession.getHostWorkspaceData(mSession.getUser().get_id());
+                        Intent intent = new Intent(LoginActivity.this, HostSignUpActivity.class);
+                        startActivity(intent);
+                        finish();
+                    }
                 } else {
                     Toast.makeText(mContext, "Not able to login. Please check your details.", Toast.LENGTH_LONG).show();
                 }

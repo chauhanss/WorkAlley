@@ -19,6 +19,7 @@ import org.greenrobot.eventbus.Subscribe;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import raj.workalley.host.HomeActivity;
 import raj.workalley.host.signup.HostSignUpActivity;
 import raj.workalley.user.fresh.offers.OfferActivity;
 import raj.workalley.util.Helper;
@@ -171,7 +172,6 @@ public class SignUpActivity extends BaseActivity {
         switch (event.getType()) {
             case CobbocEvent.SIGNUP:
                 if (event.getStatus()) {
-
                     boolean isHost = false;
                     JSONObject response = (JSONObject) event.getValue();
                     if (response != null && response.has("isProvider") && !response.isNull("isProvider")) {
@@ -181,10 +181,7 @@ public class SignUpActivity extends BaseActivity {
                             e.printStackTrace();
                         }
                     }
-
                     makeLoginCall(isHost);
-
-
                 } else {
                     Helper.dismissProgressDialog();
                     Toast.makeText(mContext, "Not able to signUp. Please check your details.", Toast.LENGTH_LONG).show();
@@ -198,16 +195,18 @@ public class SignUpActivity extends BaseActivity {
                     mSession.setUser(parsedResponse);
 
 
-                    if (mSession.getUser().getRole().equalsIgnoreCase(Constants.USER))
+                    if (mSession.getUser().getRole().equalsIgnoreCase(Constants.USER)) {
                         mSession.getUserWorkspaceData(mSession.getUser().get_id());
-
-                    else if (mSession.getUser().getRole().equalsIgnoreCase(Constants.PROVIDER))
+                        Intent intent = new Intent(SignUpActivity.this, OfferActivity.class);
+                        startActivity(intent);
+                        finish();
+                    } else if (mSession.getUser().getRole().equalsIgnoreCase(Constants.PROVIDER)) {
                         mSession.getHostWorkspaceData(mSession.getUser().get_id());
+                        Intent intent = new Intent(SignUpActivity.this, HostSignUpActivity.class);
+                        startActivity(intent);
+                        finish();
+                    }
 
-
-                    Intent intent = new Intent(SignUpActivity.this, OfferActivity.class);
-                    startActivity(intent);
-                    finish();
                 } else {
                     Toast.makeText(mContext, "Not able to login. Please check your details.", Toast.LENGTH_LONG).show();
                 }

@@ -25,4 +25,13 @@ public class Constants {
     public static final String ROLE = "role";
     public static final String USER = "USER";
     public static final String PROVIDER = "PROVIDER";
+    public static final String WORKSPACE_NAME = "name";
+    public static final String LINE1 = "line1";
+    public static final String LOCALITY = "locality";
+    public static final String STATE = "state";
+    public static final String CITY = "city";
+    public static final String PINCODE = "pincode";
+    public static final String LOCATION = "loc";
+    public static final String ADDRESS = "address";
+    public static final String OWNER = "owner";
 }
