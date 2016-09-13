@@ -2,6 +2,9 @@ package raj.workalley.host.signup;
 
 import android.app.TimePickerDialog;
 import android.content.Intent;
+import android.location.Address;
+import android.location.Geocoder;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.view.ActionMode;
@@ -17,10 +20,15 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -48,6 +56,7 @@ public class HostSignUpActivity extends BaseActivity {
     AmenitiesListAdapter mAdapter;
     Session mSession;
     ImageListAdapter imageListAdapter;
+    LatLng latLng;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -116,12 +125,12 @@ public class HostSignUpActivity extends BaseActivity {
                 //Toast.makeText(getApplicationContext(), mAdapter.getSelectedItem().size() + " ", Toast.LENGTH_LONG).show();
                 String[] address = getAddress();
                 List<String> amenities = mAdapter.getSelectedItem();
+                if (goodToGo(address, amenities)) {
+                    new GeocoderTask().execute(address);
+                } else
+                    Toast.makeText(getApplicationContext(), "Review Details", Toast.LENGTH_LONG).show();
                 String to = ((TextView) findViewById(R.id.to_time)).getText().toString();
                 String from = ((TextView) findViewById(R.id.from_time)).getText().toString();
-                if (goodToGo(address, amenities))
-                    makeCreateWorkSpaceApiCall();
-                else
-                    Toast.makeText(getApplicationContext(), "Review Details", Toast.LENGTH_LONG).show();
             }
         });
 
@@ -142,8 +151,6 @@ public class HostSignUpActivity extends BaseActivity {
             if (address[i].equals(""))
                 return false;
         }
-
-
         return true;
     }
 
@@ -175,9 +182,10 @@ public class HostSignUpActivity extends BaseActivity {
     }
 
     private void makeCreateWorkSpaceApiCall() {
-        String[] address = {"hd 111 sector i", "jankipuram", "up", "lucknow", "226021"};
-        int[] loc = {23, 45};
-        mSession.createWorkSpaceApi("xyz", address, loc);
+        //String[] address = {"hd 111 sector i", "jankipuram", "up", "lucknow", "226021"};
+        double[] loc = {latLng.longitude, latLng.latitude};
+        String name = ((TextView) findViewById(R.id.workspace_name)).getText().toString();
+        mSession.createWorkSpaceApi(name, getAddress(), loc);
     }
 
     private List<ImageItem> getImageList() {
@@ -223,6 +231,47 @@ public class HostSignUpActivity extends BaseActivity {
                     Toast.makeText(getApplicationContext(), "Not able to login. Please check your details.", Toast.LENGTH_LONG).show();
                 }
                 break;
+        }
+    }
+
+    private class GeocoderTask extends AsyncTask<String, Void, List<Address>> {
+
+        @Override
+        protected List<Address> doInBackground(String... locationName) {
+            Geocoder geocoder = new Geocoder(getApplicationContext());
+            List<Address> addresses = null;
+
+            try {
+                addresses = geocoder.getFromLocationName(locationName[0], 1);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return addresses;
+        }
+
+        @Override
+        protected void onPostExecute(List<Address> addresses) {
+
+            if (addresses == null || addresses.size() == 0) {
+                Toast.makeText(HostSignUpActivity.this, "No Location Found!", Toast.LENGTH_SHORT);
+            } else {
+
+                //mMap.clear();
+
+                Address address = addresses.get(0);
+
+                latLng = new LatLng(address.getLatitude(), address.getLongitude());
+                makeCreateWorkSpaceApiCall();
+
+                String addressText = String.format("%s, %s",
+                        address.getMaxAddressLineIndex() > 0 ? address.getAddressLine(0) : "",
+                        address.getCountryName());
+
+                // Add a marker in user's location, and move the camera.
+                //mMap.addMarker(new MarkerOptions().position(latLng).title(addressText));
+                //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 14));
+
+            }
         }
     }
 }

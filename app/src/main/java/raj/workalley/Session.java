@@ -25,6 +25,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.lang.reflect.Type;
+import java.net.CookieHandler;
+import java.net.CookieManager;
+import java.net.CookiePolicy;
 import java.net.SocketTimeoutException;
 import java.util.HashMap;
 import java.util.Map;
@@ -126,6 +129,7 @@ public class Session {
     /*Volley Section Start*/
     public RequestQueue getRequestQueue(Context context) {
         if (mRequestQueue == null) {
+            CookieHandler.setDefault(new CookieManager(null, CookiePolicy.ACCEPT_ALL));
             mRequestQueue = Volley.newRequestQueue(context);
         }
         return mRequestQueue;
@@ -416,7 +420,7 @@ public class Session {
 
     }
 
-    public void createWorkSpaceApi(String workspaceName, String[] address, int[] loc) {
+    public void createWorkSpaceApi(String workspaceName, String[] address, double[] loc) {
         JSONObject params = new JSONObject();
         try {
             params.put(Constants.WORKSPACE_NAME, workspaceName);
@@ -430,12 +434,13 @@ public class Session {
             jsonAddress.put(Constants.LOCATION, new JSONArray(loc));
 
             params.put(Constants.ADDRESS, jsonAddress);
-            params.put(Constants.OWNER, getUser().get_id());
+
+            params.put(Constants.OWNER, /*new Gson().toJson(getUser())*/getUser().get_id());
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
-        postFetch("api/spaces", params, new Task() {
+        postFetch("spaces", params, new Task() {
 
             @Override
             public void onSuccess(JSONObject jsonObject) {
