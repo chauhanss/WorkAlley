@@ -36,4 +36,5 @@ public class Constants {
     public static final String OWNER = "owner";
 
     public static final String WORKSPACE_ID = "workspace_id";
+    public static final String DATA = "data";
 }

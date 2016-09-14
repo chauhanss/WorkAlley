@@ -13,6 +13,7 @@ import android.widget.Toast;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 
@@ -159,10 +160,12 @@ public class LoginActivity extends BaseActivity {
                         startActivity(intent);
                         finish();
                     } else if (mSession.getUser().getRole().equalsIgnoreCase(Constants.PROVIDER)) {
+                        Helper.showProgressDialogSpinner(mContext, "Please Wait", "Connecting to server", false);
                         mSession.getHostWorkspaceData(mSession.getUser().get_id());
+                       /* mSession.getHostWorkspaceData(mSession.getUser().get_id());
                         Intent intent = new Intent(LoginActivity.this, HostSignUpActivity.class);
                         startActivity(intent);
-                        finish();
+                       // finish();*/
                     }
                 } else {
                     Toast.makeText(mContext, "Not able to login. Please check your details.", Toast.LENGTH_LONG).show();
@@ -175,6 +178,24 @@ public class LoginActivity extends BaseActivity {
 
                 } else {
                     Toast.makeText(mContext, "Details not fetched.", Toast.LENGTH_LONG).show();
+                }
+                break;
+            case CobbocEvent.GET_HOST_DETAILS:
+                Helper.dismissProgressDialog();
+                if (event.getStatus()) {
+
+                    JSONObject jsonObject = (JSONObject) event.getValue();
+                    try {
+                        if (jsonObject.getJSONArray(Constants.DATA).length()==0) {
+                            Intent intent = new Intent(LoginActivity.this, HostSignUpActivity.class);
+                            startActivity(intent);
+                        } else {
+                            Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
+                            startActivity(intent);
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                 }
                 break;
         }
