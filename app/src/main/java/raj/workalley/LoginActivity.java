@@ -190,6 +190,8 @@ public class LoginActivity extends BaseActivity {
                             Intent intent = new Intent(LoginActivity.this, HostSignUpActivity.class);
                             startActivity(intent);
                         } else {
+                            WorkspaceList parsedResponse = (WorkspaceList) Session.getInstance(mContext).getParsedResponseFromGSON(jsonObject, Session.workAlleyModels.Workspaces);
+                            Session.getInstance(mContext).setWorkspaces(parsedResponse);
                             Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
                             startActivity(intent);
                         }

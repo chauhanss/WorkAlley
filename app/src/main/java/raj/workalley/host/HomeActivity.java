@@ -7,13 +7,21 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.cleveroad.loopbar.adapter.ICategoryItem;
 import com.cleveroad.loopbar.adapter.SimpleCategoriesAdapter;
 import com.cleveroad.loopbar.widget.LoopBarView;
 import com.cleveroad.loopbar.widget.OnItemClickListener;
 import com.cleveroad.loopbar.widget.Orientation;
+import com.github.nkzawa.emitter.Emitter;
+import com.github.nkzawa.socketio.client.IO;
+import com.github.nkzawa.socketio.client.Socket;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,6 +42,31 @@ public class HomeActivity extends BaseActivity implements OnItemClickListener {
     private SimpleFragmentStatePagerAdapter pagerAdapter;
 
     private ViewPager viewPager;
+
+    private Socket mSocket;
+
+    private Emitter.Listener onNewMessage = new Emitter.Listener() {
+        @Override
+        public void call(final Object... args) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    JSONObject data = (JSONObject) args[0];
+                    String username;
+                    String message;
+                    try {
+                        username = data.getString("username");
+                        // message = data.getString("message");
+                    } catch (JSONException e) {
+                        return;
+                    }
+                    Toast.makeText(getApplicationContext(), "here", Toast.LENGTH_LONG).show();
+                    // ((TextView) findViewById(R.id.message_display)).setText(message);
+                }
+            });
+        }
+    };
+
 
     @Orientation
     private int orientation;
@@ -77,6 +110,19 @@ public class HomeActivity extends BaseActivity implements OnItemClickListener {
             }
         });
 
+        try {
+            mSocket = IO.socket("http://app.workalley.in");
+        } catch (URISyntaxException e) {
+        }
+        mSocket.on("BOOKING_REQUESTED", onNewMessage);
+        mSocket.on("BOOKING_ACCEPTED", onNewMessage);
+        mSocket.on("BOOKING_REJECTED", onNewMessage);
+        mSocket.on("BOOKING_CANCELED", onNewMessage);
+        mSocket.on("BOOKING_END_REQUESTED", onNewMessage);
+        mSocket.on("BOOKING_END_CONFIRMED", onNewMessage);
+        mSocket.on("CONNECTED", onNewMessage);
+        mSocket.on("AUTH", onNewMessage);
+        mSocket.connect();
 
     }
 

@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import raj.workalley.user.fresh.UserInfo;
+
 /**
  * Created by shruti.vig on 9/12/16.
  */
@@ -16,9 +18,10 @@ public class WorkspaceList implements Serializable {
     }
 
     public class Workspace implements Serializable {
-        String _id, name, owner;
+        String _id, name;
         boolean available;
         Address address;
+        UserInfo owner;
         ArrayList<String> amenities;
 
         public String getName() {
@@ -29,7 +32,7 @@ public class WorkspaceList implements Serializable {
             return _id;
         }
 
-        public String getOwnerId() {
+        public UserInfo getOwner() {
             return owner;
         }
 

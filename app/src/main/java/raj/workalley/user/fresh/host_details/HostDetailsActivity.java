@@ -6,19 +6,26 @@ import android.support.annotation.Nullable;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import org.greenrobot.eventbus.Subscribe;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import raj.workalley.AmenitiesItem;
 import raj.workalley.BaseActivity;
+import raj.workalley.CobbocEvent;
 import raj.workalley.Constants;
 import raj.workalley.R;
 import raj.workalley.Session;
 import raj.workalley.WorkspaceList;
 import raj.workalley.util.AmenitiesListAdapter;
+import raj.workalley.util.Helper;
 
 /**
  * Created by vishal.raj on 9/7/16.
@@ -28,6 +35,8 @@ public class HostDetailsActivity extends BaseActivity {
     Session mSession;
     Context mContext;
     WorkspaceList.Workspace mWorkspace = null;
+    Button bookSeat;
+    String workspaceId;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -37,7 +46,7 @@ public class HostDetailsActivity extends BaseActivity {
         mSession = Session.getInstance(mContext);
 
         if (getIntent() != null) {
-            String workspaceId = getIntent().getStringExtra(Constants.WORKSPACE_ID);
+            workspaceId = getIntent().getStringExtra(Constants.WORKSPACE_ID);
             WorkspaceList workspaces = mSession.getWorkspaces();
 
             if (workspaces != null && workspaces.getWorkspaceData() != null && workspaces.getWorkspaceData().size() > 0) {
@@ -55,6 +64,14 @@ public class HostDetailsActivity extends BaseActivity {
             } else
                 makeHostDataRequest();
         }
+        bookSeat = (Button) findViewById(R.id.book_seat);
+        bookSeat.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getApplicationContext(), mSession.getUser().get_id() + " " + workspaceId, Toast.LENGTH_LONG).show();
+                mSession.requestSeat(mSession.getUser().get_id(), workspaceId);
+            }
+        });
     }
 
     private void makeHostDataRequest() {
@@ -115,5 +132,19 @@ public class HostDetailsActivity extends BaseActivity {
         }
 
         return list;
+    }
+
+    @Subscribe
+    public void onEventMainThread(CobbocEvent event) {
+        switch (event.getType()) {
+            case CobbocEvent.REQUEST_SEAT: {
+                Helper.dismissProgressDialog();
+                if (event.getStatus()) {
+                    JSONObject jsonObject = (JSONObject) event.getValue();
+
+                    break;
+                }
+            }
+        }
     }
 }

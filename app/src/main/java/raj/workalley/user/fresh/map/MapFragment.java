@@ -126,8 +126,8 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback, Loc
                      * get(0) field is longitude
                      * get(1) filed is latitude
                      */
-                    LatLng latLng = new LatLng(dummyLocationList().get(i).get(1), dummyLocationList().get(i).get(0));
-                    createMarker(dummyLocationList().get(i).get(0), dummyLocationList().get(i).get(1), workspace.getName(), workspace.getAddress().getState() + " " + workspace.getAddress().getCity(), workspace.get_id());
+                    LatLng latLng = new LatLng(workspaceAddress.getLoc().get(1), workspaceAddress.getLoc().get(0));
+                    createMarker(workspaceAddress.getLoc().get(1), workspaceAddress.getLoc().get(0), workspace.getName(), workspace.getAddress().getState() + " " + workspace.getAddress().getCity(), workspace.get_id());
                     i++;
                 }
             }

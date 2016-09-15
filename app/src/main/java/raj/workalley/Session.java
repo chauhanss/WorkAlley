@@ -466,6 +466,41 @@ public class Session {
 
     }
 
+    public void requestSeat(String userId, String hostId) {
+        JSONObject params = new JSONObject();
+        try {
+            params.put(Constants.USER_ID, userId);
+            params.put(Constants.SPACE, hostId);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        postFetch("requests", params, new Task() {
+
+            @Override
+            public void onSuccess(JSONObject jsonObject) {
+                eventBus.post(new CobbocEvent(CobbocEvent.REQUEST_SEAT, true, jsonObject));
+            }
+
+            @Override
+            public void onSuccess(String response) {
+
+            }
+
+            @Override
+            public void onError(Throwable throwable) {
+                eventBus.post(new CobbocEvent(CobbocEvent.REQUEST_SEAT, false, "An error occurred while creating workspace. Please try again later."));
+            }
+
+            @Override
+            public void onProgress(int percent) {
+
+            }
+        }, Request.Method.POST);
+
+
+    }
+
     public void getUserWorkspaceData(String userId) {
 
         String getRequestUrl = "requests?user=" + userId;
@@ -521,6 +556,8 @@ public class Session {
         }, Request.Method.GET);
     }
 
+
+
     public void getAllActiveWorkspace() {
         String getRequestUrl = "spaces";
 
@@ -547,5 +584,7 @@ public class Session {
             }
         }, Request.Method.GET);
     }
+
+
 
 }

@@ -1,6 +1,7 @@
 package raj.workalley.host.signup;
 
 import android.app.TimePickerDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
@@ -39,6 +40,7 @@ import raj.workalley.CobbocEvent;
 import raj.workalley.Constants;
 import raj.workalley.R;
 import raj.workalley.Session;
+import raj.workalley.WorkspaceList;
 import raj.workalley.host.HomeActivity;
 import raj.workalley.user.fresh.offers.OfferActivity;
 import raj.workalley.user.fresh.offers.OfferDummyItem;
@@ -57,11 +59,13 @@ public class HostSignUpActivity extends BaseActivity {
     Session mSession;
     ImageListAdapter imageListAdapter;
     LatLng latLng;
+    Context mContext;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_host_signup);
+        mContext = this;
         mSession = Session.getInstance(this);
         continueBtn = (Button) findViewById(R.id.host_continue);
 
@@ -226,7 +230,11 @@ public class HostSignUpActivity extends BaseActivity {
             case CobbocEvent.CREATE_WORKSPACE:
                 Helper.dismissProgressDialog();
                 if (event.getStatus()) {
-                    Log.d("here", "ok");
+                    JSONObject jsonObject = (JSONObject) event.getValue();
+                    WorkspaceList parsedResponse = (WorkspaceList) Session.getInstance(mContext).getParsedResponseFromGSON(jsonObject, Session.workAlleyModels.Workspaces);
+                    Session.getInstance(mContext).setWorkspaces(parsedResponse);
+                    Intent intent = new Intent(HostSignUpActivity.this, HomeActivity.class);
+                    startActivity(intent);
                 } else {
                     Toast.makeText(getApplicationContext(), "Not able to login. Please check your details.", Toast.LENGTH_LONG).show();
                 }
