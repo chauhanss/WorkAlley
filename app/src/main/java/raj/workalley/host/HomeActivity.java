@@ -15,6 +15,7 @@ import com.cleveroad.loopbar.widget.LoopBarView;
 import com.cleveroad.loopbar.widget.OnItemClickListener;
 import com.cleveroad.loopbar.widget.Orientation;
 import com.github.nkzawa.emitter.Emitter;
+import com.github.nkzawa.socketio.client.Ack;
 import com.github.nkzawa.socketio.client.IO;
 import com.github.nkzawa.socketio.client.Socket;
 
@@ -48,22 +49,7 @@ public class HomeActivity extends BaseActivity implements OnItemClickListener {
     private Emitter.Listener onNewMessage = new Emitter.Listener() {
         @Override
         public void call(final Object... args) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    JSONObject data = (JSONObject) args[0];
-                    String username;
-                    String message;
-                    try {
-                        username = data.getString("username");
-                        // message = data.getString("message");
-                    } catch (JSONException e) {
-                        return;
-                    }
-                    Toast.makeText(getApplicationContext(), "here", Toast.LENGTH_LONG).show();
-                    // ((TextView) findViewById(R.id.message_display)).setText(message);
-                }
-            });
+            Log.e("received", "enjoy");
         }
     };
 
@@ -114,15 +100,35 @@ public class HomeActivity extends BaseActivity implements OnItemClickListener {
             mSocket = IO.socket("http://app.workalley.in");
         } catch (URISyntaxException e) {
         }
+
+        mSocket.connect();
+        mSocket.on("CONNECTED", new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                Ack ack = (Ack) args[args.length - 1];
+                Log.e("received", "enjoy");
+                ack.call();
+            }
+        });
+
+        mSocket.on("AUTH", new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                Ack ack = (Ack) args[args.length - 1];
+                Log.e("received", "enjoy");
+                ack.call();
+            }
+        });
+
+       // mSocket.on("CONNECTED", onNewMessage);
+        //mSocket.on("AUTH", onNewMessage);
         mSocket.on("BOOKING_REQUESTED", onNewMessage);
         mSocket.on("BOOKING_ACCEPTED", onNewMessage);
         mSocket.on("BOOKING_REJECTED", onNewMessage);
         mSocket.on("BOOKING_CANCELED", onNewMessage);
         mSocket.on("BOOKING_END_REQUESTED", onNewMessage);
         mSocket.on("BOOKING_END_CONFIRMED", onNewMessage);
-        mSocket.on("CONNECTED", onNewMessage);
-        mSocket.on("AUTH", onNewMessage);
-        mSocket.connect();
+
 
     }
 
