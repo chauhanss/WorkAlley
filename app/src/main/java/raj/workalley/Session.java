@@ -262,7 +262,7 @@ public class Session {
                             HttpHeaderParser.parseCharset(response.headers, PROTOCOL_CHARSET));
                     JSONObject jsonResponse = new JSONObject(jsonString);
                     String sessionId = response.headers.get("set-cookie");
-                    setSessionIdCookies(sessionId.substring(4));
+                    setSessionIdCookies(sessionId);
                     jsonResponse.put("headers", new JSONObject(response.headers));
                     return Response.success(jsonResponse,
                             HttpHeaderParser.parseCacheHeaders(response));

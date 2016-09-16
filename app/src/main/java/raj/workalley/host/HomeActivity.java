@@ -113,13 +113,14 @@ public class HomeActivity extends BaseActivity implements OnItemClickListener {
 
 
         try {
-            mSocket = IO.socket("http://app.workalley.in");
+            mSocket = IO.socket("http://app.workalley.in", headers);
         } catch (URISyntaxException e) {
         }
 
         mSocket.io().on(Manager.EVENT_TRANSPORT, new Emitter.Listener() {
             @Override
             public void call(Object... args) {
+                Log.e("here", "ok");
                 Transport transport = (Transport) args[0];
 
                 transport.on(Transport.EVENT_REQUEST_HEADERS, new Emitter.Listener() {
@@ -129,6 +130,7 @@ public class HomeActivity extends BaseActivity implements OnItemClickListener {
                         Map<String, String> headers = (Map<String, String>) args[0];
                         // modify request headers
                         headers.put("Cookie", session.getSessionIdCookies());
+                        Log.e("here", "ok1");
                     }
                 });
             }
@@ -142,9 +144,10 @@ public class HomeActivity extends BaseActivity implements OnItemClickListener {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Map<String, String> headers = (Map<String, String>) args[0];
+                        //Map<String, String> headers = (Map<String, String>) args[0];
                         // modify request headers
-                        headers.put("Cookie", session.getSessionIdCookies());
+                        //headers.put("Cookie", session.getSessionIdCookies());
+                        Log.e("here", "connected");
                     }
                 });
             }
@@ -157,6 +160,7 @@ public class HomeActivity extends BaseActivity implements OnItemClickListener {
                     @Override
                     public void run() {
                         //dialog goes here
+                        Log.e("here", "auth");
                         Toast.makeText(getApplicationContext(), "auth" + " " + "enjoy", Toast.LENGTH_LONG).show();
                     }
                 });
@@ -170,6 +174,7 @@ public class HomeActivity extends BaseActivity implements OnItemClickListener {
                     @Override
                     public void run() {
                         //dialog goes here
+                        Log.e("here", "BOOKING_REQUESTED");
                         Toast.makeText(getApplicationContext(), "BOOKING_REQUESTED" + " " + "enjoy", Toast.LENGTH_LONG).show();
                     }
                 });
