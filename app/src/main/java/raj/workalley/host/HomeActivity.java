@@ -15,8 +15,10 @@ import com.cleveroad.loopbar.widget.LoopBarView;
 import com.cleveroad.loopbar.widget.OnItemClickListener;
 import com.cleveroad.loopbar.widget.Orientation;
 import com.github.nkzawa.emitter.Emitter;
+import com.github.nkzawa.engineio.client.Transport;
 import com.github.nkzawa.socketio.client.Ack;
 import com.github.nkzawa.socketio.client.IO;
+import com.github.nkzawa.socketio.client.Manager;
 import com.github.nkzawa.socketio.client.Socket;
 
 import org.json.JSONException;
@@ -24,10 +26,14 @@ import org.json.JSONObject;
 
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 import raj.workalley.BaseActivity;
 import raj.workalley.R;
+import raj.workalley.Session;
 import raj.workalley.host.dashboard.DashboardFragment;
 import raj.workalley.host.settings.SettingFragment;
 
@@ -41,6 +47,8 @@ public class HomeActivity extends BaseActivity implements OnItemClickListener {
 
     private SimpleCategoriesAdapter categoriesAdapter;
     private SimpleFragmentStatePagerAdapter pagerAdapter;
+    private IO.Options headers = new IO.Options();
+    Session session;
 
     private ViewPager viewPager;
 
@@ -69,6 +77,7 @@ public class HomeActivity extends BaseActivity implements OnItemClickListener {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_host);
+        session = Session.getInstance(this);
         loopBarView = (LoopBarView) findViewById(R.id.endlessView);
         viewPager = (ViewPager) findViewById(R.id.viewPager);
 
@@ -102,20 +111,40 @@ public class HomeActivity extends BaseActivity implements OnItemClickListener {
             }
         });
 
+
         try {
             mSocket = IO.socket("http://app.workalley.in");
         } catch (URISyntaxException e) {
         }
 
+        mSocket.io().on(Manager.EVENT_TRANSPORT, new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                Transport transport = (Transport) args[0];
+
+                transport.on(Transport.EVENT_REQUEST_HEADERS, new Emitter.Listener() {
+                    @Override
+                    public void call(Object... args) {
+                        @SuppressWarnings("unchecked")
+                        Map<String, String> headers = (Map<String, String>) args[0];
+                        // modify request headers
+                        headers.put("Cookie", session.getSessionIdCookies());
+                    }
+                });
+            }
+        });
+
         // mSocket.on("new message", onNewMessage);
 
         mSocket.on("connected", new Emitter.Listener() {
             @Override
-            public void call(Object... args) {
+            public void call(final Object... args) {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Toast.makeText(getApplicationContext(), "connected" + " " + "enjoy", Toast.LENGTH_LONG).show();
+                        Map<String, String> headers = (Map<String, String>) args[0];
+                        // modify request headers
+                        headers.put("Cookie", session.getSessionIdCookies());
                     }
                 });
             }

@@ -1,6 +1,7 @@
 package raj.workalley;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
@@ -8,10 +9,13 @@ import android.util.Log;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.NetworkResponse;
+import com.android.volley.ParseError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
@@ -24,6 +28,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
 import java.net.CookieHandler;
 import java.net.CookieManager;
@@ -47,6 +52,7 @@ public class Session {
     Long start = null, end = null, diff = null;
     private final Handler handler;
     private final SessionData mSessionData = new SessionData();
+    private String sessionIdCookies;
 
     public enum workAlleyModels {
         UserInfo,
@@ -70,6 +76,15 @@ public class Session {
 
         private UserInfo user;
         private WorkspaceList workspaceList;
+        private String sessionIdCookies;
+
+        private String getSessionIdCookies() {
+            return sessionIdCookies;
+        }
+
+        private void setSessionIdCookies(String sessionIdCookies) {
+            this.sessionIdCookies = sessionIdCookies;
+        }
 
         public SessionData() {
             reset();
@@ -94,6 +109,15 @@ public class Session {
         public void setWorkspaceList(WorkspaceList workspaceList) {
             this.workspaceList = workspaceList;
         }
+    }
+
+
+    public String getSessionIdCookies() {
+        return mSessionData.getSessionIdCookies();
+    }
+
+    public void setSessionIdCookies(String sessionIdCookies) {
+        mSessionData.setSessionIdCookies(sessionIdCookies);
     }
 
     public void setUser(UserInfo userInfo) {
@@ -227,7 +251,26 @@ public class Session {
             public Map<String, String> getHeaders() throws AuthFailureError {
                 HashMap<String, String> headers = new HashMap<String, String>();
                 headers.put("Content-Type", "application/json");
+                //String sessionId = Hawk.get("connect.sid", "");
                 return headers;
+            }
+
+            @Override
+            protected Response<JSONObject> parseNetworkResponse(NetworkResponse response) {
+                try {
+                    String jsonString = new String(response.data,
+                            HttpHeaderParser.parseCharset(response.headers, PROTOCOL_CHARSET));
+                    JSONObject jsonResponse = new JSONObject(jsonString);
+                    String sessionId = response.headers.get("set-cookie");
+                    setSessionIdCookies(sessionId.substring(4));
+                    jsonResponse.put("headers", new JSONObject(response.headers));
+                    return Response.success(jsonResponse,
+                            HttpHeaderParser.parseCacheHeaders(response));
+                } catch (UnsupportedEncodingException e) {
+                    return Response.error(new ParseError(e));
+                } catch (JSONException je) {
+                    return Response.error(new ParseError(je));
+                }
             }
 
         };
@@ -557,7 +600,6 @@ public class Session {
     }
 
 
-
     public void getAllActiveWorkspace() {
         String getRequestUrl = "spaces";
 
@@ -584,7 +626,6 @@ public class Session {
             }
         }, Request.Method.GET);
     }
-
 
 
 }
