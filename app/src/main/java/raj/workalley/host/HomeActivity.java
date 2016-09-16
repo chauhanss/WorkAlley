@@ -49,7 +49,13 @@ public class HomeActivity extends BaseActivity implements OnItemClickListener {
     private Emitter.Listener onNewMessage = new Emitter.Listener() {
         @Override
         public void call(final Object... args) {
-            Log.e("received", "enjoy");
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    //JSONObject data = (JSONObject) args[0];
+                    Toast.makeText(getApplicationContext(), "connected" + " " + "enjoy", Toast.LENGTH_LONG).show();
+                }
+            });
         }
     };
 
@@ -101,34 +107,63 @@ public class HomeActivity extends BaseActivity implements OnItemClickListener {
         } catch (URISyntaxException e) {
         }
 
-        mSocket.connect();
-        mSocket.on("CONNECTED", new Emitter.Listener() {
+        // mSocket.on("new message", onNewMessage);
+
+        mSocket.on("connected", new Emitter.Listener() {
             @Override
             public void call(Object... args) {
-                Ack ack = (Ack) args[args.length - 1];
-                Log.e("received", "enjoy");
-                ack.call();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(getApplicationContext(), "connected" + " " + "enjoy", Toast.LENGTH_LONG).show();
+                    }
+                });
             }
         });
 
         mSocket.on("AUTH", new Emitter.Listener() {
             @Override
             public void call(Object... args) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        //dialog goes here
+                        Toast.makeText(getApplicationContext(), "auth" + " " + "enjoy", Toast.LENGTH_LONG).show();
+                    }
+                });
+            }
+        });
+
+        mSocket.on("BOOKING_REQUESTED", new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        //dialog goes here
+                        Toast.makeText(getApplicationContext(), "BOOKING_REQUESTED" + " " + "enjoy", Toast.LENGTH_LONG).show();
+                    }
+                });
+            }
+        });
+       /* mSocket.on("AUTH", new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
                 Ack ack = (Ack) args[args.length - 1];
                 Log.e("received", "enjoy");
                 ack.call();
             }
         });
 
-       // mSocket.on("CONNECTED", onNewMessage);
+        // mSocket.on("CONNECTED", onNewMessage);
         //mSocket.on("AUTH", onNewMessage);
         mSocket.on("BOOKING_REQUESTED", onNewMessage);
         mSocket.on("BOOKING_ACCEPTED", onNewMessage);
         mSocket.on("BOOKING_REJECTED", onNewMessage);
         mSocket.on("BOOKING_CANCELED", onNewMessage);
         mSocket.on("BOOKING_END_REQUESTED", onNewMessage);
-        mSocket.on("BOOKING_END_CONFIRMED", onNewMessage);
-
+        mSocket.on("BOOKING_END_CONFIRMED", onNewMessage);*/
+        mSocket.connect();
 
     }
 
