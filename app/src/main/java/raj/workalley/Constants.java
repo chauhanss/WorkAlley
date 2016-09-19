@@ -41,4 +41,5 @@ public class Constants {
 
     public static final String HOST_ID = "host";
     public static final String SPACE = "space";
+    public static final String SESSION_COOKIES_ID = "sessionCookiesId";
 }

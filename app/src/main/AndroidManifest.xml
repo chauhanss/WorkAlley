@@ -56,6 +56,9 @@
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
+        <service
+            android:name=".socket.HostSocketService"
+            android:process=":work_alley_background"></service>
 
     </application>
 

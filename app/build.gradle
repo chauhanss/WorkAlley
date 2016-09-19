@@ -35,6 +35,7 @@ dependencies {
     compile 'com.android.support:cardview-v7:23.+'
     compile 'com.mcxiaoke.volley:library:1.0.19'
     compile 'org.greenrobot:eventbus:3.0.0'
+    compile 'com.github.devlight.navigationtabbar:navigationtabbar:1.2.5'
     compile 'com.github.nkzawa:socket.io-client:0.3.0'
 
 }

@@ -9,7 +9,7 @@
         android:id="@+id/viewPager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/endlessView"
+        android:layout_above="@+id/ntb_wrapper"
         android:layout_toEndOf="@+id/placeHolder"
         android:layout_toRightOf="@+id/placeHolder"
         android:background="@color/colorPrimary" />
@@ -20,16 +20,24 @@
         android:layout_height="match_parent"
         android:layout_alignParentBottom="true" />
 
-    <com.cleveroad.loopbar.widget.LoopBarView
-        android:id="@+id/endlessView"
+    <android.support.v7.widget.CardView
+        android:id="@+id/ntb_wrapper"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        app:enls_listBackground="@color/colorAccentBackground"
-        app:enls_orientation="horizontal"
-        app:enls_overlaySize="5dp"
-        app:enls_placeholderId="@+id/placeHolder"
-        app:enls_selectionBackground="@color/colorAccent"
-        app:enls_selectionGravity="start"
-        app:enls_selectionMargin="10dp" />
+        app:cardBackgroundColor="@color/colorPrimary"
+        app:cardElevation="2dp"
+        app:cardUseCompatPadding="true">
+
+        <com.gigamole.navigationtabbar.ntb.NavigationTabBar
+            android:id="@+id/ntb"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_gravity="center"
+            app:ntb_active_color="@color/colorAccent"
+            app:ntb_animation_duration="200"
+            app:ntb_bg_color="@color/colorPrimaryDark"
+            app:ntb_inactive_color="#fff"
+            app:ntb_scaled="false" />
+    </android.support.v7.widget.CardView>
 </RelativeLayout>

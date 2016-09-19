@@ -1,6 +1,7 @@
 package raj.workalley.user.fresh;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -16,6 +17,7 @@ import com.cleveroad.loopbar.adapter.SimpleCategoriesAdapter;
 import com.cleveroad.loopbar.widget.LoopBarView;
 import com.cleveroad.loopbar.widget.OnItemClickListener;
 import com.cleveroad.loopbar.widget.Orientation;
+import com.gigamole.navigationtabbar.ntb.NavigationTabBar;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -59,37 +61,72 @@ public class HomeActivity extends BaseActivity implements OnItemClickListener {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_user);
-        loopBarView = (LoopBarView) findViewById(R.id.endlessView);
-        viewPager = (ViewPager) findViewById(R.id.viewPager);
+        initNavToolBar();
+        //loopBarView = (LoopBarView) findViewById(R.id.endlessView);
+
         mContext = this;
         mSession = Session.getInstance(this);
 
-        List<ICategoryItem> items = new ArrayList<>();
+       /* List<ICategoryItem> items = new ArrayList<>();
         items.add(new CategoryItem(R.drawable.ic_map, "Map"));
         items.add(new CategoryItem(R.drawable.ic_offer, "Offers"));
         items.add(new CategoryItem(R.drawable.ic_setting, "Settings"));
-        items.add(new CategoryItem(R.drawable.ic_account, "Account"));
+        items.add(new CategoryItem(R.drawable.ic_account, "Account"));*/
 
 
-        categoriesAdapter = new SimpleCategoriesAdapter(items);
+        /*categoriesAdapter = new SimpleCategoriesAdapter(items);
         loopBarView.setCategoriesAdapter(categoriesAdapter);
         loopBarView.addOnItemClickListener(this);
+*/
+
+
+    }
+
+    private void initNavToolBar() {
+        viewPager = (ViewPager) findViewById(R.id.viewPager);
+        final NavigationTabBar navigationTabBar = (NavigationTabBar) findViewById(R.id.ntb);
 
         List<Fragment> list = new ArrayList<>(3);
         list.add(MapFragment.newInstance());
         list.add(OffersFragment.newInstance());
         list.add(SettingFragment.newInstance());
         list.add(AccountFragment.newInstance());
-
-
         pagerAdapter = new SimpleFragmentStatePagerAdapter(getSupportFragmentManager(), list);
         viewPager.setAdapter(pagerAdapter);
+
+        final ArrayList<NavigationTabBar.Model> models = new ArrayList<>();
+        models.add(
+                new NavigationTabBar.Model.Builder(
+                        getResources().getDrawable(R.drawable.ic_map),
+                        Color.parseColor("#EE946F")
+                ).build()
+        );
+        models.add(
+                new NavigationTabBar.Model.Builder(
+                        getResources().getDrawable(R.drawable.ic_offer),
+                        Color.parseColor("#EE946F")
+                ).build()
+        );
+        models.add(
+                new NavigationTabBar.Model.Builder(
+                        getResources().getDrawable(R.drawable.ic_setting),
+                        Color.parseColor("#EE946F")
+                ).build()
+        );
+        models.add(
+                new NavigationTabBar.Model.Builder(
+                        getResources().getDrawable(R.drawable.ic_account),
+                        Color.parseColor("#EE946F")
+                ).build()
+        );
+        navigationTabBar.setModels(models);
+        navigationTabBar.setViewPager(viewPager, 2);
 
         viewPager.addOnPageChangeListener(new AbstractPageChangedListener() {
             @Override
             public void onPageSelected(int position) {
                 super.onPageSelected(position);
-                loopBarView.setCurrentItem(position);
+                navigationTabBar.getModels().get(position).hideBadge();
             }
 
             @Override
@@ -97,7 +134,6 @@ public class HomeActivity extends BaseActivity implements OnItemClickListener {
                 Log.d("tag", "on page scrolled");
             }
         });
-
     }
 
 
@@ -144,33 +180,4 @@ public class HomeActivity extends BaseActivity implements OnItemClickListener {
         }
     }
 
-    class CategoryItem implements ICategoryItem {
-        private int categoryItemDrawableId;
-        private String categoryName;
-
-        public CategoryItem(int categoryItemDrawableId, String categoryName) {
-            this.categoryItemDrawableId = categoryItemDrawableId;
-            this.categoryName = categoryName;
-        }
-
-        @Override
-        public int getCategoryIconDrawable() {
-            return categoryItemDrawableId;
-        }
-
-        @Override
-        public String getCategoryName() {
-            return categoryName;
-        }
-
-        @Override
-        public String toString() {
-            return categoryName;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            return o instanceof CategoryItem && ((CategoryItem) o).categoryName.equals(categoryName);
-        }
-    }
 }
