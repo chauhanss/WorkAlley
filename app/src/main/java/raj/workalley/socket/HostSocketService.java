@@ -128,7 +128,7 @@ public class HostSocketService extends Service {
         initSocket();
         connectToServer();
         sendCookies(cookieStr);
-        Log.e("here", cookieStr);
+        Log.e("here", ""+cookieStr);
         authHost();
         //Log.e("")
         mSocket.on("BOOKING_REQUESTED", new Emitter.Listener() {

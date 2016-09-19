@@ -248,9 +248,9 @@ public class HostSignUpActivity extends BaseActivity {
         protected List<Address> doInBackground(String... locationName) {
             Geocoder geocoder = new Geocoder(getApplicationContext());
             List<Address> addresses = null;
-
+            String str = locationName[0]+" "+locationName[1]+" "+locationName[2]+" "+locationName[3];
             try {
-                addresses = geocoder.getFromLocationName(locationName[0], 1);
+                addresses = geocoder.getFromLocationName(str, 1);
             } catch (IOException e) {
                 e.printStackTrace();
             }
