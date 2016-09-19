@@ -11,28 +11,16 @@ import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.cleveroad.loopbar.adapter.ICategoryItem;
-import com.cleveroad.loopbar.adapter.SimpleCategoriesAdapter;
 import com.cleveroad.loopbar.widget.LoopBarView;
 import com.cleveroad.loopbar.widget.OnItemClickListener;
 import com.cleveroad.loopbar.widget.Orientation;
 import com.gigamole.navigationtabbar.ntb.NavigationTabBar;
 import com.github.nkzawa.emitter.Emitter;
-import com.github.nkzawa.engineio.client.Transport;
-import com.github.nkzawa.socketio.client.Ack;
 import com.github.nkzawa.socketio.client.IO;
-import com.github.nkzawa.socketio.client.Manager;
 import com.github.nkzawa.socketio.client.Socket;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-import java.util.Properties;
 
 import raj.workalley.BaseActivity;
 import raj.workalley.Constants;
