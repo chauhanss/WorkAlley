@@ -58,7 +58,11 @@
         </service>
         <service
             android:name=".socket.HostSocketService"
-            android:process=":work_alley_background"></service>
+            android:process=":work_alley_background" />
+
+        <receiver
+            android:name=".RequestReceiver"
+            android:enabled="true" />
 
     </application>
 

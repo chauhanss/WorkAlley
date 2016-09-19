@@ -21,11 +21,15 @@ import com.github.nkzawa.socketio.client.IO;
 import com.github.nkzawa.socketio.client.Manager;
 import com.github.nkzawa.socketio.client.Socket;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.net.URISyntaxException;
 import java.util.Map;
 
 import raj.workalley.Constants;
 import raj.workalley.R;
+import raj.workalley.RequestReceiver;
 import raj.workalley.Session;
 import raj.workalley.util.SharedPrefsUtils;
 
@@ -34,22 +38,11 @@ import raj.workalley.util.SharedPrefsUtils;
  */
 public class HostSocketService extends Service {
 
-    /**
-     * indicates how to behave if the service is killed
-     */
+    private static final String USER = "user";
+    private static final String REQUEST_TYPE = "requestType";
     int mStartMode;
-
-    /**
-     * interface for clients that bind
-     */
     IBinder mBinder;
-
-    /**
-     * indicates whether onRebind should be used
-     */
     boolean mAllowRebind;
-
-
     public Socket mSocket;
     static int count = 0;
 
@@ -124,20 +117,31 @@ public class HostSocketService extends Service {
             SharedPrefsUtils.setStringPreference(this, Constants.SESSION_COOKIES_ID, cookieId, Constants.SP_NAME);
         }
         String cookieStr = SharedPrefsUtils.getStringPreference(this, Constants.SESSION_COOKIES_ID, Constants.SP_NAME);
-        Log.e("here", "service started");
         initSocket();
         connectToServer();
         sendCookies(cookieStr);
-        Log.e("here", cookieStr);
         authHost();
-        //Log.e("")
         mSocket.on("BOOKING_REQUESTED", new Emitter.Listener() {
             @Override
             public void call(Object... args) {
-                //dialog goes here
-                Log.e("here", "BOOKING_REQUESTED");
-                createNoti(++count);
-                //Toast.makeText(getApplicationContext(), "BOOKING_REQUESTED" + " " + "enjoy", Toast.LENGTH_LONG).show();
+
+                try {
+                    createNoti(++count);
+                    JSONObject jsonObject = new JSONObject(args[0].toString());
+                    Intent i = new Intent(HostSocketService.this, RequestReceiver.class);
+
+                    Bundle bundle = new Bundle();
+                    if (jsonObject.has("user") && !jsonObject.isNull("user")) {
+                        bundle.putString(USER, jsonObject.get("user").toString());
+                        bundle.putString(REQUEST_TYPE, "BOOKING_REQUESTED");
+                        i.putExtra("bundle", bundle);
+                        sendBroadcast(i);
+                    }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
             }
         });
         return START_STICKY;
@@ -151,10 +155,8 @@ public class HostSocketService extends Service {
                         .setContentText("Hello World!");
 
         int mNotificationId = 001;
-// Gets an instance of the NotificationManager service
         NotificationManager mNotifyMgr =
                 (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-// Builds the notification and issues it.
         mNotifyMgr.notify(mNotificationId, mBuilder.build());
 
     }
@@ -162,10 +164,8 @@ public class HostSocketService extends Service {
     @Override
     public void onDestroy() {
         Log.e("here", "service stopped");
-        //Log.e(LOG_TAG, "------------------------------------------ Destroyed Location update Service");
-        //cleanUp();
         super.onDestroy();
-        // startService(new Intent(this, HostSocketService.class)); // add this line
+        //     startService(new Intent(this, HostSocketService.class));
     }
 
     @Nullable

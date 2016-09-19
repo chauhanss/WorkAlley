@@ -43,4 +43,11 @@ public class Constants {
     public static final String SPACE = "space";
     public static final String SESSION_COOKIES_ID = "sessionCookiesId";
     public static final String SP_NAME = "workAlleySharedPref";
+
+    /**
+     * Socket Requests
+     */
+    public static final String REQUEST_TYPE = "requestType";
+
+    public static final String BOOKING_REQUEST = "BOOKING_REQUESTED";
 }

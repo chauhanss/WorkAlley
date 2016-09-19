@@ -11,6 +11,7 @@ public class CobbocEvent {
     public static final int CREATE_WORKSPACE = 5;
     public static final int GET_ALL_WORKSPACES = 6;
     public static final int REQUEST_SEAT = 7;
+    public static final int ACCEPT_REJECT_BOOKING_REQUEST = 8;
 
     private boolean STATUS;
 

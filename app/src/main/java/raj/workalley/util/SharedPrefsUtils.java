@@ -5,7 +5,9 @@ import android.content.SharedPreferences;
 import android.text.TextUtils;
 import android.util.Log;
 
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by vishal.raj on 9/5/16.
@@ -27,6 +29,15 @@ public class SharedPrefsUtils {
         SharedPreferences preferences = context.getSharedPreferences(file, Context.MODE_PRIVATE);
         if (preferences != null) {
             value = preferences.getString(key, null);
+        }
+        return value;
+    }
+
+    public static Set getHashSetPreference(Context context, String key, String file) {
+        Set<String> value = null;
+        SharedPreferences preferences = context.getSharedPreferences(file, Context.MODE_PRIVATE);
+        if (preferences != null) {
+            value = preferences.getStringSet(key, null);
         }
         return value;
     }
@@ -72,6 +83,20 @@ public class SharedPrefsUtils {
         if (preferences != null && !TextUtils.isEmpty(key)) {
             SharedPreferences.Editor editor = preferences.edit();
             editor.putString(key, value);
+            return editor.commit();
+        }
+        return false;
+    }
+
+    public static boolean setHashSetPreference(Context context, String key, Set values, String file) {
+        SharedPreferences preferences = context.getSharedPreferences(file, Context.MODE_PRIVATE);
+        Set<String> set = preferences.getStringSet(key, null);
+        if (preferences != null && !TextUtils.isEmpty(key)) {
+            SharedPreferences.Editor editor = preferences.edit();
+            Set<String> set2 = new HashSet<String>();
+            if (set != null)
+                set.addAll(set);
+            editor.putStringSet(key, values);
             return editor.commit();
         }
         return false;
