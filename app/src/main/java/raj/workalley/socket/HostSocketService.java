@@ -27,6 +27,7 @@ import java.util.Map;
 import raj.workalley.Constants;
 import raj.workalley.R;
 import raj.workalley.Session;
+import raj.workalley.util.SharedPrefsUtils;
 
 /**
  * Created by vishal.raj on 9/19/16.
@@ -117,13 +118,17 @@ public class HostSocketService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
-        Bundle b = intent.getExtras();
-        String str = b.getString(Constants.SESSION_COOKIES_ID);
+        if (intent != null) {
+            Bundle b = intent.getExtras();
+            String cookieId = b.getString(Constants.SESSION_COOKIES_ID);
+            SharedPrefsUtils.setStringPreference(this, Constants.SESSION_COOKIES_ID, cookieId, Constants.SP_NAME);
+        }
+        String cookieStr = SharedPrefsUtils.getStringPreference(this, Constants.SESSION_COOKIES_ID, Constants.SP_NAME);
         Log.e("here", "service started");
         initSocket();
         connectToServer();
-        sendCookies(str);
-        Log.e("here", str);
+        sendCookies(cookieStr);
+        Log.e("here", cookieStr);
         authHost();
         //Log.e("")
         mSocket.on("BOOKING_REQUESTED", new Emitter.Listener() {
