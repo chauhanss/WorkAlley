@@ -26,6 +26,4 @@ public class UserRequestFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_user_request, null);
         return v;
     }
-
-
 }

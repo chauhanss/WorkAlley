@@ -1,6 +1,7 @@
 package raj.workalley.user.fresh.host_details;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -11,7 +12,9 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -37,6 +40,23 @@ public class HostDetailsActivity extends BaseActivity {
     WorkspaceList.Workspace mWorkspace = null;
     Button bookSeat;
     String workspaceId;
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (EventBus.getDefault().isRegistered(this)) {
+            EventBus.getDefault().unregister(this);
+        }
+    }
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (!EventBus.getDefault().isRegistered(this)) {
+            EventBus.getDefault().register(this);
+        }
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -141,7 +161,16 @@ public class HostDetailsActivity extends BaseActivity {
                 Helper.dismissProgressDialog();
                 if (event.getStatus()) {
                     JSONObject jsonObject = (JSONObject) event.getValue();
-
+                    Intent intent = new Intent();
+                    try {
+                        Bundle b = new Bundle();
+                        b.putString(Constants.WORKSPACE_NAME, jsonObject.getJSONObject("space").getString("name"));
+                        intent.putExtras(b);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    setResult(Constants.HOST_DETAILS_ACTIVITY_REQUEST_DETAILS, intent);
+                    finish();
                     break;
                 }
             }

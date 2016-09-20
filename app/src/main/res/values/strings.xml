@@ -39,4 +39,5 @@
     <string name="number_of_seat">Number of seat</string>
     <string name="save">Save</string>
     <string name="workspace_name">Workspace Name</string>
+    <string name="waiting">Waiting for response</string>
 </resources>

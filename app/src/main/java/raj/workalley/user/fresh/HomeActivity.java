@@ -1,6 +1,7 @@
 package raj.workalley.user.fresh;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -28,6 +29,7 @@ import java.util.List;
 
 import raj.workalley.BaseActivity;
 import raj.workalley.CobbocEvent;
+import raj.workalley.Constants;
 import raj.workalley.R;
 import raj.workalley.Session;
 import raj.workalley.WorkspaceList;
@@ -46,6 +48,7 @@ public class HomeActivity extends BaseActivity implements OnItemClickListener {
 
     private SimpleCategoriesAdapter categoriesAdapter;
     private SimpleFragmentStatePagerAdapter pagerAdapter;
+    String workspaceName;
 
     private ViewPager viewPager;
     private Session mSession;
@@ -179,5 +182,19 @@ public class HomeActivity extends BaseActivity implements OnItemClickListener {
 
         }
     }
+
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == Constants.HOST_DETAILS_ACTIVITY_REQUEST_DETAILS) {
+            if (resultCode == Constants.HOST_DETAILS_ACTIVITY_REQUEST_DETAILS) {
+                Bundle b = data.getExtras();
+                workspaceName = b.getString(Constants.WORKSPACE_NAME);
+                viewPager.setCurrentItem(3, true);
+                //startUserService();
+            }
+        }
+    }
+
 
 }
