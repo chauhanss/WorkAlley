@@ -70,7 +70,6 @@ public class UserRequestFragment extends Fragment {
         if (userRequests != null && userRequests.size() > 0) {
 
             userRequestList = new ArrayList<>();
-
             for (String user : userRequests) {
 
                 try {
@@ -123,7 +122,9 @@ public class UserRequestFragment extends Fragment {
 
         if (Helper.isConnected(mContext)) {
             Helper.showProgressDialogSpinner(mContext, "Please Wait", "Rejecting request", false);
-            Session.getInstance(mContext).acceptRejectWorkspaceBookSeatRequest(user, true);
+
+            String requestId = SharedPrefsUtils.getStringPreference(mContext, user.get_id(), Constants.SP_NAME);
+            Session.getInstance(mContext).acceptRejectWorkspaceBookSeatRequest(user, true, requestId);
         } else
             Toast.makeText(mContext, "No internet", Toast.LENGTH_LONG).show();
     }
@@ -140,6 +141,9 @@ public class UserRequestFragment extends Fragment {
                         UserInfo user = (UserInfo) jsonObject.get("user");
                         if (userRequestList != null) {
                             userRequestList.remove(user.get_id());
+
+                            SharedPrefsUtils.removePreferenceByKey(mContext, user.get_id(), Constants.SP_NAME);
+                            SharedPrefsUtils.removeSetInHashSetPreference(mContext, Constants.BOOKING_REQUEST, user, Constants.SP_NAME);
                             invalidateList(userRequestList);
                         }
                     } else {

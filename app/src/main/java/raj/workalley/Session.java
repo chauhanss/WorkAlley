@@ -622,13 +622,13 @@ public class Session {
     }
 
 
-    public void acceptRejectWorkspaceBookSeatRequest(final UserInfo user, final boolean isReject) {
+    public void acceptRejectWorkspaceBookSeatRequest(final UserInfo user, final boolean isReject, String requestId) {
 
         String getRequestUrl = "";
         if (isReject) {
-            getRequestUrl = "requests/" + user.get_id() + "/reject";
+            getRequestUrl = "requests/" + requestId + "/reject";
         } else {
-            getRequestUrl = "requests/" + user.get_id() + "/accept";
+            getRequestUrl = "requests/" + requestId + "/accept";
         }
 
         putFetch(getRequestUrl, null, new Task() {

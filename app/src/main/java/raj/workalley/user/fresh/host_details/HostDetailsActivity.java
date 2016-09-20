@@ -11,6 +11,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.json.JSONObject;
 
@@ -26,6 +27,7 @@ import raj.workalley.Session;
 import raj.workalley.WorkspaceList;
 import raj.workalley.util.AmenitiesListAdapter;
 import raj.workalley.util.Helper;
+import raj.workalley.util.SharedPrefsUtils;
 
 /**
  * Created by vishal.raj on 9/7/16.
@@ -65,13 +67,41 @@ public class HostDetailsActivity extends BaseActivity {
                 makeHostDataRequest();
         }
         bookSeat = (Button) findViewById(R.id.book_seat);
+
+        if (SharedPrefsUtils.hasKey(mContext, Constants.BOOKING_REJECT, Constants.SP_NAME)) {
+            //      bookSeat.setEnabled(false);
+            bookSeat.setText("Request Rejected");
+        } else if (SharedPrefsUtils.hasKey(mContext, Constants.BOOKING_ACCEPT, Constants.SP_NAME)) {
+            //session start/end layout
+        }
         bookSeat.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getApplicationContext(), mSession.getUser().get_id() + " " + workspaceId, Toast.LENGTH_LONG).show();
-                mSession.requestSeat(mSession.getUser().get_id(), workspaceId);
+                if (Helper.isConnected(mContext)) {
+                    Toast.makeText(getApplicationContext(), mSession.getUser().get_id() + " " + workspaceId, Toast.LENGTH_LONG).show();
+                    mSession.requestSeat(mSession.getUser().get_id(), workspaceId);
+                } else
+                    Toast.makeText(mContext, "No internet", Toast.LENGTH_LONG).show();
+
+
             }
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if (!EventBus.getDefault().isRegistered(mContext))
+            EventBus.getDefault().register(mContext);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        if (EventBus.getDefault().isRegistered(mContext))
+            EventBus.getDefault().unregister(mContext);
     }
 
     private void makeHostDataRequest() {
@@ -141,7 +171,7 @@ public class HostDetailsActivity extends BaseActivity {
                 Helper.dismissProgressDialog();
                 if (event.getStatus()) {
                     JSONObject jsonObject = (JSONObject) event.getValue();
-
+                    bookSeat.setText("Request Pending");
                     break;
                 }
             }

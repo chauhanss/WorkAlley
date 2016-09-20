@@ -126,14 +126,20 @@ public class HostSocketService extends Service {
             public void call(Object... args) {
 
                 try {
-                    createNoti(++count);
+
                     JSONObject jsonObject = new JSONObject(args[0].toString());
                     Intent i = new Intent(HostSocketService.this, RequestReceiver.class);
 
                     Bundle bundle = new Bundle();
                     if (jsonObject.has("user") && !jsonObject.isNull("user")) {
-                        bundle.putString(USER, jsonObject.get("user").toString());
+
+                        JSONObject userObject = (JSONObject) jsonObject.get("user");
+                        bundle.putString(USER, userObject.toString());
+                        bundle.putString(Constants.REQUEST_ID, jsonObject.get("_id").toString());
                         bundle.putString(REQUEST_TYPE, "BOOKING_REQUESTED");
+
+                        if (userObject.has("name") && !userObject.isNull("name"))
+                            createNotification(userObject.getString("name"), "xyz", "BOOKING_REQUESTED");
                         i.putExtra("bundle", bundle);
                         sendBroadcast(i);
                     }
@@ -144,21 +150,67 @@ public class HostSocketService extends Service {
 
             }
         });
+
+        mSocket.on("BOOKING_REJECTED", new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+
+                try {
+                    JSONObject jsonObject = new JSONObject(args[0].toString());
+                    Intent i = new Intent(HostSocketService.this, RequestReceiver.class);
+
+                    Bundle bundle = new Bundle();
+                    if (jsonObject.has("user") && !jsonObject.isNull("user")) {
+
+                        JSONObject userObject = (JSONObject) jsonObject.get("user");
+                        bundle.putString(USER, jsonObject.get("user").toString());
+                        bundle.putString(REQUEST_TYPE, "BOOKING_REJECTED");
+                        if (userObject.has("name") && !userObject.isNull("name"))
+                            createNotification(userObject.getString("name"), "xyz", "BOOKING_REJECTED");
+                        i.putExtra("bundle", bundle);
+                        sendBroadcast(i);
+                    }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        });
+
+
         return START_STICKY;
     }
 
-    public void createNoti(int count) {
+    public void createNotification(String userName, String workspace, String requestType) {
+
+        String messageText = "";
+        switch (requestType) {
+            case "BOOKING_REQUESTED":
+                messageText = userName + " has requested a seat in your workspace " + workspace + ".Please accept/reject their request";
+                break;
+            case "BOOKING_REJECTED":
+                messageText = "Sorry " + userName + "! Your request for a seat in " + workspace + " has been rejected. Please try again later.";
+
+        }
+        Intent dismissIntent = new Intent(this, raj.workalley.LoginActivity.class);
+        PendingIntent piDismiss = PendingIntent.getActivity(this, 0, dismissIntent, 0);
+
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
                         .setSmallIcon(R.drawable.ic_account)
-                        .setContentTitle("My notification " + count)
-                        .setContentText("Hello World!");
+                        .setContentTitle(messageText)
+                        .setContentIntent(piDismiss);
+
+        NotificationCompat.BigTextStyle inboxStyle = new NotificationCompat.BigTextStyle();
+        inboxStyle.setBigContentTitle(messageText);
+        mBuilder.setStyle(inboxStyle);
+
 
         int mNotificationId = 001;
         NotificationManager mNotifyMgr =
                 (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         mNotifyMgr.notify(mNotificationId, mBuilder.build());
-
     }
 
     @Override

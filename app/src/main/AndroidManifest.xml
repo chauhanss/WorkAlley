@@ -27,7 +27,7 @@
             android:name="com.google.android.maps.v2.API_KEY"
             android:value="AIzaSyAHEMQUZMyDbFOPZOqo5bn5FbGPEAqg-BE" />
 
-        <activity android:name=".MainActivity"></activity>
+        <activity android:name=".MainActivity"/>
         <activity android:name=".LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -35,27 +35,17 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".SignUpActivity"></activity>
+        <activity android:name=".SignUpActivity"/>
         <activity
             android:name=".user.fresh.HomeActivity"
-            android:windowSoftInputMode="adjustPan"></activity>
+            android:windowSoftInputMode="adjustPan"/>
 
-        <activity android:name=".host.HomeActivity"></activity>
-        <activity android:name=".host.signup.HostSignUpActivity"></activity>
-        <activity android:name=".user.fresh.offers.OfferActivity"></activity>
-        <activity android:name=".user.fresh.host_details.HostDetailsActivity"></activity>
-        <activity android:name=".OTPActivity"></activity>
+        <activity android:name=".host.HomeActivity"/>
+        <activity android:name=".host.signup.HostSignUpActivity"/>
+        <activity android:name=".user.fresh.offers.OfferActivity"/>
+        <activity android:name=".user.fresh.host_details.HostDetailsActivity"/>
+        <activity android:name=".OTPActivity"/>
 
-        <service android:name=".Notification.GcmTokenRefreshListenerService">
-            <intent-filter>
-                <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
-            </intent-filter>
-        </service>
-        <service android:name=".Notification.GcmNotificationListenerService">
-            <intent-filter>
-                <action android:name="com.google.firebase.MESSAGING_EVENT" />
-            </intent-filter>
-        </service>
         <service
             android:name=".socket.HostSocketService"
             android:process=":work_alley_background" />

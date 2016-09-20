@@ -35,11 +35,29 @@ public class RequestReceiver extends BroadcastReceiver {
                     case Constants.BOOKING_REQUEST:
                         try {
                             JSONObject userInfo = new JSONObject(bundle.getString(USER));
-                            //       UserInfo user = (UserInfo) Session.getInstance(context).getParsedResponseFromGSON(userInfo, Session.workAlleyModels.UserInfo);
 
                             Set<String> requestSet = new HashSet<>();
                             requestSet.add(userInfo.toString());
+
+                            /**
+                             * Mapped request id with user id as the key.
+                             * This can be done because host will receive only one request from one user.
+                             * Request can be retrieved later using that user's id.
+                             */
+                            SharedPrefsUtils.setStringPreference(context, userInfo.getString("_id"), bundle.getString(Constants.REQUEST_ID), Constants.SP_NAME);
                             SharedPrefsUtils.setHashSetPreference(context, Constants.BOOKING_REQUEST, requestSet, Constants.SP_NAME);
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                        break;
+                    case Constants.BOOKING_REJECT:
+                        try {
+                            JSONObject userInfo = new JSONObject(bundle.getString(USER));
+                            //       UserInfo user = (UserInfo) Session.getInstance(context).getParsedResponseFromGSON(userInfo, Session.workAlleyModels.UserInfo);
+
+                            SharedPrefsUtils.setStringPreference(context, Constants.BOOKING_REJECT, userInfo.toString(), Constants.SP_NAME);
 
                         } catch (JSONException e) {
                             e.printStackTrace();
