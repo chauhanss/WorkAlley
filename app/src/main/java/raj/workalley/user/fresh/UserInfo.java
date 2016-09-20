@@ -1,9 +1,11 @@
 package raj.workalley.user.fresh;
 
+import java.io.Serializable;
+
 /**
  * Created by shruti.vig on 9/8/16.
  */
-public class UserInfo {
+public class UserInfo implements Serializable {
 
     String name, _id, role, email;
     boolean active;
@@ -46,5 +48,10 @@ public class UserInfo {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return _id.equalsIgnoreCase(((UserInfo) o).get_id());
     }
 }

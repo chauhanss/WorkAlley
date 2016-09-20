@@ -33,6 +33,7 @@ import raj.workalley.Constants;
 import raj.workalley.R;
 import raj.workalley.Session;
 import raj.workalley.WorkspaceList;
+import raj.workalley.socket.HostSocketService;
 import raj.workalley.user.fresh.account.AccountFragment;
 import raj.workalley.user.fresh.map.MapFragment;
 import raj.workalley.user.fresh.settings.SettingFragment;
@@ -45,6 +46,8 @@ import raj.workalley.util.Helper;
 public class HomeActivity extends BaseActivity implements OnItemClickListener {
 
     private LoopBarView loopBarView;
+    Session session;
+
 
     private SimpleCategoriesAdapter categoriesAdapter;
     private SimpleFragmentStatePagerAdapter pagerAdapter;
@@ -64,7 +67,10 @@ public class HomeActivity extends BaseActivity implements OnItemClickListener {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_user);
+        session = Session.getInstance(this);
         initNavToolBar();
+        startUserService();
+
         //loopBarView = (LoopBarView) findViewById(R.id.endlessView);
 
         mContext = this;
@@ -83,6 +89,14 @@ public class HomeActivity extends BaseActivity implements OnItemClickListener {
 */
 
 
+    }
+
+    private void startUserService() {
+        Intent intent = new Intent(getBaseContext(), HostSocketService.class);
+        Bundle b = new Bundle();
+        b.putString(Constants.SESSION_COOKIES_ID, session.getSessionIdCookies());
+        intent.putExtras(b);
+        startService(intent);
     }
 
     private void initNavToolBar() {

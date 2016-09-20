@@ -228,10 +228,6 @@ public class Session {
 
     public void postFetch(final String url, JSONObject params, final Task task, final int method) {
 
-        if (Constants.DEBUG) {
-            Log.d("PayU", "SdkSession.postFetch: " + url + " " + params + " " + method);
-        }
-
         JsonObjectRequest myRequest = new JsonObjectRequest
                 (Request.Method.POST, getAbsoluteUrl(url), params, new com.android.volley.Response
                         .Listener<JSONObject>() {
@@ -276,8 +272,8 @@ public class Session {
         };
         myRequest.setShouldCache(false);
         myRequest.setRetryPolicy(new DefaultRetryPolicy(60000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT)
+                        DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                        DefaultRetryPolicy.DEFAULT_BACKOFF_MULT)
 
         );
 
@@ -287,64 +283,62 @@ public class Session {
 
     }
 
-    public void postFetch2(final String url, final Map<String, String> params, final Task task, final int method) {
+    public void putFetch(final String url, String params, final Task task, final int method) {
 
-        if (Constants.DEBUG) {
-            Log.d(TAG, "SdkSession.postFetch: " + url + " " + params + " " + method);
-        }
-        StringRequest myRequest = new StringRequest(method, getAbsoluteUrl(url), new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-
-                Log.d(TAG, "SdkSession.postFetch: " + "success");
-                try {
-
-                    JSONObject object = new JSONObject(response);
-                    runSuccessOnHandlerThread(task, object);
-
-                } catch (JSONException e) {
-                    onFailure(e.getMessage(), e);
-                }
-            }
-
-            public void onFailure(String msg, Throwable e) {
-                runErrorOnHandlerThread(task, e);
-            }
-
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d(TAG, "SdkSession.postFetch: " + "error");
-                runErrorOnHandlerThread(task, error);
-            }
-        }) {
-            @Override
-            protected Map<String, String> getParams() {
-                return params;
-            }
-
+        JsonObjectRequest myRequest = new JsonObjectRequest
+                (Request.Method.PUT, getAbsoluteUrl(url), params, new com.android.volley.Response
+                        .Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Log.e(TAG, response + "");
+                        runSuccessOnHandlerThread(task, response);
+                    }
+                }, new com.android.volley.Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.e(TAG, error.getMessage() + "");
+                        runErrorOnHandlerThread(task, error);
+                    }
+                }) {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 HashMap<String, String> headers = new HashMap<String, String>();
-                headers.put("Content-Type", "application/json; charset=utf-8");
+                headers.put("Content-Type", "application/json");
+                //String sessionId = Hawk.get("connect.sid", "");
                 return headers;
             }
+
+            @Override
+            protected Response<JSONObject> parseNetworkResponse(NetworkResponse response) {
+                try {
+                    String jsonString = new String(response.data,
+                            HttpHeaderParser.parseCharset(response.headers, PROTOCOL_CHARSET));
+                    JSONObject jsonResponse = new JSONObject(jsonString);
+                    String sessionId = response.headers.get("set-cookie");
+                    setSessionIdCookies(sessionId);
+                    jsonResponse.put("headers", new JSONObject(response.headers));
+                    return Response.success(jsonResponse,
+                            HttpHeaderParser.parseCacheHeaders(response));
+                } catch (UnsupportedEncodingException e) {
+                    return Response.error(new ParseError(e));
+                } catch (JSONException je) {
+                    return Response.error(new ParseError(je));
+                }
+            }
+
         };
         myRequest.setShouldCache(false);
-        myRequest.setRetryPolicy(new DefaultRetryPolicy(
-                30000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        addToRequestQueue(myRequest);
+        myRequest.setRetryPolicy(new DefaultRetryPolicy(60000,
+                        DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                        DefaultRetryPolicy.DEFAULT_BACKOFF_MULT)
 
+        );
+
+        addToRequestQueue(myRequest);
     }
 
 
     public void getFetch(final String url, String params, final Task task, final int method) {
-
-        if (Constants.DEBUG) {
-            Log.d("PayU", "SdkSession.postFetch: " + url + " " + params + " " + method);
-        }
 
         JsonObjectRequest myRequest = new JsonObjectRequest
                 (method, getAbsoluteUrl(url), params, new com.android.volley.Response
@@ -370,8 +364,8 @@ public class Session {
         };
         myRequest.setShouldCache(false);
         myRequest.setRetryPolicy(new DefaultRetryPolicy(30000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT)
+                        DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                        DefaultRetryPolicy.DEFAULT_BACKOFF_MULT)
 
         );
 
@@ -628,6 +622,43 @@ public class Session {
     }
 
 
+    public void acceptRejectWorkspaceBookSeatRequest(final UserInfo user, final boolean isReject, String requestId) {
 
+        String getRequestUrl = "";
+        if (isReject) {
+            getRequestUrl = "requests/" + requestId + "/reject";
+        } else {
+            getRequestUrl = "requests/" + requestId + "/accept";
+        }
+
+        putFetch(getRequestUrl, null, new Task() {
+
+            @Override
+            public void onSuccess(JSONObject jsonObject) {
+                try {
+                    jsonObject.put("isRejectRequest", isReject);
+                    jsonObject.put("user", user);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                eventBus.post(new CobbocEvent(CobbocEvent.ACCEPT_REJECT_BOOKING_REQUEST, true, jsonObject));
+            }
+
+            @Override
+            public void onSuccess(String response) {
+
+            }
+
+            @Override
+            public void onError(Throwable throwable) {
+                eventBus.post(new CobbocEvent(CobbocEvent.ACCEPT_REJECT_BOOKING_REQUEST, false, "An error occurred while trying to login. Please try again later."));
+            }
+
+            @Override
+            public void onProgress(int percent) {
+
+            }
+        }, Request.Method.PUT);
+    }
 
 }

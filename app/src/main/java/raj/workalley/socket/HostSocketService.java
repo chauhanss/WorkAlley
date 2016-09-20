@@ -21,11 +21,15 @@ import com.github.nkzawa.socketio.client.IO;
 import com.github.nkzawa.socketio.client.Manager;
 import com.github.nkzawa.socketio.client.Socket;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.net.URISyntaxException;
 import java.util.Map;
 
 import raj.workalley.Constants;
 import raj.workalley.R;
+import raj.workalley.RequestReceiver;
 import raj.workalley.Session;
 import raj.workalley.util.SharedPrefsUtils;
 
@@ -34,22 +38,11 @@ import raj.workalley.util.SharedPrefsUtils;
  */
 public class HostSocketService extends Service {
 
-    /**
-     * indicates how to behave if the service is killed
-     */
+    private static final String USER = "user";
+    private static final String REQUEST_TYPE = "requestType";
     int mStartMode;
-
-    /**
-     * interface for clients that bind
-     */
     IBinder mBinder;
-
-    /**
-     * indicates whether onRebind should be used
-     */
     boolean mAllowRebind;
-
-
     public Socket mSocket;
     static int count = 0;
 
@@ -124,48 +117,107 @@ public class HostSocketService extends Service {
             SharedPrefsUtils.setStringPreference(this, Constants.SESSION_COOKIES_ID, cookieId, Constants.SP_NAME);
         }
         String cookieStr = SharedPrefsUtils.getStringPreference(this, Constants.SESSION_COOKIES_ID, Constants.SP_NAME);
-        Log.e("here", "service started");
         initSocket();
         connectToServer();
         sendCookies(cookieStr);
-        Log.e("here", cookieStr);
         authHost();
-        //Log.e("")
         mSocket.on("BOOKING_REQUESTED", new Emitter.Listener() {
             @Override
             public void call(Object... args) {
-                //dialog goes here
-                Log.e("here", "BOOKING_REQUESTED");
-                createNoti(++count);
-                //Toast.makeText(getApplicationContext(), "BOOKING_REQUESTED" + " " + "enjoy", Toast.LENGTH_LONG).show();
+
+                try {
+
+                    JSONObject jsonObject = new JSONObject(args[0].toString());
+                    Intent i = new Intent(HostSocketService.this, RequestReceiver.class);
+
+                    Bundle bundle = new Bundle();
+                    if (jsonObject.has("user") && !jsonObject.isNull("user")) {
+
+                        JSONObject userObject = (JSONObject) jsonObject.get("user");
+                        bundle.putString(USER, userObject.toString());
+                        bundle.putString(Constants.REQUEST_ID, jsonObject.get("_id").toString());
+                        bundle.putString(REQUEST_TYPE, "BOOKING_REQUESTED");
+
+                        if (userObject.has("name") && !userObject.isNull("name"))
+                            createNotification(userObject.getString("name"), "xyz", "BOOKING_REQUESTED");
+                        i.putExtra("bundle", bundle);
+                        sendBroadcast(i);
+                    }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
             }
         });
+
+        mSocket.on("BOOKING_REJECTED", new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+
+                try {
+                    JSONObject jsonObject = new JSONObject(args[0].toString());
+                    Intent i = new Intent(HostSocketService.this, RequestReceiver.class);
+
+                    Bundle bundle = new Bundle();
+                    if (jsonObject.has("user") && !jsonObject.isNull("user")) {
+
+                        JSONObject userObject = (JSONObject) jsonObject.get("user");
+                        bundle.putString(USER, jsonObject.get("user").toString());
+                        bundle.putString(REQUEST_TYPE, "BOOKING_REJECTED");
+                        if (userObject.has("name") && !userObject.isNull("name"))
+                            createNotification(userObject.getString("name"), "xyz", "BOOKING_REJECTED");
+                        i.putExtra("bundle", bundle);
+                        sendBroadcast(i);
+                    }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        });
+
+
         return START_STICKY;
     }
 
-    public void createNoti(int count) {
+    public void createNotification(String userName, String workspace, String requestType) {
+
+        String messageText = "";
+        switch (requestType) {
+            case "BOOKING_REQUESTED":
+                messageText = userName + " has requested a seat in your workspace " + workspace + ".Please accept/reject their request";
+                break;
+            case "BOOKING_REJECTED":
+                messageText = "Sorry " + userName + "! Your request for a seat in " + workspace + " has been rejected. Please try again later.";
+
+        }
+        Intent dismissIntent = new Intent(this, raj.workalley.LoginActivity.class);
+        PendingIntent piDismiss = PendingIntent.getActivity(this, 0, dismissIntent, 0);
+
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
                         .setSmallIcon(R.drawable.ic_account)
-                        .setContentTitle("My notification " + count)
-                        .setContentText("Hello World!");
+                        .setContentTitle(messageText)
+                        .setContentIntent(piDismiss);
+
+        NotificationCompat.BigTextStyle inboxStyle = new NotificationCompat.BigTextStyle();
+        inboxStyle.setBigContentTitle(messageText);
+        mBuilder.setStyle(inboxStyle);
+
 
         int mNotificationId = 001;
-// Gets an instance of the NotificationManager service
         NotificationManager mNotifyMgr =
                 (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-// Builds the notification and issues it.
         mNotifyMgr.notify(mNotificationId, mBuilder.build());
-
     }
 
     @Override
     public void onDestroy() {
         Log.e("here", "service stopped");
-        //Log.e(LOG_TAG, "------------------------------------------ Destroyed Location update Service");
-        //cleanUp();
         super.onDestroy();
-        // startService(new Intent(this, HostSocketService.class)); // add this line
+        //     startService(new Intent(this, HostSocketService.class));
     }
 
     @Nullable

@@ -45,4 +45,15 @@ public class Constants {
     public static final String SP_NAME = "workAlleySharedPref";
     public static final int HOST_DETAILS_ACTIVITY_REQUEST_DETAILS = 12;
     public static final int RESULT_OK = 1;
+
+
+    /**
+     * Socket Requests
+     */
+    public static final String REQUEST_TYPE = "requestType";
+
+    public static final String BOOKING_REQUEST = "BOOKING_REQUESTED";
+    public static final String BOOKING_REJECT= "BOOKING_REJECTED";
+    public static final String BOOKING_ACCEPT = "BOOKING_ACCEPTED";
+    public static final String REQUEST_ID = "request_id";
 }

@@ -22,10 +22,10 @@
 
     <TextView
         android:id="@+id/progress_text_view"
-        android:layout_marginTop="@dimen/margin_10"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="@dimen/margin_20"
+        android:layout_marginTop="@dimen/margin_10"
         android:text="@string/waiting"
         android:textColor="@color/colorPrimary" />
 
@@ -38,9 +38,19 @@
         android:orientation="horizontal">
 
         <Button
+            android:id="@+id/start_session_btn"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:layout_weight="1"
+            android:background="@color/colorAccent"
+            android:text="End Session" />
+
+        <Button
             android:id="@+id/end_session_btn"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_margin="10dp"
             android:layout_weight="1"
             android:background="@color/colorAccent"
             android:text="End Session" />
