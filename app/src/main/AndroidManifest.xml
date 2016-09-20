@@ -48,7 +48,12 @@
 
         <service
             android:name=".socket.HostSocketService"
-            android:process=":work_alley_background" />
+            android:process=":work_alley_host_background"></service>
+
+        <service
+            android:name=".socket.UserSocketService"
+            android:process=":work_alley_user_background"></service>
+
 
         <receiver
             android:name=".RequestReceiver"

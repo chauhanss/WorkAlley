@@ -1,6 +1,7 @@
 package raj.workalley.user.fresh.host_details;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
@@ -15,6 +16,7 @@ import android.widget.Toast;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -43,6 +45,7 @@ public class HostDetailsActivity extends BaseActivity {
     Button bookSeat;
     String workspaceId;
     UserInfo mUser = null;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -206,10 +209,24 @@ public class HostDetailsActivity extends BaseActivity {
                 Helper.dismissProgressDialog();
                 if (event.getStatus()) {
                     JSONObject jsonObject = (JSONObject) event.getValue();
+
+                    Intent intent = new Intent();
+                    try {
+                        Bundle b = new Bundle();
+                        b.putString(Constants.WORKSPACE_NAME, jsonObject.getJSONObject("space").getString("name"));
+                        intent.putExtras(b);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    setResult(Constants.HOST_DETAILS_ACTIVITY_REQUEST_DETAILS, intent);
+                    finish();
+                    bookSeat.setText("Request Pending");
+
                     TextView requestStatus = (TextView) findViewById(R.id.request_status);
                     requestStatus.setText("Request Pending! Please refresh to get updated data!");
                     bookSeat.setText("CANCEL REQUEST");
                     requestStatus.setTextColor(ContextCompat.getColor(mContext, android.R.color.holo_blue_dark));
+
                     break;
                 }
             }

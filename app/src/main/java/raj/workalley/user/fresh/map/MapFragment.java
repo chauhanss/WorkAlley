@@ -150,6 +150,7 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback, Loc
 
     }
 
+
     @Override
     public boolean onMarkerClick(final Marker marker) {
 
@@ -159,10 +160,9 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback, Loc
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-
                 Intent intent = new Intent(getActivity(), HostDetailsActivity.class);
                 intent.putExtra(Constants.WORKSPACE_ID, mMarkersMap.get(marker.getId()));
-                startActivity(intent);
+                getActivity().startActivityForResult(intent, Constants.HOST_DETAILS_ACTIVITY_REQUEST_DETAILS);
             }
         }, 500);
         return false;
@@ -191,6 +191,8 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback, Loc
             }
         }
     }
+
+
 
     public HashMap<Integer, ArrayList<Double>> dummyLocationList() {
 

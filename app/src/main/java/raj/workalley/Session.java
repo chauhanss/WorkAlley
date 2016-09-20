@@ -533,7 +533,7 @@ public class Session {
             public void onProgress(int percent) {
 
             }
-        }, Request.Method.POST);
+        }, Request.Method.GET);
 
 
     }
