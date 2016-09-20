@@ -13,6 +13,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.json.JSONException;
@@ -58,16 +60,21 @@ public class UserRequestFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         Toolbar toolbar = (Toolbar) view.findViewById(R.id.toolbar);
-        toolbar.setTitle("USER REQUESTS");
+        toolbar.findViewById(R.id.refresh).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setUpRecyclerViewAdapter();
+            }
+        });
 
         userRequestsListView = (RecyclerView) view.findViewById(R.id.requests);
-        userRequests = SharedPrefsUtils.getHashSetPreference(getActivity(), Constants.BOOKING_REQUEST, Constants.SP_NAME);
         setUpRecyclerViewAdapter();
 
     }
 
     private void setUpRecyclerViewAdapter() {
 
+        userRequests = SharedPrefsUtils.getHashSetPreference(getActivity(), Constants.BOOKING_REQUEST, Constants.SP_NAME);
         if (userRequests != null && userRequests.size() > 0) {
 
             userRequestList = new ArrayList<>();
@@ -130,6 +137,17 @@ public class UserRequestFragment extends Fragment {
             Toast.makeText(mContext, "No internet", Toast.LENGTH_LONG).show();
     }
 
+    public void acceptRequest(UserInfo user) {
+
+        if (Helper.isConnected(mContext)) {
+            Helper.showProgressDialogSpinner(mContext, "Please Wait", "Accepting request", false);
+
+            String requestId = SharedPrefsUtils.getStringPreference(mContext, user.get_id(), Constants.SP_NAME);
+            Session.getInstance(mContext).acceptRejectWorkspaceBookSeatRequest(user, false, requestId);
+        } else
+            Toast.makeText(mContext, "No internet", Toast.LENGTH_LONG).show();
+    }
+
     @Subscribe
     public void onEventMainThread(CobbocEvent event) {
         Helper.dismissProgressDialog();
@@ -137,19 +155,18 @@ public class UserRequestFragment extends Fragment {
             case CobbocEvent.ACCEPT_REJECT_BOOKING_REQUEST:
                 try {
                     JSONObject jsonObject = (JSONObject) event.getValue();
-                    if (jsonObject.getBoolean("isRejectRequest")) {
 
-                        UserInfo user = (UserInfo) jsonObject.get("user");
-                        if (userRequestList != null) {
-                            userRequestList.remove(user.get_id());
+                    UserInfo user = (UserInfo) jsonObject.get("user");
+                    if (userRequestList != null) {
+                        userRequestList.remove(user);
 
-                            SharedPrefsUtils.removePreferenceByKey(mContext, user.get_id(), Constants.SP_NAME);
-                            SharedPrefsUtils.removeSetInHashSetPreference(mContext, Constants.BOOKING_REQUEST, user, Constants.SP_NAME);
-                            invalidateList(userRequestList);
-                        }
-                    } else {
-
+                        Gson gson = new Gson();
+                        String jsonUser = gson.toJson(user);
+                        SharedPrefsUtils.removePreferenceByKey(mContext, user.get_id(), Constants.SP_NAME);
+                        SharedPrefsUtils.removeSetInHashSetPreference(mContext, Constants.BOOKING_REQUEST, jsonUser, Constants.SP_NAME);
+                        invalidateList(userRequestList);
                     }
+
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }

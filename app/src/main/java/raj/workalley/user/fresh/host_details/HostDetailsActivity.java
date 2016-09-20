@@ -4,9 +4,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -27,6 +29,7 @@ import raj.workalley.Constants;
 import raj.workalley.R;
 import raj.workalley.Session;
 import raj.workalley.WorkspaceList;
+import raj.workalley.user.fresh.UserInfo;
 import raj.workalley.util.AmenitiesListAdapter;
 import raj.workalley.util.Helper;
 import raj.workalley.util.SharedPrefsUtils;
@@ -41,6 +44,7 @@ public class HostDetailsActivity extends BaseActivity {
     WorkspaceList.Workspace mWorkspace = null;
     Button bookSeat;
     String workspaceId;
+    UserInfo mUser = null;
 
 
     @Override
@@ -49,6 +53,7 @@ public class HostDetailsActivity extends BaseActivity {
         setContentView(R.layout.activity_host_details);
         mContext = this;
         mSession = Session.getInstance(mContext);
+        mUser = mSession.getUser();
 
         if (getIntent() != null) {
             workspaceId = getIntent().getStringExtra(Constants.WORKSPACE_ID);
@@ -71,12 +76,6 @@ public class HostDetailsActivity extends BaseActivity {
         }
         bookSeat = (Button) findViewById(R.id.book_seat);
 
-        if (SharedPrefsUtils.hasKey(mContext, Constants.BOOKING_REJECT, Constants.SP_NAME)) {
-            //      bookSeat.setEnabled(false);
-            bookSeat.setText("Request Rejected");
-        } else if (SharedPrefsUtils.hasKey(mContext, Constants.BOOKING_ACCEPT, Constants.SP_NAME)) {
-            //session start/end layout
-        }
         bookSeat.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -85,10 +84,42 @@ public class HostDetailsActivity extends BaseActivity {
                     mSession.requestSeat(mSession.getUser().get_id(), workspaceId);
                 } else
                     Toast.makeText(mContext, "No internet", Toast.LENGTH_LONG).show();
-
-
             }
         });
+
+        findViewById(R.id.refresh).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getLatestDataFromSharedPreference();
+            }
+        });
+    }
+
+    public void getLatestDataFromSharedPreference() {
+        TextView requestStatus = (TextView) findViewById(R.id.request_status);
+        if (SharedPrefsUtils.hasKey(mContext, mUser.get_id(), Constants.SP_NAME)) {
+
+            String value = SharedPrefsUtils.getStringPreference(mContext, mUser.get_id(), Constants.SP_NAME);
+
+            String requestType = value.substring(0, value.lastIndexOf("|"));
+            String workspace = value.substring(value.lastIndexOf("|") + 1, value.length());
+            Log.d("SHRUTI", "request " + requestType + "workspace " + workspace);
+
+            if (workspace.equalsIgnoreCase(workspaceId)) {
+                switch (requestType) {
+                    case Constants.BOOKING_ACCEPT:
+                        requestStatus.setTextColor(ContextCompat.getColor(mContext, android.R.color.holo_green_dark));
+                        requestStatus.setText("*Your request to book a seat for this workspace has been accepted!");
+                        //start session
+                        break;
+                    case Constants.BOOKING_REJECT:
+                        requestStatus.setTextColor(ContextCompat.getColor(mContext, android.R.color.holo_red_dark));
+                        requestStatus.setText("*Sorry! Your request to book a seat for this workspace has been rejected!");
+                        break;
+                }
+            }
+
+        }
     }
 
     @Override
@@ -97,6 +128,8 @@ public class HostDetailsActivity extends BaseActivity {
 
         if (!EventBus.getDefault().isRegistered(mContext))
             EventBus.getDefault().register(mContext);
+
+        getLatestDataFromSharedPreference();
     }
 
     @Override
@@ -174,6 +207,7 @@ public class HostDetailsActivity extends BaseActivity {
                 Helper.dismissProgressDialog();
                 if (event.getStatus()) {
                     JSONObject jsonObject = (JSONObject) event.getValue();
+
                     Intent intent = new Intent();
                     try {
                         Bundle b = new Bundle();
@@ -185,6 +219,11 @@ public class HostDetailsActivity extends BaseActivity {
                     setResult(Constants.HOST_DETAILS_ACTIVITY_REQUEST_DETAILS, intent);
                     finish();
                     bookSeat.setText("Request Pending");
+
+                    TextView requestStatus = (TextView) findViewById(R.id.request_status);
+                    requestStatus.setText("Request Pending! Please refresh to get updated data!");
+                    requestStatus.setTextColor(ContextCompat.getColor(mContext, android.R.color.holo_blue_dark));
+
                     break;
                 }
             }

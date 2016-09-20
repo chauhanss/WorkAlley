@@ -7,11 +7,24 @@ import java.io.Serializable;
  */
 public class UserInfo implements Serializable {
 
-    String name, _id, role, email;
+    String name, _id, role, email, updatedAt,createdAt;
     boolean active;
+    int __v;
 
     public String get_id() {
         return _id;
+    }
+
+    public String getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public int get__v() {
+        return __v;
+    }
+
+    public String getCreatedAt() {
+        return createdAt;
     }
 
     public String getEmail() {

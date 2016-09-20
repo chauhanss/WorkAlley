@@ -175,7 +175,6 @@ public class LoginActivity extends BaseActivity {
                 Helper.dismissProgressDialog();
                 if (event.getStatus()) {
                     Toast.makeText(mContext, "Details fetched successfully.", Toast.LENGTH_LONG).show();
-
                 } else {
                     Toast.makeText(mContext, "Details not fetched.", Toast.LENGTH_LONG).show();
                 }

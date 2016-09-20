@@ -40,6 +40,7 @@ public class HostSocketService extends Service {
 
     private static final String USER = "user";
     private static final String REQUEST_TYPE = "requestType";
+    private static final String WORKSPACE = "workspace_id";
     int mStartMode;
     IBinder mBinder;
     boolean mAllowRebind;
@@ -162,11 +163,13 @@ public class HostSocketService extends Service {
                     Bundle bundle = new Bundle();
                     if (jsonObject.has("user") && !jsonObject.isNull("user")) {
 
+                        JSONObject space = (JSONObject) jsonObject.get("space");
                         JSONObject userObject = (JSONObject) jsonObject.get("user");
                         bundle.putString(USER, jsonObject.get("user").toString());
+                        bundle.putString(WORKSPACE, space.getString("_id"));
                         bundle.putString(REQUEST_TYPE, "BOOKING_REJECTED");
                         if (userObject.has("name") && !userObject.isNull("name"))
-                            createNotification(userObject.getString("name"), "xyz", "BOOKING_REJECTED");
+                            createNotification(userObject.getString("name"), space.getString("name"), "BOOKING_REJECTED");
                         i.putExtra("bundle", bundle);
                         sendBroadcast(i);
                     }
@@ -178,6 +181,38 @@ public class HostSocketService extends Service {
             }
         });
 
+        mSocket.on("BOOKING_ACCEPTED", new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+
+                try {
+                    JSONObject jsonObject = new JSONObject(args[0].toString());
+                    Intent i = new Intent(HostSocketService.this, RequestReceiver.class);
+
+                    Bundle bundle = new Bundle();
+                    if (jsonObject.has("user") && !jsonObject.isNull("user")) {
+                        /**
+                         * workspace : workspace id
+                         * user : user Info object
+                         * request Type
+                         */
+                        JSONObject space = (JSONObject) jsonObject.get("space");
+                        JSONObject userObject = (JSONObject) jsonObject.get("user");
+                        bundle.putString(USER, jsonObject.get("user").toString());
+                        bundle.putString(WORKSPACE, space.getString("_id"));
+                        bundle.putString(REQUEST_TYPE, "BOOKING_ACCEPTED");
+                        if (userObject.has("name") && !userObject.isNull("name"))
+                            createNotification(userObject.getString("name"), space.getString("name"), "BOOKING_ACCEPTED");
+                        i.putExtra("bundle", bundle);
+                        sendBroadcast(i);
+                    }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        });
 
         return START_STICKY;
     }
@@ -187,10 +222,14 @@ public class HostSocketService extends Service {
         String messageText = "";
         switch (requestType) {
             case "BOOKING_REQUESTED":
-                messageText = userName + " has requested a seat in your workspace " + workspace + ".Please accept/reject their request";
+                messageText = userName + " has requested a seat in your workspace " + workspace + ". Please accept/reject their request";
                 break;
             case "BOOKING_REJECTED":
                 messageText = "Sorry " + userName + "! Your request for a seat in " + workspace + " has been rejected. Please try again later.";
+                break;
+            case "BOOKING_ACCEPTED":
+                messageText = "Your request for a seat in " + workspace + " has been accepted. You can start working!.";
+                break;
 
         }
         Intent dismissIntent = new Intent(this, raj.workalley.LoginActivity.class);
@@ -199,12 +238,10 @@ public class HostSocketService extends Service {
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
                         .setSmallIcon(R.drawable.ic_account)
-                        .setContentTitle(messageText)
+                        .setContentText(messageText)
+                        .setStyle(new NotificationCompat.BigTextStyle().bigText(messageText))
+                        .setContentTitle(requestType)
                         .setContentIntent(piDismiss);
-
-        NotificationCompat.BigTextStyle inboxStyle = new NotificationCompat.BigTextStyle();
-        inboxStyle.setBigContentTitle(messageText);
-        mBuilder.setStyle(inboxStyle);
 
 
         int mNotificationId = 001;
@@ -217,7 +254,7 @@ public class HostSocketService extends Service {
     public void onDestroy() {
         Log.e("here", "service stopped");
         super.onDestroy();
-        //     startService(new Intent(this, HostSocketService.class));
+        startService(new Intent(this, HostSocketService.class));
     }
 
     @Nullable

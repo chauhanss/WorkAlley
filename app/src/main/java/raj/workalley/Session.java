@@ -540,7 +540,7 @@ public class Session {
 
     public void getUserWorkspaceData(String userId) {
 
-        String getRequestUrl = "requests?user=" + userId;
+        String getRequestUrl = "users/" + userId + "/spaces";
 
         getFetch(getRequestUrl, null, new Task() {
 

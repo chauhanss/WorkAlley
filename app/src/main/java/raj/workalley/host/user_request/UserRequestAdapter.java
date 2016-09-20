@@ -93,11 +93,10 @@ public class UserRequestAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
             switch (v.getId()) {
                 case R.id.reject:
-
                     mContext.rejectRequest(user);
-
                     break;
                 case R.id.accept:
+                    mContext.acceptRequest(user);
                     break;
             }
         }
