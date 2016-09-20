@@ -68,7 +68,6 @@ public class HomeActivity extends BaseActivity implements OnItemClickListener {
         setContentView(R.layout.activity_home_user);
         session = Session.getInstance(this);
         initNavToolBar();
-        startUserService();
 
         //loopBarView = (LoopBarView) findViewById(R.id.endlessView);
 
@@ -88,14 +87,6 @@ public class HomeActivity extends BaseActivity implements OnItemClickListener {
 */
 
 
-    }
-
-    private void startUserService() {
-        Intent intent = new Intent(getBaseContext(), HostSocketService.class);
-        Bundle b = new Bundle();
-        b.putString(Constants.SESSION_COOKIES_ID, session.getSessionIdCookies());
-        intent.putExtras(b);
-        startService(intent);
     }
 
     private void initNavToolBar() {

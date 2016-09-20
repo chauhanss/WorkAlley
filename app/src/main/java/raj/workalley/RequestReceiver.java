@@ -53,11 +53,17 @@ public class RequestReceiver extends BroadcastReceiver {
 
                         break;
                     case Constants.BOOKING_REJECT:
+                    case Constants.BOOKING_ACCEPT:
                         try {
                             JSONObject userInfo = new JSONObject(bundle.getString(USER));
                             //       UserInfo user = (UserInfo) Session.getInstance(context).getParsedResponseFromGSON(userInfo, Session.workAlleyModels.UserInfo);
 
-                            SharedPrefsUtils.setStringPreference(context, Constants.BOOKING_REJECT, userInfo.toString(), Constants.SP_NAME);
+                            /**
+                             * key : user ID, value : pipe separated requestType and workspace id
+                             * user : user Info object saved with key requestType
+                             */
+                            SharedPrefsUtils.setStringPreference(context, userInfo.getString("_id"), requestType + "|" + bundle.getString("workspace_id"), Constants.SP_NAME);
+                  //          SharedPrefsUtils.setStringPreference(context, Constants.BOOKING_REJECT, userInfo.toString(), Constants.SP_NAME);
 
                         } catch (JSONException e) {
                             e.printStackTrace();

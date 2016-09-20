@@ -5,8 +5,12 @@ import android.content.SharedPreferences;
 import android.text.TextUtils;
 import android.util.Log;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -105,17 +109,31 @@ public class SharedPrefsUtils {
         return false;
     }
 
-    public static boolean removeSetInHashSetPreference(Context context, String key, UserInfo user, String file) {
+    public static boolean removeSetInHashSetPreference(Context context, String key, String user, String file) {
         SharedPreferences preferences = context.getSharedPreferences(file, Context.MODE_PRIVATE);
-        Set<String> set = preferences.getStringSet(key, null);
-        if (preferences != null && !TextUtils.isEmpty(key)) {
 
-            set.remove(user.get_id());
-            SharedPreferences.Editor editor = preferences.edit();
-            if (set != null)
-                set.addAll(set);
-            editor.putStringSet(key, set);
-            return editor.commit();
+        try {
+            JSONObject deleteUser = new JSONObject(user);
+            Set<String> set = preferences.getStringSet(key, null);
+            if (preferences != null && !TextUtils.isEmpty(key)) {
+
+                for (String stringUser : set) {
+
+                    JSONObject users = new JSONObject(stringUser);
+                    if (users.has("_id") && deleteUser.has("_id")) {
+                        if (users.getString("_id").equalsIgnoreCase(deleteUser.getString("_id"))) {
+                            set.remove(stringUser);
+                        }
+                    }
+                }
+                SharedPreferences.Editor editor = preferences.edit();
+                if (set != null)
+                    set.addAll(set);
+                editor.putStringSet(key, set);
+                return editor.commit();
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
         return false;
 
