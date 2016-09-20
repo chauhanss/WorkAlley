@@ -105,11 +105,13 @@ public class HostDetailsActivity extends BaseActivity {
             if (workspace.equalsIgnoreCase(workspaceId)) {
                 switch (requestType) {
                     case Constants.BOOKING_ACCEPT:
+                        bookSeat.setText("END SESSION");
                         requestStatus.setTextColor(ContextCompat.getColor(mContext, android.R.color.holo_green_dark));
                         requestStatus.setText("*Your request to book a seat for this workspace has been accepted!");
                         //start session
                         break;
                     case Constants.BOOKING_REJECT:
+                        bookSeat.setText("BOOK A SEAT");
                         requestStatus.setTextColor(ContextCompat.getColor(mContext, android.R.color.holo_red_dark));
                         requestStatus.setText("*Sorry! Your request to book a seat for this workspace has been rejected!");
                         break;
@@ -206,6 +208,7 @@ public class HostDetailsActivity extends BaseActivity {
                     JSONObject jsonObject = (JSONObject) event.getValue();
                     TextView requestStatus = (TextView) findViewById(R.id.request_status);
                     requestStatus.setText("Request Pending! Please refresh to get updated data!");
+                    bookSeat.setText("CANCEL REQUEST");
                     requestStatus.setTextColor(ContextCompat.getColor(mContext, android.R.color.holo_blue_dark));
                     break;
                 }
