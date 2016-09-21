@@ -184,7 +184,7 @@ public class HomeActivity extends BaseActivity implements OnItemClickListener {
 
         List<Fragment> list = new ArrayList<>(3);
         list.add(SettingFragment.newInstance());
-        //list.add(DashboardFragment.newInstance());
+        list.add(DashboardFragment.newInstance());
         list.add(UserRequestFragment.newInstance());
         pagerAdapter = new SimpleFragmentStatePagerAdapter(getSupportFragmentManager(), list);
         viewPager.setAdapter(pagerAdapter);
@@ -196,12 +196,12 @@ public class HomeActivity extends BaseActivity implements OnItemClickListener {
                         Color.parseColor("#EE946F")
                 ).build()
         );
-        /*models.add(
+        models.add(
                 new NavigationTabBar.Model.Builder(
                         getResources().getDrawable(R.drawable.ic_account),
                         Color.parseColor("#EE946F")
                 ).build()
-        );*/
+        );
         models.add(
                 new NavigationTabBar.Model.Builder(
                         getResources().getDrawable(R.drawable.ic_calendar),
