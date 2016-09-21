@@ -724,4 +724,32 @@ public class Session {
         }, Request.Method.PUT);
     }
 
+    public void getAllActiveUsersInWorkspace(String ownerId) {
+        String getRequestUrl = "/hosts/" + ownerId + "/requests/active";
+
+        getFetch(getRequestUrl, null, new Task() {
+
+            @Override
+            public void onSuccess(JSONObject jsonObject) {
+                eventBus.post(new CobbocEvent(CobbocEvent.GET_ALL_ACTIVE_USERS, true, jsonObject));
+            }
+
+            @Override
+            public void onSuccess(String response) {
+
+            }
+
+            @Override
+            public void onError(Throwable throwable) {
+                eventBus.post(new CobbocEvent(CobbocEvent.GET_ALL_ACTIVE_USERS, false, "An error occurred while trying to login. Please try again later."));
+            }
+
+            @Override
+            public void onProgress(int percent) {
+
+            }
+        }, Request.Method.GET);
+    }
+
+
 }

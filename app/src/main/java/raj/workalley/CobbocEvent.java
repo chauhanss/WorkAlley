@@ -13,6 +13,7 @@ public class CobbocEvent {
     public static final int REQUEST_SEAT = 7;
     public static final int ACCEPT_REJECT_BOOKING_REQUEST = 8;
     public static final int LOGOUT = 9;
+    public static final int GET_ALL_ACTIVE_USERS = 10;
 
     private boolean STATUS;
 
