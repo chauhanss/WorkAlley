@@ -62,9 +62,11 @@ public class HostSocketService extends Service {
         IO.Options headers = new IO.Options();
         try {
             mSocket = IO.socket("http://app.workalley.in", headers);
+
         } catch (URISyntaxException e) {
         }
         mSocket.connect();
+        mSocket.emit("authenticate", token);
     }
 
     public void connectToServer() {

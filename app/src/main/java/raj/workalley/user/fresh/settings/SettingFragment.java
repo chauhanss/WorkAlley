@@ -22,6 +22,7 @@ import raj.workalley.R;
 import raj.workalley.Session;
 import raj.workalley.WorkspaceList;
 import raj.workalley.util.Helper;
+import raj.workalley.util.SharedPrefsUtils;
 
 /**
  * Created by vishal.raj on 9/5/16.
@@ -48,12 +49,11 @@ public class SettingFragment extends Fragment {
         save_n_logout_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!editMode){
+                if (!editMode) {
                     mSession.logout();
                     Intent intent = new Intent(getActivity(), LoginActivity.class);
                     startActivity(intent);
-                }
-                else
+                } else
                     mSession.saveUserDetails();
             }
         });
@@ -101,6 +101,7 @@ public class SettingFragment extends Fragment {
                 Helper.dismissProgressDialog();
                 if (event.getStatus()) {
                     Toast.makeText(getActivity(), "logout", Toast.LENGTH_LONG).show();
+                    SharedPrefsUtils.clearSharedPreferenceFile(getActivity());
                     break;
                 }
             }

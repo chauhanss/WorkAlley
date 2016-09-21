@@ -14,6 +14,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import raj.workalley.Constants;
 import raj.workalley.user.fresh.UserInfo;
 
 /**
@@ -135,6 +136,13 @@ public class SharedPrefsUtils {
             e.printStackTrace();
         }
         return false;
+
+    }
+
+    public static void clearSharedPreferenceFile(Context context) {
+
+        SharedPreferences preferences = context.getSharedPreferences(Constants.SP_NAME, Context.MODE_PRIVATE);
+        preferences.edit().clear().commit();
 
     }
 
