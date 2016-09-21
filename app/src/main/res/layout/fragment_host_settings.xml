@@ -27,11 +27,12 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="right"
-                    android:focusable="true"
-                    android:focusableInTouchMode="true"
                     android:layout_marginRight="@dimen/margin_10"
                     android:layout_marginTop="@dimen/margin_10"
-                    android:src="@drawable/ic_edit" />
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
+                    android:src="@drawable/ic_edit"
+                    android:visibility="gone" />
 
                 <android.support.design.widget.TextInputLayout
                     android:layout_width="match_parent"
@@ -386,6 +387,19 @@
                         android:layout_marginRight="@dimen/margin_20"
                         android:layout_marginTop="@dimen/margin_20"
                         android:text="@string/logout" />
+
+                    <Button
+                        android:id="@+id/delete"
+                        style="@style/ButtonStyle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="bottom|center"
+                        android:layout_marginBottom="@dimen/margin_30"
+                        android:layout_marginLeft="@dimen/margin_20"
+                        android:layout_marginRight="@dimen/margin_20"
+                        android:layout_marginTop="@dimen/margin_20"
+                        android:text="@string/delete_workspace"
+                        android:visibility="gone" />
 
                 </LinearLayout>
             </LinearLayout>

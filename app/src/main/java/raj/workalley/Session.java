@@ -272,8 +272,8 @@ public class Session {
         };
         myRequest.setShouldCache(false);
         myRequest.setRetryPolicy(new DefaultRetryPolicy(60000,
-                        DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                        DefaultRetryPolicy.DEFAULT_BACKOFF_MULT)
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT)
 
         );
 
@@ -329,8 +329,8 @@ public class Session {
         };
         myRequest.setShouldCache(false);
         myRequest.setRetryPolicy(new DefaultRetryPolicy(60000,
-                        DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                        DefaultRetryPolicy.DEFAULT_BACKOFF_MULT)
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT)
 
         );
 
@@ -364,8 +364,8 @@ public class Session {
         };
         myRequest.setShouldCache(false);
         myRequest.setRetryPolicy(new DefaultRetryPolicy(30000,
-                        DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                        DefaultRetryPolicy.DEFAULT_BACKOFF_MULT)
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT)
 
         );
 
@@ -455,6 +455,32 @@ public class Session {
             }
         }, Request.Method.POST);
 
+    }
+
+    public void logout() {
+        reset();
+        getFetch("auth/logout", null, new Task() {
+
+            @Override
+            public void onSuccess(JSONObject jsonObject) {
+                eventBus.post(new CobbocEvent(CobbocEvent.LOGOUT, true, jsonObject));
+            }
+
+            @Override
+            public void onSuccess(String response) {
+
+            }
+
+            @Override
+            public void onError(Throwable throwable) {
+                eventBus.post(new CobbocEvent(CobbocEvent.LOGOUT, false, "An error occurred while trying to login. Please try again later."));
+            }
+
+            @Override
+            public void onProgress(int percent) {
+
+            }
+        }, Request.Method.GET);
     }
 
     public void createWorkSpaceApi(String workspaceName, String[] address, double[] loc) {
@@ -593,7 +619,6 @@ public class Session {
         }, Request.Method.GET);
     }
 
-
     public void getAllActiveWorkspace() {
         String getRequestUrl = "spaces";
 
@@ -621,6 +646,44 @@ public class Session {
         }, Request.Method.GET);
     }
 
+    public void saveUserDetails() {
+    }
+
+    public void deleteWorkspace(String id) {
+        JSONObject params = new JSONObject();
+        try {
+            params.put(Constants.WORKSPACE_ID, id);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        postFetch("spaces", params, new Task() {
+
+            @Override
+            public void onSuccess(JSONObject jsonObject) {
+                eventBus.post(new CobbocEvent(CobbocEvent.REQUEST_SEAT, true, jsonObject));
+            }
+
+            @Override
+            public void onSuccess(String response) {
+
+            }
+
+            @Override
+            public void onError(Throwable throwable) {
+                eventBus.post(new CobbocEvent(CobbocEvent.REQUEST_SEAT, false, "An error occurred while creating workspace. Please try again later."));
+            }
+
+            @Override
+            public void onProgress(int percent) {
+
+            }
+        }, Request.Method.DELETE);
+    }
+
+
+    public void saveHostDetails() {
+    }
 
     public void acceptRejectWorkspaceBookSeatRequest(final UserInfo user, final boolean isReject, String requestId) {
 

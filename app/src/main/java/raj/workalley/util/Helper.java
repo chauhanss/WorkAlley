@@ -214,6 +214,12 @@ public class Helper {
         return dialogAndButton;
     }
 
+    public static void showKeyboard(Context act, View view) {
+        view.requestFocus();
+        InputMethodManager imm = (InputMethodManager) act.getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
+    }
+
     /*private Location getLastKnownLocation() {
 
         LocationManager mLocationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);

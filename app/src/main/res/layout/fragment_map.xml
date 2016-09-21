@@ -24,12 +24,14 @@
 
 
         <EditText
+            android:id="@+id/location_search"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginLeft="@dimen/margin_10"
             android:layout_marginRight="@dimen/margin_10"
             android:background="@color/transparent"
+            android:drawableRight="@drawable/ic_search"
             android:focusableInTouchMode="true"
             android:fontFamily="@string/font_roboto_light"
             android:hint="Search your comfort zone"

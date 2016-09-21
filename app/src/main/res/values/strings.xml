@@ -40,4 +40,5 @@
     <string name="save">Save</string>
     <string name="workspace_name">Workspace Name</string>
     <string name="waiting">Waiting for response</string>
+    <string name="delete_workspace">Delete Workspace</string>
 </resources>

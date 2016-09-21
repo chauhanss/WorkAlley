@@ -17,6 +17,7 @@
             style="@style/FloatingEditTextOppsite"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:enabled="false"
             android:hint="@string/workspace_name" />
     </android.support.design.widget.TextInputLayout>
 
@@ -44,7 +45,7 @@
             android:layout_margin="10dp"
             android:layout_weight="1"
             android:background="@color/colorAccent"
-            android:text="End Session" />
+            android:text="Start\nSession" />
 
         <Button
             android:id="@+id/end_session_btn"
@@ -53,6 +54,6 @@
             android:layout_margin="10dp"
             android:layout_weight="1"
             android:background="@color/colorAccent"
-            android:text="End Session" />
+            android:text="End\nSession" />
     </LinearLayout>
 </LinearLayout>

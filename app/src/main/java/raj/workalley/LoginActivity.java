@@ -150,13 +150,12 @@ public class LoginActivity extends BaseActivity {
                 if (event.getStatus()) {
 
                     JSONObject jsonObject = (JSONObject) event.getValue();
-                    UserInfo parsedResponse = (UserInfo) Session.getInstance(mContext).getParsedResponseFromGSON(jsonObject, Session.workAlleyModels.UserInfo);
-
-                    Session.getInstance(mContext).setUser(parsedResponse);
+                    UserInfo parsedResponse = (UserInfo) mSession.getParsedResponseFromGSON(jsonObject, Session.workAlleyModels.UserInfo);
+                    mSession.setUser(parsedResponse);
 
                     if (mSession.getUser().getRole().equalsIgnoreCase(Constants.USER)) {
                         mSession.getUserWorkspaceData(mSession.getUser().get_id());
-                        Intent intent = new Intent(LoginActivity.this, OfferActivity.class);
+                        Intent intent = new Intent(LoginActivity.this, raj.workalley.user.fresh.HomeActivity.class);
                         startActivity(intent);
                         finish();
                     } else if (mSession.getUser().getRole().equalsIgnoreCase(Constants.PROVIDER)) {
@@ -185,7 +184,7 @@ public class LoginActivity extends BaseActivity {
 
                     JSONObject jsonObject = (JSONObject) event.getValue();
                     try {
-                        if (jsonObject.getJSONArray(Constants.DATA).length()==0) {
+                        if (jsonObject.getJSONArray(Constants.DATA).length() == 0) {
                             Intent intent = new Intent(LoginActivity.this, HostSignUpActivity.class);
                             startActivity(intent);
                         } else {
@@ -200,5 +199,10 @@ public class LoginActivity extends BaseActivity {
                 }
                 break;
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+
     }
 }

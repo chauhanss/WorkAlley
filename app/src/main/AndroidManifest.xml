@@ -27,24 +27,27 @@
             android:name="com.google.android.maps.v2.API_KEY"
             android:value="AIzaSyAHEMQUZMyDbFOPZOqo5bn5FbGPEAqg-BE" />
 
-        <activity android:name=".MainActivity"/>
-        <activity android:name=".LoginActivity">
+        <activity android:name=".MainActivity" />
+        <activity android:name=".SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".SignUpActivity"/>
+        <activity android:name=".LoginActivity">
+
+        </activity>
+        <activity android:name=".SignUpActivity" />
         <activity
             android:name=".user.fresh.HomeActivity"
-            android:windowSoftInputMode="adjustPan"/>
+            android:windowSoftInputMode="adjustPan" />
 
-        <activity android:name=".host.HomeActivity"/>
-        <activity android:name=".host.signup.HostSignUpActivity"/>
-        <activity android:name=".user.fresh.offers.OfferActivity"/>
-        <activity android:name=".user.fresh.host_details.HostDetailsActivity"/>
-        <activity android:name=".OTPActivity"/>
+        <activity android:name=".host.HomeActivity" />
+        <activity android:name=".host.signup.HostSignUpActivity" />
+        <activity android:name=".user.fresh.offers.OfferActivity" />
+        <activity android:name=".user.fresh.host_details.HostDetailsActivity" />
+        <activity android:name=".OTPActivity" />
 
         <service
             android:name=".socket.HostSocketService"
