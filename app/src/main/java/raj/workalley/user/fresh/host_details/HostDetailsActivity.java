@@ -179,7 +179,7 @@ public class HostDetailsActivity extends BaseActivity {
 
         mContext.registerReceiver(notificationListener, new IntentFilter(Constants.REQUEST_RESPONSE));
 
-        getLatestDataFromSharedPreference();
+       // getLatestDataFromSharedPreference();
     }
 
     @Override

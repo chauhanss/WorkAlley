@@ -38,6 +38,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import raj.workalley.user.fresh.UserInfo;
+import raj.workalley.util.SharedPrefsUtils;
 
 /**
  * Created by vishal.raj on 9/5/16.
@@ -63,6 +64,10 @@ public class Session {
         eventBus = EventBus.getDefault();
         mContext = context;
         handler = new Handler(Looper.getMainLooper());
+        String mToken = SharedPrefsUtils.getStringPreference(mContext, Constants.ACCESS_TOKEN, Constants.SP_NAME);
+        if (mToken != null) {
+            mSessionData.setToken(mToken);
+        }
     }
 
     public static synchronized Session getInstance(Context context) {
@@ -77,6 +82,7 @@ public class Session {
         private UserInfo user;
         private WorkspaceList workspaceList;
         private String sessionIdCookies;
+        private String token = null;
 
         private String getSessionIdCookies() {
             return sessionIdCookies;
@@ -84,6 +90,14 @@ public class Session {
 
         private void setSessionIdCookies(String sessionIdCookies) {
             this.sessionIdCookies = sessionIdCookies;
+        }
+
+        public String getToken() {
+            return token;
+        }
+
+        public void setToken(String token) {
+            this.token = token;
         }
 
         public SessionData() {
@@ -100,6 +114,7 @@ public class Session {
 
         private void reset() {
             user = null;
+            token = null;
         }
 
         public WorkspaceList getWorkspaceList() {
@@ -210,6 +225,18 @@ public class Session {
         return fromJson;
     }
 
+    public boolean isLoggedIn() {
+        return getToken() != null;
+    }
+
+    public String getToken() {
+        return mSessionData.getToken();
+    }
+
+    public void setToken(String token) {
+        mSessionData.setToken(token);
+    }
+
     private static String getAbsoluteUrl(String relativeUrl) {
         if (relativeUrl.equals("/payuPaisa/up.php"))
             return Constants.BASE_URL_IMAGE + relativeUrl;
@@ -248,8 +275,14 @@ public class Session {
                 HashMap<String, String> headers = new HashMap<String, String>();
                 headers.put("Content-Type", "application/json");
                 //String sessionId = Hawk.get("connect.sid", "");
+                if (getToken() != null) {
+                    headers.put("authorization", getToken());
+                } else {
+                    headers.put("Accept", "*/*;");
+                }
                 return headers;
             }
+
 
             @Override
             protected Response<JSONObject> parseNetworkResponse(NetworkResponse response) {
@@ -436,6 +469,17 @@ public class Session {
 
             @Override
             public void onSuccess(JSONObject jsonObject) {
+                if (jsonObject.has(Constants.ACCESS_TOKEN) && !jsonObject.isNull(Constants.ACCESS_TOKEN)) {
+
+                    String token = null;
+                    try {
+                        token = jsonObject.getString(Constants.ACCESS_TOKEN);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    SharedPrefsUtils.setStringPreference(mContext, Constants.ACCESS_TOKEN, token, Constants.SP_NAME);
+                    Session.getInstance(mContext).setToken(token);
+                }
                 eventBus.post(new CobbocEvent(CobbocEvent.LOGIN, true, jsonObject));
             }
 
