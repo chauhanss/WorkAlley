@@ -136,7 +136,7 @@ public class DashboardFragment extends Fragment {
 
                             adapterData.add(user.getString("name") + "|" + user.getString("email") + "|" + space.getString("name") + "|" + objectData.getString("status"));
 
-                            if (objectData.getString("status").equalsIgnoreCase("requested")) {
+                            if (!SharedPrefsUtils.hasUserInHashSetPreference(mContext, Constants.BOOKING_REQUEST,user.toString(), Constants.SP_NAME) && objectData.getString("status").equalsIgnoreCase("requested")) {
                                 Set<String> requestSet = new HashSet<>();
                                 requestSet.add(user.toString());
 

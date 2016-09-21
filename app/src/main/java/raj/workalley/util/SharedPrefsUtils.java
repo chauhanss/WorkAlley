@@ -139,6 +139,32 @@ public class SharedPrefsUtils {
 
     }
 
+    public static boolean hasUserInHashSetPreference(Context context, String key, String user, String file) {
+        SharedPreferences preferences = context.getSharedPreferences(file, Context.MODE_PRIVATE);
+
+        try {
+            JSONObject searchUser = new JSONObject(user);
+            Set<String> set = preferences.getStringSet(key, null);
+            if (preferences != null && !TextUtils.isEmpty(key)) {
+
+                for (String stringUser : set) {
+
+                    JSONObject users = new JSONObject(stringUser);
+                    if (users.has("_id") && searchUser.has("_id")) {
+                        if (users.getString("_id").equalsIgnoreCase(searchUser.getString("_id"))) {
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return false;
+        }
+        return false;
+    }
+
     public static void clearSharedPreferenceFile(Context context) {
 
         SharedPreferences preferences = context.getSharedPreferences(Constants.SP_NAME, Context.MODE_PRIVATE);
