@@ -19,6 +19,7 @@ import raj.workalley.user.fresh.UserInfo;
 public class UserRequestAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private static final int TYPE_BOOKING_REQUEST = 1;
+    private static final int TYPE_END_REQUEST = 2;
     UserRequestFragment mContext;
     Context mActivityContext;
     List<UserInfo> users;
@@ -32,7 +33,11 @@ public class UserRequestAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
     @Override
     public int getItemViewType(int position) {
-        return TYPE_BOOKING_REQUEST;
+
+        if (users.get(position).isEndRequest())
+            return TYPE_END_REQUEST;
+        else
+            return TYPE_BOOKING_REQUEST;
     }
 
 
@@ -45,6 +50,11 @@ public class UserRequestAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 UserRequestViewHolder viewHolder = new UserRequestViewHolder(convertView);
                 convertView.setTag(viewHolder);
                 return viewHolder;
+            case TYPE_END_REQUEST:
+                convertView = LayoutInflater.from(mActivityContext).inflate(R.layout.session_end_item, parent, false);
+                UserRequestViewHolder sessionEndViewHolder = new UserRequestViewHolder(convertView);
+                convertView.setTag(sessionEndViewHolder);
+                return sessionEndViewHolder;
         }
         return null;
     }
@@ -54,7 +64,15 @@ public class UserRequestAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         int type = getItemViewType(position);
 
         switch (type) {
-            case TYPE_BOOKING_REQUEST:
+            case TYPE_BOOKING_REQUEST: {
+                UserInfo user = users.get(position);
+                UserRequestViewHolder viewHolder = (UserRequestViewHolder) holder;
+
+                viewHolder.userEmail.setText(user.getEmail());
+                viewHolder.userName.setText(user.getName());
+                break;
+            }
+            case TYPE_END_REQUEST:
                 UserInfo user = users.get(position);
                 UserRequestViewHolder viewHolder = (UserRequestViewHolder) holder;
 
@@ -83,7 +101,8 @@ public class UserRequestAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             acceptRequest = (Button) itemView.findViewById(R.id.accept);
             rejectRequest = (Button) itemView.findViewById(R.id.reject);
 
-            acceptRequest.setOnClickListener(this);
+            if (acceptRequest != null)
+                acceptRequest.setOnClickListener(this);
             rejectRequest.setOnClickListener(this);
         }
 
@@ -93,7 +112,10 @@ public class UserRequestAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
             switch (v.getId()) {
                 case R.id.reject:
-                    mContext.rejectRequest(user);
+                    if (((TextView) v).getText().toString().equalsIgnoreCase("REJECT"))
+                        mContext.rejectRequest(user);
+                    else
+                        mContext.approveEndRequest(user);
                     break;
                 case R.id.accept:
                     mContext.acceptRequest(user);

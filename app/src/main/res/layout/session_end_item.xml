@@ -13,8 +13,8 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="BOOKING REQUEST FROM:"
-            android:textColor="@android:color/holo_orange_light" />
+            android:textColor="@android:color/holo_green_light"
+            android:text="SESSION END REQUEST FROM:" />
 
         <TextView
             android:id="@+id/user_name"
@@ -42,15 +42,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:background="@android:color/transparent"
-                android:text="REJECT" />
-
-            <Button
-                android:id="@+id/accept"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:background="@android:color/transparent"
-                android:text="ACCEPT" />
+                android:text="APPROVE SESSION END" />
 
         </LinearLayout>
 

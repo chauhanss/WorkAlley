@@ -25,6 +25,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.net.URISyntaxException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 import java.util.Map;
 
 import raj.workalley.Constants;
@@ -214,7 +217,112 @@ public class HostSocketService extends Service {
             }
         });
 
+        mSocket.on("BOOKING_CANCELED", new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+
+                try {
+                    JSONObject jsonObject = new JSONObject(args[0].toString());
+                    Intent i = new Intent(HostSocketService.this, RequestReceiver.class);
+
+                    Bundle bundle = new Bundle();
+                    if (jsonObject.has("user") && !jsonObject.isNull("user")) {
+                        /**
+                         * workspace : workspace id
+                         * user : user Info object
+                         * request Type
+                         */
+                        JSONObject space = (JSONObject) jsonObject.get("space");
+                        JSONObject userObject = (JSONObject) jsonObject.get("user");
+                        bundle.putString(USER, jsonObject.get("user").toString());
+                        bundle.putString(WORKSPACE, space.getString("_id"));
+                        bundle.putString(REQUEST_TYPE, "BOOKING_CANCELED");
+                        if (userObject.has("name") && !userObject.isNull("name"))
+                            createNotification(userObject.getString("name"), space.getString("name"), "BOOKING_CANCELED");
+                        i.putExtra("bundle", bundle);
+                        sendBroadcast(i);
+                    }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        });
+
+        mSocket.on("BOOKING_END_REQUESTED", new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+
+                try {
+                    JSONObject jsonObject = new JSONObject(args[0].toString());
+                    Intent i = new Intent(HostSocketService.this, RequestReceiver.class);
+
+                    Bundle bundle = new Bundle();
+                    if (jsonObject.has("user") && !jsonObject.isNull("user")) {
+                        /**
+                         * workspace : workspace id
+                         * user : user Info object
+                         * request Type
+                         */
+                        JSONObject space = (JSONObject) jsonObject.get("space");
+                        JSONObject userObject = (JSONObject) jsonObject.get("user");
+                        bundle.putString(USER, jsonObject.get("user").toString());
+                        bundle.putString(WORKSPACE, space.getString("_id"));
+                        bundle.putString(REQUEST_TYPE, "SESSION_END_REQUEST");
+                        if (userObject.has("name") && !userObject.isNull("name"))
+                            createNotification(userObject.getString("name"), space.getString("name"), "SESSION_END_REQUEST");
+                        i.putExtra("bundle", bundle);
+                        sendBroadcast(i);
+                    }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        });
+
+        mSocket.on("BOOKING_END_CONFIRMED", new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+
+                try {
+                    JSONObject jsonObject = new JSONObject(args[0].toString());
+                    Intent i = new Intent(HostSocketService.this, RequestReceiver.class);
+
+                    Bundle bundle = new Bundle();
+                    if (jsonObject.has("user") && !jsonObject.isNull("user")) {
+                        /**
+                         * workspace : workspace id
+                         * user : user Info object
+                         * request Type
+                         */
+                        JSONObject space = (JSONObject) jsonObject.get("space");
+                        JSONObject userObject = (JSONObject) jsonObject.get("user");
+                        bundle.putString(USER, jsonObject.get("user").toString());
+                        bundle.putString(WORKSPACE, space.getString("_id"));
+                        bundle.putString(REQUEST_TYPE, "SESSION_END_CONFIRMED");
+                        if (userObject.has("name") && !userObject.isNull("name"))
+                            createNotification(userObject.getString("name"), space.getString("name"), "SESSION_END_CONFIRMED");
+                        i.putExtra("bundle", bundle);
+                        sendBroadcast(i);
+                    }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        });
+
         return START_STICKY;
+    }
+
+    public int createID() {
+        Date now = new Date();
+        int id = Integer.parseInt(new SimpleDateFormat("ddHHmmss", Locale.US).format(now));
+        return id;
     }
 
     public void createNotification(String userName, String workspace, String requestType) {
@@ -230,7 +338,15 @@ public class HostSocketService extends Service {
             case "BOOKING_ACCEPTED":
                 messageText = "Your request for a seat in " + workspace + " has been accepted. You can start working!.";
                 break;
-
+            case "BOOKING_CANCELED":
+                messageText = userName + " has cancelled his seat request in your workspace " + workspace + ".";
+                break;
+            case "SESSION_END_REQUEST":
+                messageText = userName + " has requested for ending his session in" + workspace + ". Please confirm!";
+                break;
+            case "SESSION_END_CONFIRMED":
+                messageText = "Your request for ending session in " + workspace + " is approved.";
+                break;
         }
         Intent dismissIntent = new Intent(this, raj.workalley.LoginActivity.class);
         PendingIntent piDismiss = PendingIntent.getActivity(this, 0, dismissIntent, 0);
@@ -244,7 +360,7 @@ public class HostSocketService extends Service {
                         .setContentIntent(piDismiss);
 
 
-        int mNotificationId = 001;
+        int mNotificationId = createID();
         NotificationManager mNotifyMgr =
                 (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         mNotifyMgr.notify(mNotificationId, mBuilder.build());

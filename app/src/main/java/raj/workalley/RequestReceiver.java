@@ -13,6 +13,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import raj.workalley.user.fresh.UserInfo;
+import raj.workalley.user.fresh.host_details.HostDetailsActivity;
 import raj.workalley.util.SharedPrefsUtils;
 
 /**
@@ -46,6 +47,7 @@ public class RequestReceiver extends BroadcastReceiver {
                              */
                             SharedPrefsUtils.setStringPreference(context, userInfo.getString("_id"), bundle.getString(Constants.REQUEST_ID), Constants.SP_NAME);
                             SharedPrefsUtils.setHashSetPreference(context, Constants.BOOKING_REQUEST, requestSet, Constants.SP_NAME);
+                            sendBroadcastToActivity(context, requestType, null);
 
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -63,18 +65,68 @@ public class RequestReceiver extends BroadcastReceiver {
                              * user : user Info object saved with key requestType
                              */
                             SharedPrefsUtils.setStringPreference(context, userInfo.getString("_id"), requestType + "|" + bundle.getString("workspace_id"), Constants.SP_NAME);
-                  //          SharedPrefsUtils.setStringPreference(context, Constants.BOOKING_REJECT, userInfo.toString(), Constants.SP_NAME);
+                            //          SharedPrefsUtils.setStringPreference(context, Constants.BOOKING_REJECT, userInfo.toString(), Constants.SP_NAME);
 
+                            sendBroadcastToActivity(context, requestType, null);
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
 
                         break;
+
+                    case Constants.BOOKING_CANCELED: {
+                        JSONObject userInfo = null;
+                        try {
+                            userInfo = new JSONObject(bundle.getString(USER));
+                            sendBroadcastToActivity(context, requestType, userInfo.toString());
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    break;
+                    case Constants.SESSION_END_REQUEST: {
+                        JSONObject userInfo = null;
+                        try {
+                            userInfo = new JSONObject(bundle.getString(USER));
+
+                            Set<String> requestSet = new HashSet<>();
+                            requestSet.add(userInfo.toString());
+
+                            SharedPrefsUtils.setHashSetPreference(context, Constants.SESSION_END_REQUEST, requestSet, Constants.SP_NAME);
+                            sendBroadcastToActivity(context, requestType, null);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    break;
+                    case Constants.SESSION_END_CONFIRMED: {
+                        try {
+                            JSONObject userInfo = new JSONObject(bundle.getString(USER));
+
+                            /**
+                             * key : user ID, value : pipe separated requestType and workspace id
+                             * user : user Info object saved with key requestType
+                             */
+                            SharedPrefsUtils.setStringPreference(context, userInfo.getString("_id"), requestType + "|" + bundle.getString("workspace_id"), Constants.SP_NAME);
+                            sendBroadcastToActivity(context, requestType, null);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    break;
                 }
 
             }
         }
+    }
 
+    static void sendBroadcastToActivity(Context context, String message, String userInfo) {
 
+        Intent intent = new Intent(Constants.REQUEST_RESPONSE);
+        intent.putExtra("message", message);
+        intent.putExtra("USER", userInfo);
+        context.sendBroadcast(intent);
     }
 }

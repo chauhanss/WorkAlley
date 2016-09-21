@@ -53,7 +53,13 @@ public class Constants {
     public static final String REQUEST_TYPE = "requestType";
 
     public static final String BOOKING_REQUEST = "BOOKING_REQUESTED";
-    public static final String BOOKING_REJECT= "BOOKING_REJECTED";
+    public static final String BOOKING_REJECT = "BOOKING_REJECTED";
     public static final String BOOKING_ACCEPT = "BOOKING_ACCEPTED";
     public static final String REQUEST_ID = "request_id";
+    public static final String REQUEST_RESPONSE = "REQUEST_RESPONSE";
+    public static final String USER_REQUEST = "USER_REQUEST";
+    public static final String BOOKING_REQUEST_ID = "booking_request_id";
+    public static final String BOOKING_CANCELED = "BOOKING_CANCELED";
+    public static final String SESSION_END_REQUEST = "SESSION_END_REQUEST";
+    public static final String SESSION_END_CONFIRMED = "SESSION_END_CONFIRMED";
 }

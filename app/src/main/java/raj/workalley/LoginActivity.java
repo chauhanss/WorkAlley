@@ -156,7 +156,7 @@ public class LoginActivity extends BaseActivity {
 
                     if (mSession.getUser().getRole().equalsIgnoreCase(Constants.USER)) {
                         mSession.getUserWorkspaceData(mSession.getUser().get_id());
-                        Intent intent = new Intent(LoginActivity.this, OfferActivity.class);
+                        Intent intent = new Intent(LoginActivity.this, raj.workalley.user.fresh.HomeActivity.class);
                         startActivity(intent);
                         finish();
                     } else if (mSession.getUser().getRole().equalsIgnoreCase(Constants.PROVIDER)) {
@@ -191,8 +191,9 @@ public class LoginActivity extends BaseActivity {
                         } else {
                             WorkspaceList parsedResponse = (WorkspaceList) Session.getInstance(mContext).getParsedResponseFromGSON(jsonObject, Session.workAlleyModels.Workspaces);
                             Session.getInstance(mContext).setWorkspaces(parsedResponse);
-                            Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
+                            Intent intent = new Intent(LoginActivity.this, raj.workalley.host.HomeActivity.class);
                             startActivity(intent);
+                            finish();
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();

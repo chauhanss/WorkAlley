@@ -69,6 +69,7 @@ public class HomeActivity extends BaseActivity implements OnItemClickListener {
         setContentView(R.layout.activity_home_user);
         session = Session.getInstance(this);
         initNavToolBar();
+        startHostService();
 
         //loopBarView = (LoopBarView) findViewById(R.id.endlessView);
 
@@ -90,13 +91,26 @@ public class HomeActivity extends BaseActivity implements OnItemClickListener {
 
     }
 
+    private void startHostService() {
+        /*HostSocketService.initSocket();
+        HostSocketService.connectToServer();
+        HostSocketService.setSessionCookiesId(session.getSessionIdCookies());
+        HostSocketService.sendCookies();
+        HostSocketService.authHost();*/
+        Intent intent = new Intent(getBaseContext(), HostSocketService.class);
+        Bundle b = new Bundle();
+        b.putString(Constants.SESSION_COOKIES_ID, session.getSessionIdCookies());
+        intent.putExtras(b);
+        startService(intent);
+    }
+
     private void initNavToolBar() {
         viewPager = (ViewPager) findViewById(R.id.viewPager);
         final NavigationTabBar navigationTabBar = (NavigationTabBar) findViewById(R.id.ntb);
 
         List<Fragment> list = new ArrayList<>(3);
         list.add(MapFragment.newInstance());
-        list.add(OffersFragment.newInstance());
+        //    list.add(OffersFragment.newInstance());
         list.add(SettingFragment.newInstance());
         list.add(AccountFragment.newInstance());
         pagerAdapter = new SimpleFragmentStatePagerAdapter(getSupportFragmentManager(), list);
@@ -109,12 +123,12 @@ public class HomeActivity extends BaseActivity implements OnItemClickListener {
                         Color.parseColor("#EE946F")
                 ).build()
         );
-        models.add(
+     /*   models.add(
                 new NavigationTabBar.Model.Builder(
                         getResources().getDrawable(R.drawable.ic_offer),
                         Color.parseColor("#EE946F")
                 ).build()
-        );
+        ); */
         models.add(
                 new NavigationTabBar.Model.Builder(
                         getResources().getDrawable(R.drawable.ic_setting),

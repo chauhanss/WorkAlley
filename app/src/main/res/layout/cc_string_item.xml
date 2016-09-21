@@ -3,9 +3,9 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="10dp"
-    android:padding="@dimen/margin_10"
     android:background="@color/white"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:padding="@dimen/margin_10">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -61,17 +61,17 @@
             android:gravity="right"
             android:text="hdbjchds"
             android:textColor="@android:color/black"
-            android:textSize="14dp" />
+            android:textSize="12dp" />
 
     </LinearLayout>
 
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
+        android:layout_marginBottom="@dimen/margin_10"
         android:layout_marginLeft="30dp"
         android:layout_marginRight="30dp"
         android:layout_marginTop="20dp"
-        android:layout_marginBottom="@dimen/margin_10"
         android:background="@color/colorAccentBackground" />
 
 </LinearLayout>

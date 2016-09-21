@@ -162,7 +162,8 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback, Loc
             public void run() {
                 Intent intent = new Intent(getActivity(), HostDetailsActivity.class);
                 intent.putExtra(Constants.WORKSPACE_ID, mMarkersMap.get(marker.getId()));
-                getActivity().startActivityForResult(intent, Constants.HOST_DETAILS_ACTIVITY_REQUEST_DETAILS);
+                //        getActivity().startActivityForResult(intent, Constants.HOST_DETAILS_ACTIVITY_REQUEST_DETAILS);
+                getActivity().startActivity(intent);
             }
         }, 500);
         return false;
@@ -191,7 +192,6 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback, Loc
             }
         }
     }
-
 
 
     public HashMap<Integer, ArrayList<Double>> dummyLocationList() {

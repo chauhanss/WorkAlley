@@ -1,6 +1,9 @@
 package raj.workalley.host.dashboard;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -51,6 +54,7 @@ public class DashboardFragment extends Fragment {
         if (EventBus.getDefault().isRegistered(this)) {
             EventBus.getDefault().unregister(this);
         }
+        mContext.unregisterReceiver(notificationListener);
     }
 
     @Override
@@ -59,9 +63,22 @@ public class DashboardFragment extends Fragment {
         if (!EventBus.getDefault().isRegistered(this)) {
             EventBus.getDefault().register(this);
         }
+        mContext.registerReceiver(notificationListener, new IntentFilter(Constants.REQUEST_RESPONSE));
         makeActiveUserApi();
 
     }
+
+    private BroadcastReceiver notificationListener = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            String message = intent.getStringExtra("message");
+            if (message.equalsIgnoreCase(Constants.SESSION_END_CONFIRMED) || message.equalsIgnoreCase(Constants.BOOKING_ACCEPT)) {
+                makeActiveUserApi();
+            }
+        }
+
+    };
 
     public void makeActiveUserApi() {
         if (Helper.isConnected(mContext)) {
@@ -130,8 +147,8 @@ public class DashboardFragment extends Fragment {
     }
 
     private void setUpRecyclerView(List<String> list) {
-        StringAdapter billAdapter = new StringAdapter(mContext, list);
-        activeUserList.setAdapter(billAdapter);
+        StringAdapter stringAdapter = new StringAdapter(mContext, list);
+        activeUserList.setAdapter(stringAdapter);
         final LinearLayoutManager linearLayoutManager = new LinearLayoutManager(mContext);
         activeUserList.setLayoutManager(linearLayoutManager);
     }
@@ -141,5 +158,14 @@ public class DashboardFragment extends Fragment {
         super.onAttach(context);
         mContext = context;
         mSession = Session.getInstance(mContext);
+    }
+
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if (isVisibleToUser) {
+
+            makeActiveUserApi();
+        }
     }
 }

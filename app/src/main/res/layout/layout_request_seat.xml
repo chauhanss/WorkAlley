@@ -1,58 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/request_seat_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_margin="@dimen/margin_20"
     android:background="@color/white"
-    android:orientation="vertical">
-
-    <android.support.design.widget.TextInputLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="@dimen/margin_20"
-        android:layout_marginRight="@dimen/margin_20"
-        android:layout_marginTop="@dimen/margin_20">
-
-        <EditText
-            android:id="@+id/workspace_name"
-            style="@style/FloatingEditTextOppsite"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/workspace_name" />
-    </android.support.design.widget.TextInputLayout>
+    android:orientation="vertical"
+    android:visibility="gone">
 
     <TextView
-        android:id="@+id/progress_text_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="@dimen/margin_20"
-        android:layout_marginTop="@dimen/margin_10"
-        android:text="@string/waiting"
-        android:textColor="@color/colorPrimary" />
-
-    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="@dimen/margin_10"
+        android:layout_margin="@dimen/margin_20"
+        android:text="Workspace"
+        android:textAllCaps="true"
+        android:textColor="@android:color/black"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/workspace_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/margin_20"
+        android:text="@string/workspace_name"
+        android:textColor="@android:color/black" />
+
+    <TextView
+        android:id="@+id/workspace_address"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/margin_20"
+        android:layout_marginRight="@dimen/margin_10"
+        android:layout_marginTop="@dimen/margin_10"
+        android:text="address"
+        android:textColor="@android:color/black" />
+
+    <TextView
+        android:id="@+id/status"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/margin_20"
         android:layout_marginRight="@dimen/margin_10"
         android:layout_marginTop="@dimen/margin_20"
-        android:orientation="horizontal">
+        android:text="*Session end request submitted!"
+        android:gravity="center"
+        android:visibility="gone"
+        android:textSize="@dimen/text_size_10"
+        android:textColor="@android:color/holo_red_dark" />
 
-        <Button
-            android:id="@+id/start_session_btn"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:layout_weight="1"
-            android:background="@color/colorAccent"
-            android:text="End Session" />
-
-        <Button
-            android:id="@+id/end_session_btn"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:layout_weight="1"
-            android:background="@color/colorAccent"
-            android:text="End Session" />
-    </LinearLayout>
+    <Button
+        android:id="@+id/end_session_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="visible"
+        android:layout_gravity="center"
+        android:background="@color/colorAccent"
+        android:paddingBottom="@dimen/margin_10"
+        android:layout_marginTop="@dimen/margin_10"
+        android:paddingLeft="50dp"
+        android:paddingRight="50dp"
+        android:paddingTop="@dimen/margin_10"
+        android:text="End Session" />
 </LinearLayout>

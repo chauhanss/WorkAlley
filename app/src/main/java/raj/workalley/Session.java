@@ -688,5 +688,123 @@ public class Session {
         }, Request.Method.GET);
     }
 
+    public void cancelRequestedSeat(String requestId) {
+
+        String getRequestUrl = "/requests/" + requestId + "/cancel";
+
+        putFetch(getRequestUrl, null, new Task() {
+
+            @Override
+            public void onSuccess(JSONObject jsonObject) {
+                eventBus.post(new CobbocEvent(CobbocEvent.CANCEL_BOOKING_REQUEST, true, jsonObject));
+            }
+
+            @Override
+            public void onSuccess(String response) {
+
+            }
+
+            @Override
+            public void onError(Throwable throwable) {
+                eventBus.post(new CobbocEvent(CobbocEvent.CANCEL_BOOKING_REQUEST, false, "An error occurred while trying to login. Please try again later."));
+            }
+
+            @Override
+            public void onProgress(int percent) {
+
+            }
+        }, Request.Method.PUT);
+    }
+
+    public void getAllActiveSessionsOfUser(String userId) {
+
+        String getRequestUrl = "/requests/?user=" + userId + "&status=started";
+
+        getFetch(getRequestUrl, null, new Task() {
+
+            @Override
+            public void onSuccess(JSONObject jsonObject) {
+                eventBus.post(new CobbocEvent(CobbocEvent.ACTIVE_SESSIONS, true, jsonObject));
+            }
+
+            @Override
+            public void onSuccess(String response) {
+
+            }
+
+            @Override
+            public void onError(Throwable throwable) {
+                eventBus.post(new CobbocEvent(CobbocEvent.ACTIVE_SESSIONS, false, "An error occurred while trying to login. Please try again later."));
+            }
+
+            @Override
+            public void onProgress(int percent) {
+
+            }
+        }, Request.Method.GET);
+    }
+
+    public void endSessionInWorkspaceRequest(String requestId) {
+
+        String getRequestUrl = "requests/" + requestId + "/request-end";
+
+        putFetch(getRequestUrl, null, new Task() {
+
+            @Override
+            public void onSuccess(JSONObject jsonObject) {
+                eventBus.post(new CobbocEvent(CobbocEvent.END_SESSION, true, jsonObject));
+            }
+
+            @Override
+            public void onSuccess(String response) {
+
+            }
+
+            @Override
+            public void onError(Throwable throwable) {
+                eventBus.post(new CobbocEvent(CobbocEvent.END_SESSION, false, "An error occurred while trying to login. Please try again later."));
+            }
+
+            @Override
+            public void onProgress(int percent) {
+
+            }
+        }, Request.Method.PUT);
+    }
+
+    public void endSessionByHostConfirmed(final UserInfo user, String requestId) {
+
+        String getRequestUrl = "requests/" + requestId + "/end";
+
+        putFetch(getRequestUrl, null, new Task() {
+
+            @Override
+            public void onSuccess(JSONObject jsonObject) {
+                try {
+                    jsonObject.put("user", user.toString());
+                    eventBus.post(new CobbocEvent(CobbocEvent.END_SESSION_CONFIRMED, true, jsonObject));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
+
+            @Override
+            public void onSuccess(String response) {
+
+            }
+
+            @Override
+            public void onError(Throwable throwable) {
+                eventBus.post(new CobbocEvent(CobbocEvent.END_SESSION_CONFIRMED, false, "An error occurred while trying to login. Please try again later."));
+            }
+
+            @Override
+            public void onProgress(int percent) {
+
+            }
+        }, Request.Method.PUT);
+    }
+
 
 }

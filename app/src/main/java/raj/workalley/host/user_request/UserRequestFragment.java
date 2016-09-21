@@ -1,6 +1,9 @@
 package raj.workalley.host.user_request;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -75,9 +78,11 @@ public class UserRequestFragment extends Fragment {
     private void setUpRecyclerViewAdapter() {
 
         userRequests = SharedPrefsUtils.getHashSetPreference(getActivity(), Constants.BOOKING_REQUEST, Constants.SP_NAME);
-        if (userRequests != null && userRequests.size() > 0) {
+
+        if (userRequests != null) {
 
             userRequestList = new ArrayList<>();
+            userRequestList.clear();
             for (String user : userRequests) {
 
                 try {
@@ -88,6 +93,24 @@ public class UserRequestFragment extends Fragment {
                     e.printStackTrace();
                 }
             }
+
+            if (SharedPrefsUtils.hasKey(mContext, Constants.SESSION_END_REQUEST, Constants.SP_NAME)) {
+                Set<String> userEndRequests = SharedPrefsUtils.getHashSetPreference(mContext, Constants.SESSION_END_REQUEST, Constants.SP_NAME);
+
+                for (String endRequests : userEndRequests) {
+                    try {
+                        JSONObject userObject = new JSONObject(endRequests);
+                        UserInfo userRequest = (UserInfo) Session.getInstance(mContext).getParsedResponseFromGSON(userObject, Session.workAlleyModels.UserInfo);
+                        userRequest.setIsEndRequest(true);
+                        userRequestList.add(userRequest);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+            }
+
+
             UserRequestAdapter requestAdapter = new UserRequestAdapter(UserRequestFragment.this, userRequestList, mContext);
             userRequestsListView.setAdapter(requestAdapter);
             final LinearLayoutManager linearLayoutManager = new LinearLayoutManager(mContext);
@@ -110,12 +133,40 @@ public class UserRequestFragment extends Fragment {
         mContext = context;
     }
 
+    private BroadcastReceiver notificationListener = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            String message = intent.getStringExtra("message");
+            if (message.equalsIgnoreCase(Constants.BOOKING_REQUEST))
+                setUpRecyclerViewAdapter();
+            else if (message.equalsIgnoreCase(Constants.BOOKING_CANCELED)) {
+
+                JSONObject user = null;
+                try {
+                    user = new JSONObject(intent.getStringExtra("USER"));
+
+                    SharedPrefsUtils.removePreferenceByKey(mContext, user.getString("_id"), Constants.SP_NAME);
+                    SharedPrefsUtils.removeSetInHashSetPreference(mContext, Constants.BOOKING_REQUEST, user.toString(), Constants.SP_NAME);
+                    setUpRecyclerViewAdapter();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            } else if (message.equalsIgnoreCase(Constants.SESSION_END_REQUEST)) {
+                setUpRecyclerViewAdapter();
+            }
+        }
+
+    };
+
     @Override
     public void onResume() {
         super.onResume();
 
         if (!EventBus.getDefault().isRegistered(this))
             EventBus.getDefault().register(this);
+        mContext.registerReceiver(notificationListener, new IntentFilter(Constants.REQUEST_RESPONSE));
+        setUpRecyclerViewAdapter();
     }
 
     @Override
@@ -124,6 +175,7 @@ public class UserRequestFragment extends Fragment {
 
         if (EventBus.getDefault().isRegistered(this))
             EventBus.getDefault().unregister(this);
+        mContext.unregisterReceiver(notificationListener);
     }
 
     public void rejectRequest(UserInfo user) {
@@ -148,27 +200,67 @@ public class UserRequestFragment extends Fragment {
             Toast.makeText(mContext, "No internet", Toast.LENGTH_LONG).show();
     }
 
+    public void approveEndRequest(UserInfo user) {
+        if (Helper.isConnected(mContext)) {
+            Helper.showProgressDialogSpinner(mContext, "Please Wait", "Ending session", false);
+
+            String requestId = SharedPrefsUtils.getStringPreference(mContext, user.get_id(), Constants.SP_NAME);
+            Session.getInstance(mContext).endSessionByHostConfirmed(user, requestId);
+        } else
+            Toast.makeText(mContext, "No internet", Toast.LENGTH_LONG).show();
+
+    }
+
     @Subscribe
     public void onEventMainThread(CobbocEvent event) {
         Helper.dismissProgressDialog();
         switch (event.getType()) {
             case CobbocEvent.ACCEPT_REJECT_BOOKING_REQUEST:
-                try {
-                    JSONObject jsonObject = (JSONObject) event.getValue();
 
-                    UserInfo user = (UserInfo) jsonObject.get("user");
-                    if (userRequestList != null) {
-                        userRequestList.remove(user);
+                if (event.getStatus()) {
+                    try {
 
-                        Gson gson = new Gson();
-                        String jsonUser = gson.toJson(user);
-                        SharedPrefsUtils.removePreferenceByKey(mContext, user.get_id(), Constants.SP_NAME);
-                        SharedPrefsUtils.removeSetInHashSetPreference(mContext, Constants.BOOKING_REQUEST, jsonUser, Constants.SP_NAME);
-                        invalidateList(userRequestList);
+                        JSONObject jsonObject = (JSONObject) event.getValue();
+
+                        UserInfo user = (UserInfo) jsonObject.get("user");
+                        if (userRequestList != null) {
+                            userRequestList.remove(user);
+
+                            Gson gson = new Gson();
+                            String jsonUser = gson.toJson(user);
+
+                            if (jsonObject.getBoolean("isRejectRequest"))
+                                SharedPrefsUtils.removePreferenceByKey(mContext, user.get_id(), Constants.SP_NAME);
+                            SharedPrefsUtils.removeSetInHashSetPreference(mContext, Constants.BOOKING_REQUEST, jsonUser, Constants.SP_NAME);
+                            //      invalidateList(userRequestList);
+                            setUpRecyclerViewAdapter();
+                        }
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
                     }
+                }
+                break;
+            case CobbocEvent.END_SESSION_CONFIRMED:
 
-                } catch (JSONException e) {
-                    e.printStackTrace();
+                if (event.getStatus()) {
+                    try {
+                        JSONObject jsonObject = (JSONObject) event.getValue();
+                        UserInfo user = (UserInfo) jsonObject.get("user");
+
+                        if (userRequestList != null) {
+                            userRequestList.remove(user);
+
+                            Gson gson = new Gson();
+                            String jsonUser = gson.toJson(user);
+                            SharedPrefsUtils.removePreferenceByKey(mContext, user.get_id(), Constants.SP_NAME);
+                            SharedPrefsUtils.removeSetInHashSetPreference(mContext, Constants.SESSION_END_REQUEST, jsonUser, Constants.SP_NAME);
+                            setUpRecyclerViewAdapter();
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    break;
                 }
         }
     }

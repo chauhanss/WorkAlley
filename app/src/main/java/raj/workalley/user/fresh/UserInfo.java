@@ -10,6 +10,7 @@ public class UserInfo implements Serializable {
     String name, _id, role, email, updatedAt,createdAt;
     boolean active;
     int __v;
+    boolean isEndRequest = false;
 
     public String get_id() {
         return _id;
@@ -61,6 +62,14 @@ public class UserInfo implements Serializable {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public void setIsEndRequest(boolean isEndRequest) {
+        this.isEndRequest = isEndRequest;
+    }
+
+    public boolean isEndRequest() {
+        return isEndRequest;
     }
 
     @Override
