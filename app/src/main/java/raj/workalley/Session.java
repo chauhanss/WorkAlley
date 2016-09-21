@@ -265,7 +265,7 @@ public class Session {
                 HashMap<String, String> headers = new HashMap<String, String>();
                 headers.put("Content-Type", "application/json");
                 if (getToken() != null) {
-                    headers.put("Authorization", "" + getToken());
+                    headers.put("authorization", "" + getToken());
                 }
                 //String sessionId = Hawk.get("connect.sid", "");
                 return headers;
@@ -325,7 +325,7 @@ public class Session {
                 HashMap<String, String> headers = new HashMap<String, String>();
                 headers.put("Content-Type", "application/json");
                 if (getToken() != null) {
-                    headers.put("Authorization", "" + getToken());
+                    headers.put("authorization", "" + getToken());
                 }
                 //String sessionId = Hawk.get("connect.sid", "");
                 return headers;
@@ -383,7 +383,7 @@ public class Session {
                 HashMap<String, String> headers = new HashMap<String, String>();
                 headers.put("Content-Type", "application/json; charset=utf-8");
                 if (getToken() != null) {
-                    headers.put("Authorization", "" + getToken());
+                    headers.put("authorization", "" + getToken());
                 }
                 return headers;
             }
