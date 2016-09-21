@@ -75,6 +75,7 @@ public class Session {
     private class SessionData {
 
         private UserInfo user;
+        private String token = null;
         private WorkspaceList workspaceList;
         private String sessionIdCookies;
 
@@ -88,6 +89,14 @@ public class Session {
 
         public SessionData() {
             reset();
+        }
+
+        public String getToken() {
+            return token;
+        }
+
+        public void setToken(String token) {
+            this.token = token;
         }
 
         public UserInfo getUser() {
@@ -118,6 +127,14 @@ public class Session {
 
     public void setSessionIdCookies(String sessionIdCookies) {
         mSessionData.setSessionIdCookies(sessionIdCookies);
+    }
+
+    public String getToken() {
+        return mSessionData.getToken();
+    }
+
+    public void setToken(String token) {
+        mSessionData.setToken(token);
     }
 
     public void setUser(UserInfo userInfo) {
@@ -153,7 +170,7 @@ public class Session {
     /*Volley Section Start*/
     public RequestQueue getRequestQueue(Context context) {
         if (mRequestQueue == null) {
-            CookieHandler.setDefault(new CookieManager(null, CookiePolicy.ACCEPT_ALL));
+            //CookieHandler.setDefault(new CookieManager(null, CookiePolicy.ACCEPT_ALL));
             mRequestQueue = Volley.newRequestQueue(context);
         }
         return mRequestQueue;
@@ -247,6 +264,9 @@ public class Session {
             public Map<String, String> getHeaders() throws AuthFailureError {
                 HashMap<String, String> headers = new HashMap<String, String>();
                 headers.put("Content-Type", "application/json");
+                if (getToken() != null) {
+                    headers.put("Authorization", "" + getToken());
+                }
                 //String sessionId = Hawk.get("connect.sid", "");
                 return headers;
             }
@@ -304,6 +324,9 @@ public class Session {
             public Map<String, String> getHeaders() throws AuthFailureError {
                 HashMap<String, String> headers = new HashMap<String, String>();
                 headers.put("Content-Type", "application/json");
+                if (getToken() != null) {
+                    headers.put("Authorization", "" + getToken());
+                }
                 //String sessionId = Hawk.get("connect.sid", "");
                 return headers;
             }
@@ -359,6 +382,9 @@ public class Session {
             public Map<String, String> getHeaders() throws AuthFailureError {
                 HashMap<String, String> headers = new HashMap<String, String>();
                 headers.put("Content-Type", "application/json; charset=utf-8");
+                if (getToken() != null) {
+                    headers.put("Authorization", "" + getToken());
+                }
                 return headers;
             }
         };
