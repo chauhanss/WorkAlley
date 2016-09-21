@@ -89,7 +89,6 @@ public class HostDetailsActivity extends BaseActivity {
                 switch (bookSeat.getText().toString()) {
                     case REQUEST_BOOK:
                         if (Helper.isConnected(mContext)) {
-                            Toast.makeText(getApplicationContext(), mSession.getUser().get_id() + " " + workspaceId, Toast.LENGTH_LONG).show();
                             mSession.requestSeat(mSession.getUser().get_id(), workspaceId);
                         } else
                             Toast.makeText(mContext, "No internet", Toast.LENGTH_LONG).show();
@@ -98,7 +97,6 @@ public class HostDetailsActivity extends BaseActivity {
                         if (SharedPrefsUtils.hasKey(mContext, Constants.BOOKING_REQUEST_ID, Constants.SP_NAME)) {
                             String requestId = SharedPrefsUtils.getStringPreference(mContext, Constants.BOOKING_REQUEST_ID, Constants.SP_NAME);
                             if (Helper.isConnected(mContext)) {
-                                Toast.makeText(getApplicationContext(), "CANCEL SEAT", Toast.LENGTH_LONG).show();
                                 mSession.cancelRequestedSeat(requestId);
                             } else
                                 Toast.makeText(mContext, "No internet", Toast.LENGTH_LONG).show();
@@ -284,7 +282,8 @@ public class HostDetailsActivity extends BaseActivity {
                     clearRejectAcceptSharedPreference();
 
                     break;
-                }
+                }else
+                    Toast.makeText(mContext, "Some error occurred!", Toast.LENGTH_LONG).show();
             }
             case CobbocEvent.CANCEL_BOOKING_REQUEST: {
                 Helper.dismissProgressDialog();
@@ -299,7 +298,8 @@ public class HostDetailsActivity extends BaseActivity {
                     bookSeat.setText(REQUEST_BOOK);
                     requestStatus.setTextColor(ContextCompat.getColor(mContext, android.R.color.holo_blue_dark));
                     requestStatus.setText("*Request Canceled!");
-                }
+                }else
+                    Toast.makeText(mContext, "Some error occurred!", Toast.LENGTH_LONG).show();
             }
             break;
         }

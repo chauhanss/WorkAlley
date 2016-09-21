@@ -45,19 +45,6 @@ public class HomeActivity extends BaseActivity implements OnItemClickListener {
 
     private Socket mSocket;
 
-    private Emitter.Listener onNewMessage = new Emitter.Listener() {
-        @Override
-        public void call(final Object... args) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    //JSONObject data = (JSONObject) args[0];
-                    Toast.makeText(getApplicationContext(), "connected" + " " + "enjoy", Toast.LENGTH_LONG).show();
-                }
-            });
-        }
-    };
-
 
     @Orientation
     private int orientation;

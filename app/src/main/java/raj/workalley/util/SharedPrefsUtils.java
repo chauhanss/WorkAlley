@@ -100,9 +100,8 @@ public class SharedPrefsUtils {
         Set<String> set = preferences.getStringSet(key, null);
         if (preferences != null && !TextUtils.isEmpty(key)) {
             SharedPreferences.Editor editor = preferences.edit();
-            Set<String> set2 = new HashSet<String>();
             if (set != null)
-                set.addAll(set);
+                values.addAll(set);
             editor.putStringSet(key, values);
             return editor.commit();
         }

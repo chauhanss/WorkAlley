@@ -141,7 +141,8 @@ public class DashboardFragment extends Fragment {
                         e.printStackTrace();
                     }
                     break;
-                }
+                }else
+                    Toast.makeText(mContext, "Some error occurred!", Toast.LENGTH_LONG).show();
             }
         }
     }

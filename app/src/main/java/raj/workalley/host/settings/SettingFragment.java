@@ -1,5 +1,6 @@
 package raj.workalley.host.settings;
 
+import android.content.Intent;
 import android.media.Image;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -11,8 +12,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 
+import raj.workalley.LoginActivity;
 import raj.workalley.R;
 import raj.workalley.Session;
+import raj.workalley.util.Helper;
 
 /**
  * Created by vishal.raj on 9/5/16.
@@ -23,7 +26,7 @@ public class SettingFragment extends Fragment {
     EditText email, name, phone, workspaceName, numberOfSeat;
     EditText line1, line2, city, state, pincode;
     ImageView editModeBtn;
-    Button save_n_logout_btn;
+    Button save_n_logout_btn, dlt_workspace;
 
     boolean editMode;
 
@@ -41,6 +44,7 @@ public class SettingFragment extends Fragment {
 
         editModeBtn = (ImageView) v.findViewById(R.id.edit_mode);
         save_n_logout_btn = (Button) v.findViewById(R.id.host_save_logout);
+        dlt_workspace = (Button) v.findViewById(R.id.delete);
 
         editModeBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -54,6 +58,13 @@ public class SettingFragment extends Fragment {
                     save_n_logout_btn.setText(getString(R.string.logout));
                     setEditTextNonEditable();
                 }
+            }
+        });
+
+        dlt_workspace.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mSession.deleteWorkspace(mSession.getWorkspaces().getWorkspaceData().get(0).get_id());
             }
         });
 
@@ -74,11 +85,13 @@ public class SettingFragment extends Fragment {
     }
 
     private void callHostLogoutApi() {
-
+        mSession.logout();
+        Intent intent = new Intent(getActivity(), LoginActivity.class);
+        startActivity(intent);
     }
 
     private void callHostDetailsSaveApi() {
-
+        mSession.saveHostDetails();
     }
 
     private void setEditTextEditable() {

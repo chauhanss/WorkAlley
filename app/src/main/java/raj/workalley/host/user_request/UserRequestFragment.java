@@ -239,7 +239,8 @@ public class UserRequestFragment extends Fragment {
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                }
+                }else
+                    Toast.makeText(mContext, "Some error occurred!", Toast.LENGTH_LONG).show();
                 break;
             case CobbocEvent.END_SESSION_CONFIRMED:
 
@@ -261,7 +262,8 @@ public class UserRequestFragment extends Fragment {
                         e.printStackTrace();
                     }
                     break;
-                }
+                }else
+                    Toast.makeText(mContext, "Some error occurred!", Toast.LENGTH_LONG).show();
         }
     }
 }

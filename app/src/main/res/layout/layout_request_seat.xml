@@ -25,6 +25,7 @@
         android:text="@string/workspace_name"
         android:textColor="@android:color/black" />
 
+
     <TextView
         android:id="@+id/workspace_address"
         android:layout_width="match_parent"
@@ -61,4 +62,5 @@
         android:paddingRight="50dp"
         android:paddingTop="@dimen/margin_10"
         android:text="End Session" />
-</LinearLayout>
+
+    </LinearLayout>

@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -31,6 +32,7 @@ import raj.workalley.Session;
 import raj.workalley.user.fresh.UserInfo;
 import raj.workalley.util.Helper;
 import raj.workalley.util.SharedPrefsUtils;
+import raj.workalley.user.fresh.offers.OfferActivity;
 
 /**
  * Created by vishal.raj on 9/5/16.
@@ -53,6 +55,13 @@ public class AccountFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
         View v = inflater.inflate(R.layout.fragment_account_fresh_user, null);
+        v.findViewById(R.id.recharge_btn).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), OfferActivity.class);
+                startActivity(intent);
+            }
+        });
         return v;
     }
 
@@ -162,7 +171,8 @@ public class AccountFragment extends Fragment {
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                }
+                }else
+                    Toast.makeText(mContext, "Some error occurred!", Toast.LENGTH_LONG).show();
 
             }
             break;
@@ -173,7 +183,8 @@ public class AccountFragment extends Fragment {
                     SharedPrefsUtils.removePreferenceByKey(mContext, Constants.BOOKING_REQUEST_ID, Constants.SP_NAME);
                     endSession.setVisibility(View.GONE);
                     requestLayout.findViewById(R.id.status).setVisibility(View.VISIBLE);
-                }
+                }else
+                    Toast.makeText(mContext, "Some error occurred!", Toast.LENGTH_LONG).show();
             }
         }
     }

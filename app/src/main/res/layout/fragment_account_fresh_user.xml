@@ -43,10 +43,36 @@
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/wrapper2"
+                android:id="@+id/wrapper4"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/wrapper"
+                android:layout_marginBottom="@dimen/margin_10"
+                android:layout_marginLeft="@dimen/margin_10"
+                android:layout_marginRight="@dimen/margin_10"
+                android:layout_marginTop="@dimen/margin_30"
+                android:orientation="horizontal">
+
+                <TextView
+                    style="@style/Title"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Valid" />
+
+                <TextView
+                    style="@style/TextOnly"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="30 Sept 2016" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/wrapper2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/wrapper4"
                 android:gravity="center"
                 android:orientation="horizontal"
                 android:paddingBottom="@dimen/margin_10"
@@ -89,7 +115,8 @@
                 android:layout_marginLeft="@dimen/margin_20"
                 android:layout_marginRight="@dimen/margin_20"
                 android:layout_marginTop="@dimen/margin_20"
-                android:text="@string/recharge" />
+                android:text="@string/recharge"
+                android:visibility="gone" />
         </RelativeLayout>
     </android.support.v7.widget.CardView>
 </LinearLayout>

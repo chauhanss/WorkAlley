@@ -1,13 +1,18 @@
 package raj.workalley.user.fresh.map;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.android.gms.location.LocationListener;
@@ -23,8 +28,10 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.logging.Handler;
 
 import raj.workalley.BaseFragment;
@@ -46,6 +53,7 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback, Loc
     private String destination = "random";
     private LatLng latLng = new LatLng(12.9539974, 77.6309394);
     private Session mSession;
+    EditText locationSearch;
     HashMap<String, String> mMarkersMap = new HashMap<String, String>();
 
     public static MapFragment newInstance() {
@@ -63,6 +71,8 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback, Loc
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
         View v = inflater.inflate(R.layout.fragment_map, null);
+        locationSearch = (EditText) v.findViewById(R.id.location_search);
+
 
         SupportMapFragment mapFragment = (SupportMapFragment) this.getChildFragmentManager().findFragmentById(R.id.map_1);
         mapFragment.getMapAsync(this);
@@ -72,6 +82,25 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback, Loc
             mSession.getAllActiveWorkspace();
         } else
             Toast.makeText(mContext, "No internet", Toast.LENGTH_LONG).show();
+
+        locationSearch.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                final int DRAWABLE_LEFT = 0;
+                final int DRAWABLE_TOP = 1;
+                final int DRAWABLE_RIGHT = 2;
+                final int DRAWABLE_BOTTOM = 3;
+
+                if (event.getAction() == MotionEvent.ACTION_UP) {
+                    if (event.getRawX() >= (locationSearch.getRight() - locationSearch.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width())) {
+                        onMapSearch();
+                        Helper.showKeyboard(mContext, locationSearch);
+                        return true;
+                    }
+                }
+                return false;
+            }
+        });
 
         return v;
     }
@@ -94,9 +123,29 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback, Loc
         }
     }
 
+    public void onMapSearch() {
+        String location = locationSearch.getText().toString();
+        List<Address> addressList = null;
+
+        if (location != null || !location.equals("")) {
+            Geocoder geocoder = new Geocoder(getActivity());
+            try {
+                addressList = geocoder.getFromLocationName(location, 1);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            Address address = addressList.get(0);
+            LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
+            mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
+        }
+    }
+
+
     @Override
     public void onPause() {
         super.onPause();
+        Helper.hideKeyboardIfShown((Activity) mContext, locationSearch);
         if (EventBus.getDefault().isRegistered(this)) {
             EventBus.getDefault().unregister(this);
         }
@@ -188,7 +237,8 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback, Loc
 
                     setWorkspaceDataOnMap();
                     break;
-                }
+                }else
+                    Toast.makeText(mContext, "Some error occurred!", Toast.LENGTH_LONG).show();
             }
         }
     }
