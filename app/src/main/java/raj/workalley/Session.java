@@ -38,6 +38,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import raj.workalley.user.fresh.UserInfo;
+import raj.workalley.util.SharedPrefsUtils;
 
 /**
  * Created by vishal.raj on 9/5/16.
@@ -63,6 +64,11 @@ public class Session {
         eventBus = EventBus.getDefault();
         mContext = context;
         handler = new Handler(Looper.getMainLooper());
+
+        String mToken = SharedPrefsUtils.getStringPreference(mContext,"token",Constants.SP_NAME);
+        if (mToken != null) {
+            mSessionData.setToken(mToken);
+        }
     }
 
     public static synchronized Session getInstance(Context context) {
@@ -265,7 +271,7 @@ public class Session {
                 HashMap<String, String> headers = new HashMap<String, String>();
                 headers.put("Content-Type", "application/json");
                 if (getToken() != null) {
-                    headers.put("authorization", "" + getToken());
+                    headers.put("authorization",getToken());
                 }
                 //String sessionId = Hawk.get("connect.sid", "");
                 return headers;
@@ -277,6 +283,11 @@ public class Session {
                     String jsonString = new String(response.data,
                             HttpHeaderParser.parseCharset(response.headers, PROTOCOL_CHARSET));
                     JSONObject jsonResponse = new JSONObject(jsonString);
+                    if(jsonResponse.has("token") && !jsonResponse.isNull("token")){
+                        String token = jsonResponse.getString("token");
+                        setToken(token);
+                        SharedPrefsUtils.setStringPreference(mContext,"token",token,Constants.SP_NAME);
+                    }
                     String sessionId = response.headers.get("set-cookie");
                     setSessionIdCookies(sessionId);
                     jsonResponse.put("headers", new JSONObject(response.headers));
@@ -325,7 +336,7 @@ public class Session {
                 HashMap<String, String> headers = new HashMap<String, String>();
                 headers.put("Content-Type", "application/json");
                 if (getToken() != null) {
-                    headers.put("authorization", "" + getToken());
+                    headers.put("authorization",getToken());
                 }
                 //String sessionId = Hawk.get("connect.sid", "");
                 return headers;
@@ -383,7 +394,7 @@ public class Session {
                 HashMap<String, String> headers = new HashMap<String, String>();
                 headers.put("Content-Type", "application/json; charset=utf-8");
                 if (getToken() != null) {
-                    headers.put("authorization", "" + getToken());
+                    headers.put("authorization",getToken());
                 }
                 return headers;
             }
