@@ -156,7 +156,7 @@ public class HomeActivity extends BaseActivity implements OnItemClickListener {
         HostSocketService.authHost();*/
         Intent intent = new Intent(getBaseContext(), HostSocketService.class);
         Bundle b = new Bundle();
-        b.putString(Constants.SESSION_COOKIES_ID, session.getSessionIdCookies());
+        b.putString(Constants.SESSION_COOKIES_ID, session.getToken());
         intent.putExtras(b);
         startService(intent);
     }
