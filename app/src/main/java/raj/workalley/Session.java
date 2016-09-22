@@ -65,7 +65,7 @@ public class Session {
         mContext = context;
         handler = new Handler(Looper.getMainLooper());
 
-        String mToken = SharedPrefsUtils.getStringPreference(mContext,"token",Constants.SP_NAME);
+        String mToken = SharedPrefsUtils.getStringPreference(mContext, "token", Constants.SP_NAME);
         if (mToken != null) {
             mSessionData.setToken(mToken);
         }
@@ -168,7 +168,7 @@ public class Session {
 
         void onSuccess(String response);
 
-        void onError(Throwable throwable);
+        void onError(Throwable throwable, String errorMessage);
 
         void onProgress(int percent);
     }
@@ -194,20 +194,20 @@ public class Session {
     }
     /*VOlley Section End*/
 
-    private void runErrorOnHandlerThread(final Task task, final Throwable e) {
+    private void runErrorOnHandlerThread(final Task task, final Throwable e, final String errorMessage) {
         if (e instanceof ConnectTimeoutException || e instanceof SocketTimeoutException) {
             final Throwable x = new Throwable("time out error");
             handler.post(new Runnable() {
                 @Override
                 public void run() {
-                    task.onError(x);
+                    task.onError(x, errorMessage);
                 }
             });
         } else {
             handler.post(new Runnable() {
                 @Override
                 public void run() {
-                    task.onError(e);
+                    task.onError(e, errorMessage);
                 }
             });
         }
@@ -263,7 +263,24 @@ public class Session {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         Log.e(TAG, error.getMessage() + "");
-                        runErrorOnHandlerThread(task, error);
+
+                        String json = null;
+                        NetworkResponse response = error.networkResponse;
+                        if (response != null && response.data != null) {
+                            switch (response.statusCode) {
+                                case 400:
+                                    json = new String(response.data);
+                                    json = trimMessage(json, "message");
+                                    break;
+                            }
+                            //Additional cases
+                        }
+                        String errorMessage = "";
+                        if (json != null) {
+                            Log.d("SESSION", "ERROR : " + json.toString());
+                            errorMessage = json.toString();
+                        }
+                        runErrorOnHandlerThread(task, error, errorMessage);
                     }
                 }) {
             @Override
@@ -271,7 +288,7 @@ public class Session {
                 HashMap<String, String> headers = new HashMap<String, String>();
                 headers.put("Content-Type", "application/json");
                 if (getToken() != null) {
-                    headers.put("authorization",getToken());
+                    headers.put("authorization", getToken());
                 }
                 //String sessionId = Hawk.get("connect.sid", "");
                 return headers;
@@ -283,10 +300,10 @@ public class Session {
                     String jsonString = new String(response.data,
                             HttpHeaderParser.parseCharset(response.headers, PROTOCOL_CHARSET));
                     JSONObject jsonResponse = new JSONObject(jsonString);
-                    if(jsonResponse.has("token") && !jsonResponse.isNull("token")){
+                    if (jsonResponse.has("token") && !jsonResponse.isNull("token")) {
                         String token = jsonResponse.getString("token");
                         setToken(token);
-                        SharedPrefsUtils.setStringPreference(mContext,"token",token,Constants.SP_NAME);
+                        SharedPrefsUtils.setStringPreference(mContext, "token", token, Constants.SP_NAME);
                     }
                     String sessionId = response.headers.get("set-cookie");
                     setSessionIdCookies(sessionId);
@@ -303,8 +320,8 @@ public class Session {
         };
         myRequest.setShouldCache(false);
         myRequest.setRetryPolicy(new DefaultRetryPolicy(60000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT)
+                        DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                        DefaultRetryPolicy.DEFAULT_BACKOFF_MULT)
 
         );
 
@@ -328,7 +345,24 @@ public class Session {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         Log.e(TAG, error.getMessage() + "");
-                        runErrorOnHandlerThread(task, error);
+
+                        String json = null;
+                        NetworkResponse response = error.networkResponse;
+                        if (response != null && response.data != null) {
+                            switch (response.statusCode) {
+                                case 400:
+                                    json = new String(response.data);
+                                    json = trimMessage(json, "message");
+                                    break;
+                            }
+                            //Additional cases
+                        }
+                        String errorMessage = "";
+                        if (json != null) {
+                            Log.d("SESSION", "ERROR : " + json.toString());
+                            errorMessage = json.toString();
+                        }
+                        runErrorOnHandlerThread(task, error, errorMessage);
                     }
                 }) {
             @Override
@@ -336,9 +370,9 @@ public class Session {
                 HashMap<String, String> headers = new HashMap<String, String>();
                 headers.put("Content-Type", "application/json");
                 if (getToken() != null) {
-                    headers.put("authorization",getToken());
+                    headers.put("authorization", getToken());
                 }
-                //String sessionId = Hawk.get("connect.sid", "");
+
                 return headers;
             }
 
@@ -363,12 +397,26 @@ public class Session {
         };
         myRequest.setShouldCache(false);
         myRequest.setRetryPolicy(new DefaultRetryPolicy(60000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT)
+                        DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                        DefaultRetryPolicy.DEFAULT_BACKOFF_MULT)
 
         );
 
         addToRequestQueue(myRequest);
+    }
+
+    public String trimMessage(String json, String key) {
+        String trimmedString = null;
+
+        try {
+            JSONObject obj = new JSONObject(json);
+            trimmedString = obj.getString(key);
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return null;
+        }
+
+        return trimmedString;
     }
 
 
@@ -386,7 +434,23 @@ public class Session {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         Log.e(TAG, error.getMessage() + "");
-                        runErrorOnHandlerThread(task, error);
+                        String json = null;
+                        NetworkResponse response = error.networkResponse;
+                        if (response != null && response.data != null) {
+                            switch (response.statusCode) {
+                                case 400:
+                                    json = new String(response.data);
+                                    json = trimMessage(json, "message");
+                                    break;
+                            }
+                            //Additional cases
+                        }
+                        String errorMessage = "";
+                        if (json != null) {
+                            Log.d("SESSION", "ERROR : " + json.toString());
+                            errorMessage = json.toString();
+                        }
+                        runErrorOnHandlerThread(task, error, errorMessage);
                     }
                 }) {
             @Override
@@ -394,15 +458,15 @@ public class Session {
                 HashMap<String, String> headers = new HashMap<String, String>();
                 headers.put("Content-Type", "application/json; charset=utf-8");
                 if (getToken() != null) {
-                    headers.put("authorization",getToken());
+                    headers.put("authorization", getToken());
                 }
                 return headers;
             }
         };
         myRequest.setShouldCache(false);
         myRequest.setRetryPolicy(new DefaultRetryPolicy(30000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT)
+                        DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                        DefaultRetryPolicy.DEFAULT_BACKOFF_MULT)
 
         );
 
@@ -446,8 +510,8 @@ public class Session {
             }
 
             @Override
-            public void onError(Throwable throwable) {
-                eventBus.post(new CobbocEvent(CobbocEvent.SIGNUP, false, "An error occurred while trying to login. Please try again later."));
+            public void onError(Throwable throwable, String errorMessage) {
+                eventBus.post(new CobbocEvent(CobbocEvent.SIGNUP, false, errorMessage));
             }
 
             @Override
@@ -482,8 +546,8 @@ public class Session {
             }
 
             @Override
-            public void onError(Throwable throwable) {
-                eventBus.post(new CobbocEvent(CobbocEvent.LOGIN, false, "An error occurred while trying to login. Please try again later."));
+            public void onError(Throwable throwable, String errorMessage) {
+                eventBus.post(new CobbocEvent(CobbocEvent.LOGIN, false, errorMessage));
             }
 
             @Override
@@ -509,8 +573,8 @@ public class Session {
             }
 
             @Override
-            public void onError(Throwable throwable) {
-                eventBus.post(new CobbocEvent(CobbocEvent.LOGOUT, false, "An error occurred while trying to login. Please try again later."));
+            public void onError(Throwable throwable, String errorMessage) {
+                eventBus.post(new CobbocEvent(CobbocEvent.LOGOUT, false, errorMessage));
             }
 
             @Override
@@ -553,8 +617,8 @@ public class Session {
             }
 
             @Override
-            public void onError(Throwable throwable) {
-                eventBus.post(new CobbocEvent(CobbocEvent.CREATE_WORKSPACE, false, "An error occurred while creating workspace. Please try again later."));
+            public void onError(Throwable throwable, String errorMessage) {
+                eventBus.post(new CobbocEvent(CobbocEvent.CREATE_WORKSPACE, false, errorMessage));
             }
 
             @Override
@@ -588,8 +652,8 @@ public class Session {
             }
 
             @Override
-            public void onError(Throwable throwable) {
-                eventBus.post(new CobbocEvent(CobbocEvent.REQUEST_SEAT, false, "An error occurred while creating workspace. Please try again later."));
+            public void onError(Throwable throwable, String errorMessage) {
+                eventBus.post(new CobbocEvent(CobbocEvent.REQUEST_SEAT, false, errorMessage));
             }
 
             @Override
@@ -618,8 +682,8 @@ public class Session {
             }
 
             @Override
-            public void onError(Throwable throwable) {
-                eventBus.post(new CobbocEvent(CobbocEvent.GET_USER_DETAILS, false, "An error occurred while trying to login. Please try again later."));
+            public void onError(Throwable throwable, String errorMessage) {
+                eventBus.post(new CobbocEvent(CobbocEvent.GET_USER_DETAILS, false, errorMessage));
             }
 
             @Override
@@ -645,8 +709,8 @@ public class Session {
             }
 
             @Override
-            public void onError(Throwable throwable) {
-                eventBus.post(new CobbocEvent(CobbocEvent.GET_HOST_DETAILS, false, "An error occurred while trying to login. Please try again later."));
+            public void onError(Throwable throwable, String errorMessage) {
+                eventBus.post(new CobbocEvent(CobbocEvent.GET_HOST_DETAILS, false, errorMessage));
             }
 
             @Override
@@ -672,8 +736,8 @@ public class Session {
             }
 
             @Override
-            public void onError(Throwable throwable) {
-                eventBus.post(new CobbocEvent(CobbocEvent.GET_ALL_WORKSPACES, false, "An error occurred while trying to login. Please try again later."));
+            public void onError(Throwable throwable, String errorMessage) {
+                eventBus.post(new CobbocEvent(CobbocEvent.GET_ALL_WORKSPACES, false, errorMessage));
             }
 
             @Override
@@ -707,8 +771,8 @@ public class Session {
             }
 
             @Override
-            public void onError(Throwable throwable) {
-                eventBus.post(new CobbocEvent(CobbocEvent.REQUEST_SEAT, false, "An error occurred while creating workspace. Please try again later."));
+            public void onError(Throwable throwable, String errorMessage) {
+                eventBus.post(new CobbocEvent(CobbocEvent.REQUEST_SEAT, false, errorMessage));
             }
 
             @Override
@@ -750,8 +814,8 @@ public class Session {
             }
 
             @Override
-            public void onError(Throwable throwable) {
-                eventBus.post(new CobbocEvent(CobbocEvent.ACCEPT_REJECT_BOOKING_REQUEST, false, "An error occurred while trying to login. Please try again later."));
+            public void onError(Throwable throwable, String errorMessage) {
+                eventBus.post(new CobbocEvent(CobbocEvent.ACCEPT_REJECT_BOOKING_REQUEST, false, errorMessage));
             }
 
             @Override
@@ -777,8 +841,8 @@ public class Session {
             }
 
             @Override
-            public void onError(Throwable throwable) {
-                eventBus.post(new CobbocEvent(CobbocEvent.GET_ALL_ACTIVE_USERS, false, "An error occurred while trying to login. Please try again later."));
+            public void onError(Throwable throwable, String errorMessage) {
+                eventBus.post(new CobbocEvent(CobbocEvent.GET_ALL_ACTIVE_USERS, false, errorMessage));
             }
 
             @Override
@@ -805,8 +869,8 @@ public class Session {
             }
 
             @Override
-            public void onError(Throwable throwable) {
-                eventBus.post(new CobbocEvent(CobbocEvent.CANCEL_BOOKING_REQUEST, false, "An error occurred while trying to login. Please try again later."));
+            public void onError(Throwable throwable, String errorMessage) {
+                eventBus.post(new CobbocEvent(CobbocEvent.CANCEL_BOOKING_REQUEST, false, errorMessage));
             }
 
             @Override
@@ -833,8 +897,36 @@ public class Session {
             }
 
             @Override
-            public void onError(Throwable throwable) {
-                eventBus.post(new CobbocEvent(CobbocEvent.ACTIVE_SESSIONS, false, "An error occurred while trying to login. Please try again later."));
+            public void onError(Throwable throwable, String errorMessage) {
+                eventBus.post(new CobbocEvent(CobbocEvent.ACTIVE_SESSIONS, false, errorMessage));
+            }
+
+            @Override
+            public void onProgress(int percent) {
+
+            }
+        }, Request.Method.GET);
+    }
+
+    public void getUpdatedRequestStatus(String requestId) {
+
+        String getRequestUrl = "/requests/" + requestId;
+
+        getFetch(getRequestUrl, null, new Task() {
+
+            @Override
+            public void onSuccess(JSONObject jsonObject) {
+                eventBus.post(new CobbocEvent(CobbocEvent.LAST_STATUS, true, jsonObject));
+            }
+
+            @Override
+            public void onSuccess(String response) {
+
+            }
+
+            @Override
+            public void onError(Throwable throwable, String errorMessage) {
+                eventBus.post(new CobbocEvent(CobbocEvent.LAST_STATUS, false, errorMessage));
             }
 
             @Override
@@ -861,8 +953,8 @@ public class Session {
             }
 
             @Override
-            public void onError(Throwable throwable) {
-                eventBus.post(new CobbocEvent(CobbocEvent.END_SESSION, false, "An error occurred while trying to login. Please try again later."));
+            public void onError(Throwable throwable, String errorMessage) {
+                eventBus.post(new CobbocEvent(CobbocEvent.END_SESSION, false, errorMessage));
             }
 
             @Override
@@ -872,16 +964,23 @@ public class Session {
         }, Request.Method.PUT);
     }
 
-    public void endSessionByHostConfirmed(final UserInfo user, String requestId) {
+    public void endSessionByHostConfirmed(final UserInfo user, String requestId, final String endToken) {
 
         String getRequestUrl = "requests/" + requestId + "/end";
+        JSONObject param2s = new JSONObject();
+        try {
+            param2s.put("token", endToken);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        String param = endToken;
 
-        putFetch(getRequestUrl, null, new Task() {
+        putFetch(getRequestUrl, param2s.toString(), new Task() {
 
             @Override
             public void onSuccess(JSONObject jsonObject) {
                 try {
-                    jsonObject.put("user", user.toString());
+                    jsonObject.put("user", user);
                     eventBus.post(new CobbocEvent(CobbocEvent.END_SESSION_CONFIRMED, true, jsonObject));
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -895,8 +994,10 @@ public class Session {
             }
 
             @Override
-            public void onError(Throwable throwable) {
-                eventBus.post(new CobbocEvent(CobbocEvent.END_SESSION_CONFIRMED, false, "An error occurred while trying to login. Please try again later."));
+            public void onError(Throwable throwable, String errorMessage) {
+
+
+                eventBus.post(new CobbocEvent(CobbocEvent.END_SESSION_CONFIRMED, false, errorMessage));
             }
 
             @Override

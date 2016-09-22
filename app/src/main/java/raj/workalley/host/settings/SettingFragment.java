@@ -1,5 +1,6 @@
 package raj.workalley.host.settings;
 
+import android.content.Context;
 import android.content.Intent;
 import android.media.Image;
 import android.os.Bundle;
@@ -11,11 +12,17 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Toast;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+
+import raj.workalley.CobbocEvent;
 import raj.workalley.LoginActivity;
 import raj.workalley.R;
 import raj.workalley.Session;
 import raj.workalley.util.Helper;
+import raj.workalley.util.SharedPrefsUtils;
 
 /**
  * Created by vishal.raj on 9/5/16.
@@ -29,6 +36,7 @@ public class SettingFragment extends Fragment {
     Button save_n_logout_btn, dlt_workspace;
 
     boolean editMode;
+    private Context mContext;
 
     public static SettingFragment newInstance() {
         SettingFragment fragment = new SettingFragment();
@@ -85,13 +93,21 @@ public class SettingFragment extends Fragment {
     }
 
     private void callHostLogoutApi() {
-        mSession.logout();
-        Intent intent = new Intent(getActivity(), LoginActivity.class);
-        startActivity(intent);
+        if (Helper.isConnected(mContext)) {
+            Helper.showProgressDialogSpinner(mContext, "Please wait", "Connecting server", false);
+            mSession.logout();
+        } else
+            Toast.makeText(mContext, "No internet", Toast.LENGTH_LONG).show();
+
     }
 
     private void callHostDetailsSaveApi() {
-        mSession.saveHostDetails();
+        if (Helper.isConnected(mContext)) {
+            Helper.showProgressDialogSpinner(mContext, "Please wait", "Connecting server", false);
+            mSession.saveHostDetails();
+        } else
+            Toast.makeText(mContext, "No internet", Toast.LENGTH_LONG).show();
+
     }
 
     private void setEditTextEditable() {
@@ -153,5 +169,43 @@ public class SettingFragment extends Fragment {
 
     }
 
+    @Subscribe
+    public void onEventMainThread(CobbocEvent event) {
+        switch (event.getType()) {
+            case CobbocEvent.LOGOUT: {
+                Helper.dismissProgressDialog();
+                if (event.getStatus()) {
+                    Toast.makeText(getActivity(), "logout", Toast.LENGTH_LONG).show();
+                    Intent intent = new Intent(getActivity(), LoginActivity.class);
+                    startActivity(intent);
+                    SharedPrefsUtils.clearSharedPreferenceFile(getActivity());
+                    break;
+                }
+            }
+        }
+    }
 
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (EventBus.getDefault().isRegistered(this)) {
+            EventBus.getDefault().unregister(this);
+        }
+    }
+
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (!EventBus.getDefault().isRegistered(this)) {
+            EventBus.getDefault().register(this);
+        }
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        mContext = context;
+    }
 }

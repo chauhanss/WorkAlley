@@ -50,6 +50,24 @@ public class SharedPrefsUtils {
         return value;
     }
 
+    public static String getHashSetTokenValueForUser(Context context, String key, String userId, String file) {
+        SharedPreferences preferences = context.getSharedPreferences(file, Context.MODE_PRIVATE);
+
+        String endToken = "";
+        Set<String> set = preferences.getStringSet(key, null);
+        if (set != null && preferences != null && !TextUtils.isEmpty(key)) {
+
+            for (String stringUser : set) {
+
+                String user = stringUser.substring(0, stringUser.lastIndexOf("|"));
+                if (user.equalsIgnoreCase(userId)) {
+                    return stringUser.substring(stringUser.lastIndexOf("|") + 1, stringUser.length());
+                }
+            }
+        }
+        return endToken;
+    }
+
     public static boolean getBooleanPreference(Context context, String key, String file) {
         boolean value = false;
         SharedPreferences preferences = context.getSharedPreferences(file, Context.MODE_PRIVATE);
@@ -145,7 +163,7 @@ public class SharedPrefsUtils {
         try {
             JSONObject searchUser = new JSONObject(user);
             Set<String> set = preferences.getStringSet(key, null);
-            if (preferences != null && !TextUtils.isEmpty(key)) {
+            if (set != null && preferences != null && !TextUtils.isEmpty(key)) {
 
                 for (String stringUser : set) {
 
@@ -157,12 +175,12 @@ public class SharedPrefsUtils {
                     }
                 }
                 return false;
-            }
+            } else
+                return false;
         } catch (JSONException e) {
             e.printStackTrace();
             return false;
         }
-        return false;
     }
 
     public static void clearSharedPreferenceFile(Context context) {

@@ -18,6 +18,7 @@ public class CobbocEvent {
     public static final int END_SESSION = 12;
     public static final int END_SESSION_CONFIRMED = 13;
     public static final int LOGOUT = 14;
+    public static final int LAST_STATUS = 15;
 
     private boolean STATUS;
 

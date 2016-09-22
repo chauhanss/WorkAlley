@@ -90,7 +90,10 @@ public class AccountFragment extends Fragment {
         public void onReceive(Context context, Intent intent) {
 
             String message = intent.getStringExtra("message");
-            if (message.equalsIgnoreCase(Constants.SESSION_END_CONFIRMED) || message.equalsIgnoreCase(Constants.BOOKING_ACCEPT)) {
+            if (message.equalsIgnoreCase(Constants.SESSION_END_CONFIRMED)) {
+                SharedPrefsUtils.removePreferenceByKey(mContext, Constants.BOOKING_REQUEST_ID, Constants.SP_NAME);
+                getAllActiveSessionsOfUser(mUser.get_id());
+            } else if (message.equalsIgnoreCase(Constants.BOOKING_ACCEPT)) {
                 getAllActiveSessionsOfUser(mUser.get_id());
             }
         }
@@ -171,7 +174,7 @@ public class AccountFragment extends Fragment {
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                }else
+                } else
                     Toast.makeText(mContext, "Some error occurred!", Toast.LENGTH_LONG).show();
 
             }
@@ -180,10 +183,10 @@ public class AccountFragment extends Fragment {
                 Helper.dismissProgressDialog();
                 if (event.getStatus()) {
                     Toast.makeText(mContext, "Session end request submitted!", Toast.LENGTH_LONG).show();
-                    SharedPrefsUtils.removePreferenceByKey(mContext, Constants.BOOKING_REQUEST_ID, Constants.SP_NAME);
+                    //          SharedPrefsUtils.removePreferenceByKey(mContext, Constants.BOOKING_REQUEST_ID, Constants.SP_NAME);
                     endSession.setVisibility(View.GONE);
                     requestLayout.findViewById(R.id.status).setVisibility(View.VISIBLE);
-                }else
+                } else
                     Toast.makeText(mContext, "Some error occurred!", Toast.LENGTH_LONG).show();
             }
         }

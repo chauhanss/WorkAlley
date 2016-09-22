@@ -44,6 +44,7 @@ public class HostSocketService extends Service {
     private static final String USER = "user";
     private static final String REQUEST_TYPE = "requestType";
     private static final String WORKSPACE = "workspace_id";
+    private static final String END_TOKEN = "endToken";
     int mStartMode;
     IBinder mBinder;
     boolean mAllowRebind;
@@ -172,6 +173,7 @@ public class HostSocketService extends Service {
                         JSONObject userObject = (JSONObject) jsonObject.get("user");
                         bundle.putString(USER, jsonObject.get("user").toString());
                         bundle.putString(WORKSPACE, space.getString("_id"));
+                        bundle.putString(Constants.REQUEST_ID, jsonObject.get("_id").toString());
                         bundle.putString(REQUEST_TYPE, "BOOKING_REJECTED");
                         if (userObject.has("name") && !userObject.isNull("name"))
                             createNotification(userObject.getString("name"), space.getString("name"), "BOOKING_REJECTED");
@@ -205,6 +207,7 @@ public class HostSocketService extends Service {
                         JSONObject userObject = (JSONObject) jsonObject.get("user");
                         bundle.putString(USER, jsonObject.get("user").toString());
                         bundle.putString(WORKSPACE, space.getString("_id"));
+                        bundle.putString(Constants.REQUEST_ID, jsonObject.get("_id").toString());
                         bundle.putString(REQUEST_TYPE, "BOOKING_ACCEPTED");
                         if (userObject.has("name") && !userObject.isNull("name"))
                             createNotification(userObject.getString("name"), space.getString("name"), "BOOKING_ACCEPTED");
@@ -238,6 +241,7 @@ public class HostSocketService extends Service {
                         JSONObject userObject = (JSONObject) jsonObject.get("user");
                         bundle.putString(USER, jsonObject.get("user").toString());
                         bundle.putString(WORKSPACE, space.getString("_id"));
+                        bundle.putString(Constants.REQUEST_ID, jsonObject.get("_id").toString());
                         bundle.putString(REQUEST_TYPE, "BOOKING_CANCELED");
                         if (userObject.has("name") && !userObject.isNull("name"))
                             createNotification(userObject.getString("name"), space.getString("name"), "BOOKING_CANCELED");
@@ -271,7 +275,9 @@ public class HostSocketService extends Service {
                         JSONObject userObject = (JSONObject) jsonObject.get("user");
                         bundle.putString(USER, jsonObject.get("user").toString());
                         bundle.putString(WORKSPACE, space.getString("_id"));
+                        bundle.putString(Constants.REQUEST_ID, jsonObject.get("_id").toString());
                         bundle.putString(REQUEST_TYPE, "SESSION_END_REQUEST");
+                        bundle.putString(END_TOKEN, jsonObject.getString("endToken"));
                         if (userObject.has("name") && !userObject.isNull("name"))
                             createNotification(userObject.getString("name"), space.getString("name"), "SESSION_END_REQUEST");
                         i.putExtra("bundle", bundle);
@@ -304,6 +310,7 @@ public class HostSocketService extends Service {
                         JSONObject userObject = (JSONObject) jsonObject.get("user");
                         bundle.putString(USER, jsonObject.get("user").toString());
                         bundle.putString(WORKSPACE, space.getString("_id"));
+                        bundle.putString(Constants.REQUEST_ID, jsonObject.get("_id").toString());
                         bundle.putString(REQUEST_TYPE, "SESSION_END_CONFIRMED");
                         if (userObject.has("name") && !userObject.isNull("name"))
                             createNotification(userObject.getString("name"), space.getString("name"), "SESSION_END_CONFIRMED");
@@ -361,11 +368,12 @@ public class HostSocketService extends Service {
                         .setContentTitle(requestType)
                         .setContentIntent(piDismiss);
 
-
+        mBuilder.setAutoCancel(true);
         int mNotificationId = createID();
         NotificationManager mNotifyMgr =
                 (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         mNotifyMgr.notify(mNotificationId, mBuilder.build());
+
     }
 
     @Override

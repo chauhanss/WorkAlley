@@ -22,7 +22,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import raj.workalley.AmenitiesItem;
 import raj.workalley.BaseActivity;
@@ -89,6 +91,7 @@ public class HostDetailsActivity extends BaseActivity {
                 switch (bookSeat.getText().toString()) {
                     case REQUEST_BOOK:
                         if (Helper.isConnected(mContext)) {
+                            Helper.showProgressDialogSpinner(mContext, "Please wait", "connecting server", false);
                             mSession.requestSeat(mSession.getUser().get_id(), workspaceId);
                         } else
                             Toast.makeText(mContext, "No internet", Toast.LENGTH_LONG).show();
@@ -97,6 +100,7 @@ public class HostDetailsActivity extends BaseActivity {
                         if (SharedPrefsUtils.hasKey(mContext, Constants.BOOKING_REQUEST_ID, Constants.SP_NAME)) {
                             String requestId = SharedPrefsUtils.getStringPreference(mContext, Constants.BOOKING_REQUEST_ID, Constants.SP_NAME);
                             if (Helper.isConnected(mContext)) {
+                                Helper.showProgressDialogSpinner(mContext, "Please wait", "connecting server", false);
                                 mSession.cancelRequestedSeat(requestId);
                             } else
                                 Toast.makeText(mContext, "No internet", Toast.LENGTH_LONG).show();
@@ -112,7 +116,14 @@ public class HostDetailsActivity extends BaseActivity {
         findViewById(R.id.refresh).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getLatestDataFromSharedPreference();
+                if (SharedPrefsUtils.hasKey(mContext, Constants.BOOKING_REQUEST_ID, Constants.SP_NAME)) {
+                    String requestId = SharedPrefsUtils.getStringPreference(mContext, Constants.BOOKING_REQUEST_ID, Constants.SP_NAME);
+                    if (Helper.isConnected(mContext)) {
+                        Helper.showProgressDialogSpinner(mContext, "Please wait", "connecting server", false);
+                        mSession.getUpdatedRequestStatus(requestId);
+                    } else
+                        Toast.makeText(mContext, "No internet", Toast.LENGTH_LONG).show();
+                }
             }
         });
     }
@@ -282,7 +293,7 @@ public class HostDetailsActivity extends BaseActivity {
                     clearRejectAcceptSharedPreference();
 
                     break;
-                }else
+                } else
                     Toast.makeText(mContext, "Some error occurred!", Toast.LENGTH_LONG).show();
             }
             case CobbocEvent.CANCEL_BOOKING_REQUEST: {
@@ -298,8 +309,58 @@ public class HostDetailsActivity extends BaseActivity {
                     bookSeat.setText(REQUEST_BOOK);
                     requestStatus.setTextColor(ContextCompat.getColor(mContext, android.R.color.holo_blue_dark));
                     requestStatus.setText("*Request Canceled!");
-                }else
+                } else
                     Toast.makeText(mContext, "Some error occurred!", Toast.LENGTH_LONG).show();
+            }
+            break;
+            case CobbocEvent.LAST_STATUS: {
+                Helper.dismissProgressDialog();
+                if (event.getStatus()) {
+                    try {
+                        JSONObject object = (JSONObject) event.getValue();
+                        JSONObject data = object.getJSONObject("data");
+                        JSONObject user = data.getJSONObject("user");
+                        String requestId = data.getString("_id");
+                        JSONObject space = data.getJSONObject("space");
+
+                        switch (data.getString("status")) {
+                            case "requested":
+
+                                if (!SharedPrefsUtils.hasKey(mContext, Constants.BOOKING_REQUEST_ID, Constants.SP_NAME)) {
+
+                                    SharedPrefsUtils.setStringPreference(mContext, Constants.BOOKING_REQUEST_ID, requestId, Constants.SP_NAME);
+                                    TextView requestStatus = (TextView) findViewById(R.id.request_status);
+                                    requestStatus.setText("Request Pending! Please refresh to get updated data!");
+                                    bookSeat.setText(REQUEST_CANCEL);
+                                    requestStatus.setTextColor(ContextCompat.getColor(mContext, android.R.color.holo_blue_dark));
+                                    clearRejectAcceptSharedPreference();
+                                }
+                                break;
+                            case "started":
+                                SharedPrefsUtils.setStringPreference(mContext, user.getString("_id"), Constants.BOOKING_ACCEPT + "|" + space.getString("_id"), Constants.SP_NAME);
+                                break;
+                            case "rejected":
+                                SharedPrefsUtils.setStringPreference(mContext, user.getString("_id"), Constants.BOOKING_REJECT + "|" + space.getString("_id"), Constants.SP_NAME);
+                                break;
+                            case "ended":
+                                SharedPrefsUtils.setStringPreference(mContext, user.getString("_id"), Constants.SESSION_END_CONFIRMED + "|" + space.getString("_id"), Constants.SP_NAME);
+                                break;
+                            case "canceled":
+                                SharedPrefsUtils.removePreferenceByKey(mContext, Constants.BOOKING_REQUEST_ID, Constants.SP_NAME);
+                                TextView requestStatus = (TextView) findViewById(R.id.request_status);
+                                bookSeat.setText(REQUEST_BOOK);
+                                requestStatus.setTextColor(ContextCompat.getColor(mContext, android.R.color.holo_blue_dark));
+                                requestStatus.setText("*Request Canceled!");
+                                break;
+                        }
+
+                        getLatestDataFromSharedPreference();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+
+                }
             }
             break;
         }

@@ -62,4 +62,5 @@ public class Constants {
     public static final String BOOKING_CANCELED = "BOOKING_CANCELED";
     public static final String SESSION_END_REQUEST = "SESSION_END_REQUEST";
     public static final String SESSION_END_CONFIRMED = "SESSION_END_CONFIRMED";
+    public static final String SESSION_END_TOKEN = "SESSION_END_TOKEN";
 }

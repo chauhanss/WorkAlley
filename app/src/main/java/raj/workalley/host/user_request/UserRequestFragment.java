@@ -78,11 +78,9 @@ public class UserRequestFragment extends Fragment {
     private void setUpRecyclerViewAdapter() {
 
         userRequests = SharedPrefsUtils.getHashSetPreference(getActivity(), Constants.BOOKING_REQUEST, Constants.SP_NAME);
-
+        userRequestList = new ArrayList<>();
+        userRequestList.clear();
         if (userRequests != null) {
-
-            userRequestList = new ArrayList<>();
-            userRequestList.clear();
             for (String user : userRequests) {
 
                 try {
@@ -93,30 +91,30 @@ public class UserRequestFragment extends Fragment {
                     e.printStackTrace();
                 }
             }
+        }
 
-            if (SharedPrefsUtils.hasKey(mContext, Constants.SESSION_END_REQUEST, Constants.SP_NAME)) {
-                Set<String> userEndRequests = SharedPrefsUtils.getHashSetPreference(mContext, Constants.SESSION_END_REQUEST, Constants.SP_NAME);
+        if (SharedPrefsUtils.hasKey(mContext, Constants.SESSION_END_REQUEST, Constants.SP_NAME)) {
+            Set<String> userEndRequests = SharedPrefsUtils.getHashSetPreference(mContext, Constants.SESSION_END_REQUEST, Constants.SP_NAME);
 
-                for (String endRequests : userEndRequests) {
-                    try {
-                        JSONObject userObject = new JSONObject(endRequests);
-                        UserInfo userRequest = (UserInfo) Session.getInstance(mContext).getParsedResponseFromGSON(userObject, Session.workAlleyModels.UserInfo);
-                        userRequest.setIsEndRequest(true);
-                        userRequestList.add(userRequest);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
+            for (String endRequests : userEndRequests) {
+                try {
+                    JSONObject userObject = new JSONObject(endRequests);
+                    UserInfo userRequest = (UserInfo) Session.getInstance(mContext).getParsedResponseFromGSON(userObject, Session.workAlleyModels.UserInfo);
+                    userRequest.setIsEndRequest(true);
+                    userRequestList.add(userRequest);
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
-
             }
 
-
-            UserRequestAdapter requestAdapter = new UserRequestAdapter(UserRequestFragment.this, userRequestList, mContext);
-            userRequestsListView.setAdapter(requestAdapter);
-            final LinearLayoutManager linearLayoutManager = new LinearLayoutManager(mContext);
-            userRequestsListView.setLayoutManager(linearLayoutManager);
-
         }
+
+
+        UserRequestAdapter requestAdapter = new UserRequestAdapter(UserRequestFragment.this, userRequestList, mContext);
+        userRequestsListView.setAdapter(requestAdapter);
+        final LinearLayoutManager linearLayoutManager = new LinearLayoutManager(mContext);
+        userRequestsListView.setLayoutManager(linearLayoutManager);
+
     }
 
     public void invalidateList(ArrayList<UserInfo> userRequests) {
@@ -205,10 +203,11 @@ public class UserRequestFragment extends Fragment {
             Helper.showProgressDialogSpinner(mContext, "Please Wait", "Ending session", false);
 
             String requestId = SharedPrefsUtils.getStringPreference(mContext, user.get_id(), Constants.SP_NAME);
-            Session.getInstance(mContext).endSessionByHostConfirmed(user, requestId);
+
+            String endToken = SharedPrefsUtils.getHashSetTokenValueForUser(mContext, Constants.SESSION_END_TOKEN, user.get_id(), Constants.SP_NAME);
+            Session.getInstance(mContext).endSessionByHostConfirmed(user, requestId, endToken);
         } else
             Toast.makeText(mContext, "No internet", Toast.LENGTH_LONG).show();
-
     }
 
     @Subscribe
@@ -239,7 +238,7 @@ public class UserRequestFragment extends Fragment {
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                }else
+                } else
                     Toast.makeText(mContext, "Some error occurred!", Toast.LENGTH_LONG).show();
                 break;
             case CobbocEvent.END_SESSION_CONFIRMED:
@@ -247,6 +246,7 @@ public class UserRequestFragment extends Fragment {
                 if (event.getStatus()) {
                     try {
                         JSONObject jsonObject = (JSONObject) event.getValue();
+
                         UserInfo user = (UserInfo) jsonObject.get("user");
 
                         if (userRequestList != null) {
@@ -262,7 +262,7 @@ public class UserRequestFragment extends Fragment {
                         e.printStackTrace();
                     }
                     break;
-                }else
+                } else
                     Toast.makeText(mContext, "Some error occurred!", Toast.LENGTH_LONG).show();
         }
     }

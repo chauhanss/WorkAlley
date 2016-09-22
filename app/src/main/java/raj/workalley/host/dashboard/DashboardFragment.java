@@ -136,7 +136,7 @@ public class DashboardFragment extends Fragment {
 
                             adapterData.add(user.getString("name") + "|" + user.getString("email") + "|" + space.getString("name") + "|" + objectData.getString("status"));
 
-                            if (!SharedPrefsUtils.hasUserInHashSetPreference(mContext, Constants.BOOKING_REQUEST,user.toString(), Constants.SP_NAME) && objectData.getString("status").equalsIgnoreCase("requested")) {
+                            if (!SharedPrefsUtils.hasUserInHashSetPreference(mContext, Constants.BOOKING_REQUEST, user.toString(), Constants.SP_NAME) && objectData.getString("status").equalsIgnoreCase("requested")) {
                                 Set<String> requestSet = new HashSet<>();
                                 requestSet.add(user.toString());
 
@@ -149,6 +149,23 @@ public class DashboardFragment extends Fragment {
                                  */
                                 SharedPrefsUtils.setStringPreference(mContext, user.getString("_id"), objectData.getString("_id"), Constants.SP_NAME);
                                 SharedPrefsUtils.setHashSetPreference(mContext, Constants.BOOKING_REQUEST, requestSet, Constants.SP_NAME);
+                            }
+
+                            if (!SharedPrefsUtils.hasUserInHashSetPreference(mContext, Constants.SESSION_END_REQUEST, user.toString(), Constants.SP_NAME) && objectData.getString("status").equalsIgnoreCase("started") && objectData.has("endToken")) {
+                                Set<String> requestSet = new HashSet<>();
+                                requestSet.add(user.toString());
+
+                                Set<String> endTokenSet = new HashSet<>();
+                                endTokenSet.add(user.getString("_id") + "|" + objectData.getString("endToken"));
+
+                                /**
+                                 * here saving pipe separated user id and end token
+                                 * for key SESSION_END_TOKEN
+                                 * user id is required because multiple session end requests can be there.
+                                 */
+                                SharedPrefsUtils.setStringPreference(mContext, user.getString("_id"), objectData.getString("_id"), Constants.SP_NAME);
+                                SharedPrefsUtils.setHashSetPreference(mContext, Constants.SESSION_END_TOKEN, endTokenSet, Constants.SP_NAME);
+                                SharedPrefsUtils.setHashSetPreference(mContext, Constants.SESSION_END_REQUEST, requestSet, Constants.SP_NAME);
                             }
 
                         }

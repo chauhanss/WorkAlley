@@ -64,6 +64,7 @@ public class RequestReceiver extends BroadcastReceiver {
                              * key : user ID, value : pipe separated requestType and workspace id
                              * user : user Info object saved with key requestType
                              */
+                            SharedPrefsUtils.setStringPreference(context, userInfo.getString("_id"), bundle.getString(Constants.REQUEST_ID), Constants.SP_NAME);
                             SharedPrefsUtils.setStringPreference(context, userInfo.getString("_id"), requestType + "|" + bundle.getString("workspace_id"), Constants.SP_NAME);
                             //          SharedPrefsUtils.setStringPreference(context, Constants.BOOKING_REJECT, userInfo.toString(), Constants.SP_NAME);
 
@@ -78,6 +79,7 @@ public class RequestReceiver extends BroadcastReceiver {
                         JSONObject userInfo = null;
                         try {
                             userInfo = new JSONObject(bundle.getString(USER));
+                            SharedPrefsUtils.setStringPreference(context, userInfo.getString("_id"), bundle.getString(Constants.REQUEST_ID), Constants.SP_NAME);
                             sendBroadcastToActivity(context, requestType, userInfo.toString());
 
                         } catch (JSONException e) {
@@ -94,6 +96,16 @@ public class RequestReceiver extends BroadcastReceiver {
                             Set<String> requestSet = new HashSet<>();
                             requestSet.add(userInfo.toString());
 
+                            Set<String> endTokenSet = new HashSet<>();
+                            endTokenSet.add(userInfo.getString("_id") + "|" + bundle.getString("endToken"));
+
+                            /**
+                             * here saving pipe separated user id and end token
+                             * for key SESSION_END_TOKEN
+                             * user id is required because multiple session end requests can be there.
+                             */
+                            SharedPrefsUtils.setStringPreference(context, userInfo.getString("_id"), bundle.getString(Constants.REQUEST_ID), Constants.SP_NAME);
+                            SharedPrefsUtils.setHashSetPreference(context, Constants.SESSION_END_TOKEN, endTokenSet, Constants.SP_NAME);
                             SharedPrefsUtils.setHashSetPreference(context, Constants.SESSION_END_REQUEST, requestSet, Constants.SP_NAME);
                             sendBroadcastToActivity(context, requestType, null);
                         } catch (JSONException e) {
@@ -109,6 +121,7 @@ public class RequestReceiver extends BroadcastReceiver {
                              * key : user ID, value : pipe separated requestType and workspace id
                              * user : user Info object saved with key requestType
                              */
+                            SharedPrefsUtils.setStringPreference(context, userInfo.getString("_id"), bundle.getString(Constants.REQUEST_ID), Constants.SP_NAME);
                             SharedPrefsUtils.setStringPreference(context, userInfo.getString("_id"), requestType + "|" + bundle.getString("workspace_id"), Constants.SP_NAME);
                             sendBroadcastToActivity(context, requestType, null);
                         } catch (JSONException e) {

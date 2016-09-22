@@ -1,6 +1,7 @@
 package raj.workalley.user.fresh.settings;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -31,6 +32,7 @@ public class SettingFragment extends Fragment {
     Session mSession;
     EditText name, phone, email;
     boolean editMode = false;
+    private Context mContext;
 
     public static SettingFragment newInstance() {
         SettingFragment fragment = new SettingFragment();
@@ -49,12 +51,16 @@ public class SettingFragment extends Fragment {
         save_n_logout_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!editMode) {
-                    mSession.logout();
-                    Intent intent = new Intent(getActivity(), LoginActivity.class);
-                    startActivity(intent);
+
+                if (Helper.isConnected(mContext)) {
+                    Helper.showProgressDialogSpinner(mContext, "Please wait", "Connecting server", false);
+                    if (!editMode) {
+                        mSession.logout();
+                    } else
+                        mSession.saveUserDetails();
                 } else
-                    mSession.saveUserDetails();
+                    Toast.makeText(mContext, "No internet", Toast.LENGTH_LONG).show();
+
             }
         });
 
@@ -101,7 +107,9 @@ public class SettingFragment extends Fragment {
                 Helper.dismissProgressDialog();
                 if (event.getStatus()) {
                     Toast.makeText(getActivity(), "logout", Toast.LENGTH_LONG).show();
-                    SharedPrefsUtils.clearSharedPreferenceFile(getActivity());
+                    Intent intent = new Intent(getActivity(), LoginActivity.class);
+                    startActivity(intent);
+        //            SharedPrefsUtils.clearSharedPreferenceFile(getActivity());
                     break;
                 }
             }
@@ -132,5 +140,9 @@ public class SettingFragment extends Fragment {
         setEditTextNonEditable();
     }
 
-
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        mContext = context;
+    }
 }
