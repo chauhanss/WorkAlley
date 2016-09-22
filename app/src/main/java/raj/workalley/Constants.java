@@ -34,6 +34,7 @@ public class Constants {
     public static final String LOCATION = "loc";
     public static final String ADDRESS = "address";
     public static final String OWNER = "owner";
+    public static final String AMENITIES = "amenities";
 
     public static final String WORKSPACE_ID = "workspace_id";
     public static final String DATA = "data";
@@ -63,4 +64,5 @@ public class Constants {
     public static final String SESSION_END_REQUEST = "SESSION_END_REQUEST";
     public static final String SESSION_END_CONFIRMED = "SESSION_END_CONFIRMED";
     public static final String SESSION_END_TOKEN = "SESSION_END_TOKEN";
+
 }

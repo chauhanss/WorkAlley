@@ -104,14 +104,15 @@ public class SharedPrefsUtils {
         return value;
     }
 
-    public static boolean setStringPreference(Context context, String key, String value, String file) {
+    public static void setStringPreference(Context context, String key, String value, String file) {
         SharedPreferences preferences = context.getSharedPreferences(file, Context.MODE_PRIVATE);
         if (preferences != null && !TextUtils.isEmpty(key)) {
             SharedPreferences.Editor editor = preferences.edit();
             editor.putString(key, value);
-            return editor.commit();
+            editor.apply();
+            //return editor.commit();
         }
-        return false;
+        //return false;
     }
 
     public static boolean setHashSetPreference(Context context, String key, Set values, String file) {
@@ -232,12 +233,13 @@ public class SharedPrefsUtils {
 
     public static boolean removePreferenceByKey(Context context, String key, String file) {
         SharedPreferences preferences = context.getSharedPreferences(file, Context.MODE_PRIVATE);
-        if (preferences != null && !TextUtils.isEmpty(key)) {
-            SharedPreferences.Editor editor = preferences.edit();
-            editor.remove(key);
-            editor.apply();
-            return editor.commit();
-        }
+        if (preferences != null)
+            if (!TextUtils.isEmpty(key)) {
+                SharedPreferences.Editor editor = preferences.edit();
+                editor.remove(key);
+                editor.apply();
+                return editor.commit();
+            }
         return false;
     }
 

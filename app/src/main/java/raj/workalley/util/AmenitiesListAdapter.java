@@ -21,10 +21,13 @@ import raj.workalley.user.fresh.offers.OfferDummyItem;
  */
 public class AmenitiesListAdapter extends RecyclerView.Adapter<AmenitiesListAdapter.AmenitiesViewHolder> {
     List<AmenitiesItem> amenitiesList;
+    boolean enableCheckList;
 
-    public AmenitiesListAdapter(List<AmenitiesItem> amenitiesList) {
+    public AmenitiesListAdapter(ArrayList<AmenitiesItem> amenitiesList, boolean enableCheckList) {
         this.amenitiesList = amenitiesList;
+        this.enableCheckList = enableCheckList;
     }
+
 
     @Override
     public AmenitiesViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -56,6 +59,9 @@ public class AmenitiesListAdapter extends RecyclerView.Adapter<AmenitiesListAdap
             name = (CheckBox) view.findViewById(R.id.amenities_name);
             icon = (ImageView) view.findViewById(R.id.amenities_icon);
             name.setOnClickListener(this);
+            if (!enableCheckList) {
+                name.setEnabled(false);
+            }
         }
 
         @Override

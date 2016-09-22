@@ -202,13 +202,31 @@ public class SignUpActivity extends BaseActivity {
                         finish();
                     } else if (mSession.getUser().getRole().equalsIgnoreCase(Constants.PROVIDER)) {
                         mSession.getHostWorkspaceData(mSession.getUser().get_id());
-                        Intent intent = new Intent(SignUpActivity.this, HostSignUpActivity.class);
-                        startActivity(intent);
-                        finish();
                     }
 
                 } else {
                     Toast.makeText(mContext, "Not able to login. Please check your details.", Toast.LENGTH_LONG).show();
+                }
+                break;
+            case CobbocEvent.GET_HOST_DETAILS:
+                Helper.dismissProgressDialog();
+                if (event.getStatus()) {
+
+                    JSONObject jsonObject = (JSONObject) event.getValue();
+                    try {
+                        if (jsonObject.getJSONArray(Constants.DATA).length() == 0) {
+                            Intent intent = new Intent(SignUpActivity.this, HostSignUpActivity.class);
+                            startActivity(intent);
+                        } else {
+                            WorkspaceList parsedResponse = (WorkspaceList) Session.getInstance(mContext).getParsedResponseFromGSON(jsonObject, Session.workAlleyModels.Workspaces);
+                            Session.getInstance(mContext).setWorkspaces(parsedResponse);
+                            Intent intent = new Intent(SignUpActivity.this, raj.workalley.host.HomeActivity.class);
+                            startActivity(intent);
+                            finish();
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                 }
                 break;
         }

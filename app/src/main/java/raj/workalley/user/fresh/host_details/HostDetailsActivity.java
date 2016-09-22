@@ -190,7 +190,7 @@ public class HostDetailsActivity extends BaseActivity {
 
         mContext.registerReceiver(notificationListener, new IntentFilter(Constants.REQUEST_RESPONSE));
 
-        getLatestDataFromSharedPreference();
+        // getLatestDataFromSharedPreference();
     }
 
     @Override
@@ -207,7 +207,6 @@ public class HostDetailsActivity extends BaseActivity {
     }
 
     private void setUpAndDisplayData() {
-
         TextView name = (TextView) findViewById(R.id.workspace_name);
         name.setText(mWorkspace.getName());
 
@@ -215,8 +214,8 @@ public class HostDetailsActivity extends BaseActivity {
         address.setText(mWorkspace.getAddress().getFullAddress());
 
         RecyclerView amenitiesRecyclerView = (RecyclerView) findViewById(R.id.workspace_amenities);
-        List<AmenitiesItem> amenitiesList = getAmenitiesList();
-        AmenitiesListAdapter mAdapter = new AmenitiesListAdapter(amenitiesList);
+        ArrayList<AmenitiesItem> amenitiesList = getAmenitiesList();
+        AmenitiesListAdapter mAdapter = new AmenitiesListAdapter(amenitiesList, false);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         amenitiesRecyclerView.setLayoutManager(mLayoutManager);
         amenitiesRecyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -224,14 +223,12 @@ public class HostDetailsActivity extends BaseActivity {
 
     }
 
-    private List<AmenitiesItem> getAmenitiesList() {
+    private ArrayList<AmenitiesItem> getAmenitiesList() {
 
         ArrayList<String> amenityList = mWorkspace.getAmenities();
-        List<AmenitiesItem> list = new ArrayList<>();
+        ArrayList<AmenitiesItem> list = new ArrayList<>();
         for (String amenity : amenityList) {
-
             switch (amenity.toLowerCase()) {
-
                 case "Ac":
                     AmenitiesItem item1 = new AmenitiesItem("Ac", R.drawable.ic_ac, false);
                     list.add(item1);
@@ -258,7 +255,6 @@ public class HostDetailsActivity extends BaseActivity {
                     break;
             }
         }
-
         return list;
     }
 
