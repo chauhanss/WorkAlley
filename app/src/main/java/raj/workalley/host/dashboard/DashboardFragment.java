@@ -22,7 +22,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import raj.workalley.CobbocEvent;
 import raj.workalley.Constants;
@@ -133,6 +135,22 @@ public class DashboardFragment extends Fragment {
 
 
                             adapterData.add(user.getString("name") + "|" + user.getString("email") + "|" + space.getString("name") + "|" + objectData.getString("status"));
+
+                            if (!SharedPrefsUtils.hasUserInHashSetPreference(mContext, Constants.BOOKING_REQUEST,user.toString(), Constants.SP_NAME) && objectData.getString("status").equalsIgnoreCase("requested")) {
+                                Set<String> requestSet = new HashSet<>();
+                                requestSet.add(user.toString());
+
+                                /** [FALLBACK]
+                                 * Mapped request id with user id as the key.
+                                 * This can be done because host will receive only one request from one user.
+                                 * Request can be retrieved later using that user's id.
+                                 *
+                                 * Here, added to shared preference again so that request is not missed by notification.
+                                 */
+                                SharedPrefsUtils.setStringPreference(mContext, user.getString("_id"), objectData.getString("_id"), Constants.SP_NAME);
+                                SharedPrefsUtils.setHashSetPreference(mContext, Constants.BOOKING_REQUEST, requestSet, Constants.SP_NAME);
+                            }
+
                         }
 
                         setUpRecyclerView(adapterData);
@@ -141,10 +159,11 @@ public class DashboardFragment extends Fragment {
                         e.printStackTrace();
                     }
                     break;
-                }else
+                } else
                     Toast.makeText(mContext, "Some error occurred!", Toast.LENGTH_LONG).show();
             }
         }
+
     }
 
     private void setUpRecyclerView(List<String> list) {

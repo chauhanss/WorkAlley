@@ -58,13 +58,15 @@ public class HostSocketService extends Service {
 
     }
 
-    public void initSocket() {
+    public void initSocket(String token) {
         IO.Options headers = new IO.Options();
         try {
             mSocket = IO.socket("http://app.workalley.in", headers);
+
         } catch (URISyntaxException e) {
         }
         mSocket.connect();
+        mSocket.emit("authenticate", token);
     }
 
     public void connectToServer() {
@@ -121,7 +123,7 @@ public class HostSocketService extends Service {
             SharedPrefsUtils.setStringPreference(this, Constants.SESSION_COOKIES_ID, cookieId, Constants.SP_NAME);
         }
         String cookieStr = SharedPrefsUtils.getStringPreference(this, Constants.SESSION_COOKIES_ID, Constants.SP_NAME);
-        initSocket();
+        initSocket(cookieStr);
         connectToServer();
         sendCookies(cookieStr);
         authHost();

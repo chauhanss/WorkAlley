@@ -70,8 +70,8 @@ public class HostSignUpActivity extends BaseActivity {
         continueBtn = (Button) findViewById(R.id.host_continue);
 
         RecyclerView amenitiesRecyclerView = (RecyclerView) findViewById(R.id.amenities_list);
-        List<AmenitiesItem> amenitiesList = getAmenitiesList();
-        mAdapter = new AmenitiesListAdapter(amenitiesList);
+        ArrayList<AmenitiesItem> amenitiesList = getAmenitiesList();
+        mAdapter = new AmenitiesListAdapter(amenitiesList,true);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         amenitiesRecyclerView.setLayoutManager(mLayoutManager);
         amenitiesRecyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -189,7 +189,7 @@ public class HostSignUpActivity extends BaseActivity {
         //String[] address = {"hd 111 sector i", "jankipuram", "up", "lucknow", "226021"};
         double[] loc = {latLng.longitude, latLng.latitude};
         String name = ((TextView) findViewById(R.id.workspace_name)).getText().toString();
-        mSession.createWorkSpaceApi(name, getAddress(), loc);
+        mSession.createWorkSpaceApi(name, getAddress(), loc, mAdapter.getSelectedItem());
     }
 
     private List<ImageItem> getImageList() {
@@ -199,8 +199,8 @@ public class HostSignUpActivity extends BaseActivity {
     public class ImageItem {
     }
 
-    private List<AmenitiesItem> getAmenitiesList() {
-        List<AmenitiesItem> list = new ArrayList<>();
+    private ArrayList<AmenitiesItem> getAmenitiesList() {
+        ArrayList<AmenitiesItem> list = new ArrayList<>();
 
         AmenitiesItem item1 = new AmenitiesItem("Ac", R.drawable.ic_ac, false);
         list.add(item1);
@@ -248,7 +248,7 @@ public class HostSignUpActivity extends BaseActivity {
         protected List<Address> doInBackground(String... locationName) {
             Geocoder geocoder = new Geocoder(getApplicationContext());
             List<Address> addresses = null;
-            String str = locationName[0]+" "+locationName[1]+" "+locationName[2]+" "+locationName[3];
+            String str = locationName[0] + " " + locationName[1] + " " + locationName[2] + " " + locationName[3];
             try {
                 addresses = geocoder.getFromLocationName(str, 1);
             } catch (IOException e) {

@@ -1,10 +1,12 @@
 package raj.workalley.host.settings;
 
 import android.content.Intent;
-import android.media.Image;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,10 +14,14 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import raj.workalley.AmenitiesItem;
 import raj.workalley.LoginActivity;
 import raj.workalley.R;
 import raj.workalley.Session;
-import raj.workalley.util.Helper;
+import raj.workalley.util.AmenitiesListAdapter;
 
 /**
  * Created by vishal.raj on 9/5/16.
@@ -80,8 +86,56 @@ public class SettingFragment extends Fragment {
         });
 
         defineNonEditableViews(v);
+        defineAmenitiesList(v);
 
         return v;
+    }
+
+    private void defineAmenitiesList(View v) {
+        RecyclerView amenitiesRecyclerView = (RecyclerView) v.findViewById(R.id.amenities_list);
+        ArrayList<AmenitiesItem> amenitiesList = getAmenitiesList();
+        AmenitiesListAdapter mAdapter;
+        mAdapter = new AmenitiesListAdapter(amenitiesList,false);
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
+        amenitiesRecyclerView.setLayoutManager(mLayoutManager);
+        amenitiesRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        amenitiesRecyclerView.setAdapter(mAdapter);
+    }
+
+    private ArrayList<AmenitiesItem> getAmenitiesList() {
+        ArrayList<String> listFromBackend = mSession.getWorkspaces().getWorkspaceData().get(0).getAmenities();
+        ArrayList<AmenitiesItem> list = new ArrayList<>();
+
+        for (String amenity : listFromBackend) {
+            switch (amenity.trim()) {
+                case "Ac":
+                    AmenitiesItem item1 = new AmenitiesItem("Ac", R.drawable.ic_ac, false);
+                    list.add(item1);
+                    break;
+                case "WiFi":
+                    AmenitiesItem item2 = new AmenitiesItem("WiFi", R.drawable.ic_wifi, false);
+                    list.add(item2);
+                    break;
+                case "Elevator":
+                    AmenitiesItem item3 = new AmenitiesItem("Elevator", R.drawable.ic_lift, false);
+                    list.add(item3);
+                    break;
+                case "Cafe":
+                    AmenitiesItem item4 = new AmenitiesItem("Cafe", R.drawable.ic_cafe, false);
+                    list.add(item4);
+                    break;
+                case "Conference":
+                    AmenitiesItem item5 = new AmenitiesItem("Conference", R.drawable.ic_conference, false);
+                    list.add(item5);
+                    break;
+                case "Power Backup":
+                    AmenitiesItem item6 = new AmenitiesItem("Power Backup", R.drawable.ic_power_back, false);
+                    list.add(item6);
+                    break;
+            }
+        }
+
+        return list;
     }
 
     private void callHostLogoutApi() {

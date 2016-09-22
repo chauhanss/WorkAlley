@@ -35,6 +35,7 @@ import java.net.CookieManager;
 import java.net.CookiePolicy;
 import java.net.SocketTimeoutException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import raj.workalley.user.fresh.UserInfo;
@@ -68,6 +69,14 @@ public class Session {
         if (mToken != null) {
             mSessionData.setToken(mToken);
         }
+        String userEmail = SharedPrefsUtils.getStringPreference(mContext, Constants.EMAIL, Constants.SP_NAME);
+        if (userEmail != null) {
+            mSessionData.setUserEmail(userEmail);
+        }
+        String userPassword = SharedPrefsUtils.getStringPreference(mContext, Constants.PASSWORD, Constants.SP_NAME);
+        if (userPassword != null) {
+            mSessionData.setUserPassword(userPassword);
+        }
     }
 
     public static synchronized Session getInstance(Context context) {
@@ -83,6 +92,24 @@ public class Session {
         private WorkspaceList workspaceList;
         private String sessionIdCookies;
         private String token = null;
+        private String userEmail = null;
+        private String userPassword = null;
+
+        public String getUserEmail() {
+            return userEmail;
+        }
+
+        public void setUserEmail(String userEmail) {
+            this.userEmail = userEmail;
+        }
+
+        public String getUserPassword() {
+            return userPassword;
+        }
+
+        public void setUserPassword(String userPassword) {
+            this.userPassword = userPassword;
+        }
 
         private String getSessionIdCookies() {
             return sessionIdCookies;
@@ -92,16 +119,16 @@ public class Session {
             this.sessionIdCookies = sessionIdCookies;
         }
 
+        public SessionData() {
+            reset();
+        }
+
         public String getToken() {
             return token;
         }
 
         public void setToken(String token) {
             this.token = token;
-        }
-
-        public SessionData() {
-            reset();
         }
 
         public UserInfo getUser() {
@@ -115,6 +142,8 @@ public class Session {
         private void reset() {
             user = null;
             token = null;
+            userEmail = null;
+            userPassword = null;
         }
 
         public WorkspaceList getWorkspaceList() {
@@ -133,6 +162,30 @@ public class Session {
 
     public void setSessionIdCookies(String sessionIdCookies) {
         mSessionData.setSessionIdCookies(sessionIdCookies);
+    }
+
+    public String getToken() {
+        return mSessionData.getToken();
+    }
+
+    public void setToken(String token) {
+        mSessionData.setToken(token);
+    }
+
+    public String getUserEmail() {
+        return mSessionData.getUserEmail();
+    }
+
+    public void setUserEmail(String userEmail) {
+        mSessionData.setUserEmail(userEmail);
+    }
+
+    public String getUserPassword() {
+        return mSessionData.getUserPassword();
+    }
+
+    public void setUserPassword(String userPassword) {
+        mSessionData.setUserPassword(userPassword);
     }
 
     public void setUser(UserInfo userInfo) {
@@ -168,7 +221,7 @@ public class Session {
     /*Volley Section Start*/
     public RequestQueue getRequestQueue(Context context) {
         if (mRequestQueue == null) {
-            CookieHandler.setDefault(new CookieManager(null, CookiePolicy.ACCEPT_ALL));
+            //CookieHandler.setDefault(new CookieManager(null, CookiePolicy.ACCEPT_ALL));
             mRequestQueue = Volley.newRequestQueue(context);
         }
         return mRequestQueue;
@@ -229,13 +282,6 @@ public class Session {
         return getToken() != null;
     }
 
-    public String getToken() {
-        return mSessionData.getToken();
-    }
-
-    public void setToken(String token) {
-        mSessionData.setToken(token);
-    }
 
     private static String getAbsoluteUrl(String relativeUrl) {
         if (relativeUrl.equals("/payuPaisa/up.php"))
@@ -290,6 +336,11 @@ public class Session {
                     String jsonString = new String(response.data,
                             HttpHeaderParser.parseCharset(response.headers, PROTOCOL_CHARSET));
                     JSONObject jsonResponse = new JSONObject(jsonString);
+                    if (jsonResponse.has("token") && !jsonResponse.isNull("token")) {
+                        String token = jsonResponse.getString("token");
+                        setToken(token);
+                        SharedPrefsUtils.setStringPreference(mContext, "token", token, Constants.SP_NAME);
+                    }
                     String sessionId = response.headers.get("set-cookie");
                     setSessionIdCookies(sessionId);
                     jsonResponse.put("headers", new JSONObject(response.headers));
@@ -337,6 +388,9 @@ public class Session {
             public Map<String, String> getHeaders() throws AuthFailureError {
                 HashMap<String, String> headers = new HashMap<String, String>();
                 headers.put("Content-Type", "application/json");
+                if (getToken() != null) {
+                    headers.put("authorization", getToken());
+                }
                 //String sessionId = Hawk.get("connect.sid", "");
                 return headers;
             }
@@ -392,6 +446,9 @@ public class Session {
             public Map<String, String> getHeaders() throws AuthFailureError {
                 HashMap<String, String> headers = new HashMap<String, String>();
                 headers.put("Content-Type", "application/json; charset=utf-8");
+                if (getToken() != null) {
+                    headers.put("authorization", getToken());
+                }
                 return headers;
             }
         };
@@ -453,7 +510,7 @@ public class Session {
         }, Request.Method.POST);
     }
 
-    public void login(String userName, String password) {
+    public void login(final String userName, final String password) {
         JSONObject params = new JSONObject();
         try {
             params.put(Constants.EMAIL, userName);
@@ -462,13 +519,12 @@ public class Session {
             e.printStackTrace();
         }
 
-
         //final Map params = new HashMap<>();
 
         postFetch("auth/login/local", params, new Task() {
 
             @Override
-            public void onSuccess(JSONObject jsonObject) {
+            public void onSuccess(final JSONObject jsonObject) {
                 if (jsonObject.has(Constants.ACCESS_TOKEN) && !jsonObject.isNull(Constants.ACCESS_TOKEN)) {
 
                     String token = null;
@@ -477,8 +533,16 @@ public class Session {
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
+                    SharedPrefsUtils.removePreferenceByKey(mContext, Constants.ACCESS_TOKEN, Constants.SP_NAME);
+                    SharedPrefsUtils.removePreferenceByKey(mContext, Constants.EMAIL, Constants.SP_NAME);
+                    SharedPrefsUtils.removePreferenceByKey(mContext, Constants.PASSWORD, Constants.SP_NAME);
+
                     SharedPrefsUtils.setStringPreference(mContext, Constants.ACCESS_TOKEN, token, Constants.SP_NAME);
+                    SharedPrefsUtils.setStringPreference(mContext, Constants.EMAIL, userName, Constants.SP_NAME);
+                    SharedPrefsUtils.setStringPreference(mContext, Constants.PASSWORD, password, Constants.SP_NAME);
                     Session.getInstance(mContext).setToken(token);
+                    Session.getInstance(mContext).setUserEmail(userName);
+                    Session.getInstance(mContext).setUserPassword(password);
                 }
                 eventBus.post(new CobbocEvent(CobbocEvent.LOGIN, true, jsonObject));
             }
@@ -502,11 +566,14 @@ public class Session {
     }
 
     public void logout() {
-        reset();
         getFetch("auth/logout", null, new Task() {
 
             @Override
             public void onSuccess(JSONObject jsonObject) {
+                reset();
+                SharedPrefsUtils.removePreferenceByKey(mContext, Constants.ACCESS_TOKEN, Constants.SP_NAME);
+                SharedPrefsUtils.removePreferenceByKey(mContext, Constants.EMAIL, Constants.SP_NAME);
+                SharedPrefsUtils.removePreferenceByKey(mContext, Constants.PASSWORD, Constants.SP_NAME);
                 eventBus.post(new CobbocEvent(CobbocEvent.LOGOUT, true, jsonObject));
             }
 
@@ -527,7 +594,7 @@ public class Session {
         }, Request.Method.GET);
     }
 
-    public void createWorkSpaceApi(String workspaceName, String[] address, double[] loc) {
+    public void createWorkSpaceApi(String workspaceName, String[] address, double[] loc, List<String> selectedItem) {
         JSONObject params = new JSONObject();
         try {
             params.put(Constants.WORKSPACE_NAME, workspaceName);
@@ -540,7 +607,9 @@ public class Session {
             jsonAddress.put(Constants.PINCODE, address[4]);
             jsonAddress.put(Constants.LOCATION, new JSONArray(loc));
 
+
             params.put(Constants.ADDRESS, jsonAddress);
+            params.put(Constants.AMENITIES, selectedItem);
 
             params.put(Constants.OWNER, /*new Gson().toJson(getUser())*/getUser().get_id());
         } catch (JSONException e) {

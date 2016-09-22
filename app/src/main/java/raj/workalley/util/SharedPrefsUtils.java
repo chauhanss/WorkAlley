@@ -14,6 +14,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import raj.workalley.Constants;
 import raj.workalley.user.fresh.UserInfo;
 
 /**
@@ -85,14 +86,15 @@ public class SharedPrefsUtils {
         return value;
     }
 
-    public static boolean setStringPreference(Context context, String key, String value, String file) {
+    public static void setStringPreference(Context context, String key, String value, String file) {
         SharedPreferences preferences = context.getSharedPreferences(file, Context.MODE_PRIVATE);
         if (preferences != null && !TextUtils.isEmpty(key)) {
             SharedPreferences.Editor editor = preferences.edit();
             editor.putString(key, value);
-            return editor.commit();
+            editor.apply();
+            //return editor.commit();
         }
-        return false;
+        //return false;
     }
 
     public static boolean setHashSetPreference(Context context, String key, Set values, String file) {
@@ -138,6 +140,39 @@ public class SharedPrefsUtils {
 
     }
 
+    public static boolean hasUserInHashSetPreference(Context context, String key, String user, String file) {
+        SharedPreferences preferences = context.getSharedPreferences(file, Context.MODE_PRIVATE);
+
+        try {
+            JSONObject searchUser = new JSONObject(user);
+            Set<String> set = preferences.getStringSet(key, null);
+            if (preferences != null && !TextUtils.isEmpty(key)) {
+
+                for (String stringUser : set) {
+
+                    JSONObject users = new JSONObject(stringUser);
+                    if (users.has("_id") && searchUser.has("_id")) {
+                        if (users.getString("_id").equalsIgnoreCase(searchUser.getString("_id"))) {
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return false;
+        }
+        return false;
+    }
+
+    public static void clearSharedPreferenceFile(Context context) {
+
+        SharedPreferences preferences = context.getSharedPreferences(Constants.SP_NAME, Context.MODE_PRIVATE);
+        preferences.edit().clear().commit();
+
+    }
+
     public static boolean setBooleanPreference(Context context, String key, boolean value, String file) {
         SharedPreferences preferences = context.getSharedPreferences(file, Context.MODE_PRIVATE);
         if (preferences != null && !TextUtils.isEmpty(key)) {
@@ -180,12 +215,13 @@ public class SharedPrefsUtils {
 
     public static boolean removePreferenceByKey(Context context, String key, String file) {
         SharedPreferences preferences = context.getSharedPreferences(file, Context.MODE_PRIVATE);
-        if (preferences != null && !TextUtils.isEmpty(key)) {
-            SharedPreferences.Editor editor = preferences.edit();
-            editor.remove(key);
-            editor.apply();
-            return editor.commit();
-        }
+        if (preferences != null)
+            if (!TextUtils.isEmpty(key)) {
+                SharedPreferences.Editor editor = preferences.edit();
+                editor.remove(key);
+                editor.apply();
+                return editor.commit();
+            }
         return false;
     }
 

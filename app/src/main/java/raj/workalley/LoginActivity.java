@@ -39,9 +39,16 @@ public class LoginActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mSession = Session.getInstance(mContext);
+
+        if(mSession.isLoggedIn())
+        {
+
+        }
+
         setContentView(R.layout.activity_login);
         mContext = this;
-        mSession = Session.getInstance(mContext);
+
 
         initializeLayouts();
 
