@@ -151,7 +151,8 @@ public class DashboardFragment extends Fragment {
                                 SharedPrefsUtils.setHashSetPreference(mContext, Constants.BOOKING_REQUEST, requestSet, Constants.SP_NAME);
                             }
 
-                            if (!SharedPrefsUtils.hasUserInHashSetPreference(mContext, Constants.SESSION_END_REQUEST, user.toString(), Constants.SP_NAME) && objectData.getString("status").equalsIgnoreCase("started") && objectData.has("endToken")) {
+                            if (!SharedPrefsUtils.hasUserInHashSetPreference(mContext, Constants.SESSION_END_REQUEST, user.toString(), Constants.SP_NAME) && objectData.getString("status").equalsIgnoreCase("started") && objectData.has("endToken") &&
+                                    !objectData.isNull("endToken")) {
                                 Set<String> requestSet = new HashSet<>();
                                 requestSet.add(user.toString());
 
