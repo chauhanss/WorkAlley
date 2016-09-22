@@ -46,7 +46,7 @@ public class WorkspaceList implements Serializable {
         }
 
         public ArrayList<String> getAmenities() {
-            if (!amenities.get(0).equals("")) {
+            if (amenities.size() > 0 && !amenities.get(0).equals("")) {
                 String str = amenities.get(0).substring(1, amenities.get(0).length() - 1);
                 ArrayList<String> amenitiesList = new ArrayList<String>(Arrays.asList(str.split(",")));
                 return amenitiesList;
