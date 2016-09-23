@@ -25,6 +25,7 @@ import raj.workalley.R;
 import raj.workalley.Session;
 import raj.workalley.util.Helper;
 import raj.workalley.util.SharedPrefsUtils;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -107,7 +108,7 @@ public class SettingFragment extends Fragment {
         RecyclerView amenitiesRecyclerView = (RecyclerView) v.findViewById(R.id.amenities_list);
         ArrayList<AmenitiesItem> amenitiesList = getAmenitiesList();
         AmenitiesListAdapter mAdapter;
-        mAdapter = new AmenitiesListAdapter(amenitiesList,false);
+        mAdapter = new AmenitiesListAdapter(amenitiesList, false);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
         amenitiesRecyclerView.setLayoutManager(mLayoutManager);
         amenitiesRecyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -171,9 +172,9 @@ public class SettingFragment extends Fragment {
     private void setEditTextEditable() {
         email.setEnabled(true);
         name.setEnabled(true);
-        phone.setEnabled(true);
+        // phone.setEnabled(true);
         workspaceName.setEnabled(true);
-        numberOfSeat.setEnabled(true);
+        // numberOfSeat.setEnabled(true);
 
         line1.setEnabled(true);
         line2.setEnabled(true);
@@ -185,9 +186,9 @@ public class SettingFragment extends Fragment {
     private void setEditTextNonEditable() {
         email.setEnabled(false);
         name.setEnabled(false);
-        phone.setEnabled(false);
+//        phone.setEnabled(false);
         workspaceName.setEnabled(false);
-        numberOfSeat.setEnabled(false);
+        // numberOfSeat.setEnabled(false);
 
         line1.setEnabled(false);
         line2.setEnabled(false);
@@ -202,13 +203,13 @@ public class SettingFragment extends Fragment {
         name = (EditText) v.findViewById(R.id.name);
         //phone = (EditText) v.findViewById(R.id.phone);
         workspaceName = (EditText) v.findViewById(R.id.workspace_name);
-        numberOfSeat = (EditText) v.findViewById(R.id.number_of_seat);
+        //  numberOfSeat = (EditText) v.findViewById(R.id.number_of_seat);
 
         email.setText(mSession.getWorkspaces().getWorkspaceData().get(0).getOwner().getEmail());
         name.setText(mSession.getWorkspaces().getWorkspaceData().get(0).getOwner().getName());
-        phone.setText("");
+//        phone.setText("");
         workspaceName.setText(mSession.getWorkspaces().getWorkspaceData().get(0).getName());
-        numberOfSeat.setText("");
+        //      numberOfSeat.setText("");
 
 
         line1 = (EditText) v.findViewById(R.id.address1);

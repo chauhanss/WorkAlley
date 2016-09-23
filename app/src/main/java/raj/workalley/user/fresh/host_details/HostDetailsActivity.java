@@ -213,6 +213,9 @@ public class HostDetailsActivity extends BaseActivity {
         TextView address = (TextView) findViewById(R.id.workspace_address);
         address.setText(mWorkspace.getAddress().getFullAddress());
 
+        TextView email = (TextView) findViewById(R.id.workspace_email);
+        email.setText(mWorkspace.getOwner().getEmail());
+
         RecyclerView amenitiesRecyclerView = (RecyclerView) findViewById(R.id.workspace_amenities);
         ArrayList<AmenitiesItem> amenitiesList = getAmenitiesList();
         AmenitiesListAdapter mAdapter = new AmenitiesListAdapter(amenitiesList, false);

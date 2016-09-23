@@ -8,11 +8,14 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.location.LocationListener;
@@ -20,6 +23,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -94,9 +98,21 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback, Loc
                 if (event.getAction() == MotionEvent.ACTION_UP) {
                     if (event.getRawX() >= (locationSearch.getRight() - locationSearch.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width())) {
                         onMapSearch();
-                        Helper.showKeyboard(mContext, locationSearch);
+                        Helper.hideKeyboardIfShown((Activity) mContext, locationSearch);
                         return true;
                     }
+                }
+                return false;
+            }
+        });
+
+        locationSearch.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_ACTION_UNSPECIFIED) {
+                    onMapSearch();
+                    Helper.hideKeyboardIfShown((Activity) mContext, locationSearch);
+                    return true;
                 }
                 return false;
             }
@@ -176,20 +192,30 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback, Loc
                      * get(1) filed is latitude
                      */
                     LatLng latLng = new LatLng(workspaceAddress.getLoc().get(1), workspaceAddress.getLoc().get(0));
-                    createMarker(workspaceAddress.getLoc().get(1), workspaceAddress.getLoc().get(0), workspace.getName(), workspace.getAddress().getState() + " " + workspace.getAddress().getCity(), workspace.get_id());
+                    createMarker(workspace.isAvailable(), workspaceAddress.getLoc().get(1), workspaceAddress.getLoc().get(0), workspace.getName(), workspace.getAddress().getState() + " " + workspace.getAddress().getCity(), workspace.get_id());
                     i++;
                 }
             }
         }
     }
 
-    public void createMarker(double latitude, double longitude, String title, String snippet, String workspaceId) {
-
-        Marker marker = mMap.addMarker(new MarkerOptions()
-                .position(new LatLng(latitude, longitude))
-                .anchor(0.5f, 0.5f)
-                .title(title)
-                .snippet(snippet));
+    public void createMarker(boolean isAvailable, double latitude, double longitude, String title, String snippet, String workspaceId) {
+        Marker marker;
+        if (isAvailable) {
+            marker = mMap.addMarker(new MarkerOptions()
+                    .position(new LatLng(latitude, longitude))
+                    .anchor(0.5f, 0.5f)
+                    .title(title)
+                    .snippet(snippet)
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
+        } else {
+            marker = mMap.addMarker(new MarkerOptions()
+                    .position(new LatLng(latitude, longitude))
+                    .anchor(0.5f, 0.5f)
+                    .title(title)
+                    .snippet(snippet)
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
+        }
         marker.showInfoWindow();
         mMarkersMap.put(marker.getId(), workspaceId);
     }
@@ -237,7 +263,7 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback, Loc
 
                     setWorkspaceDataOnMap();
                     break;
-                }else
+                } else
                     Toast.makeText(mContext, "Some error occurred!", Toast.LENGTH_LONG).show();
             }
         }

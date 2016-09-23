@@ -197,7 +197,7 @@ public class SignUpActivity extends BaseActivity {
 
                     if (mSession.getUser().getRole().equalsIgnoreCase(Constants.USER)) {
                         mSession.getUserWorkspaceData(mSession.getUser().get_id());
-                        Intent intent = new Intent(SignUpActivity.this, OfferActivity.class);
+                        Intent intent = new Intent(SignUpActivity.this, raj.workalley.user.fresh.HomeActivity.class);
                         startActivity(intent);
                         finish();
                     } else if (mSession.getUser().getRole().equalsIgnoreCase(Constants.PROVIDER)) {

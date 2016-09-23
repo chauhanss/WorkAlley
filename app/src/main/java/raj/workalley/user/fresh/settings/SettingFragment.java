@@ -119,23 +119,23 @@ public class SettingFragment extends Fragment {
     private void setEditTextEditable() {
         email.setEnabled(true);
         name.setEnabled(true);
-        phone.setEnabled(true);
+        //phone.setEnabled(true);
     }
 
     private void setEditTextNonEditable() {
         email.setEnabled(false);
         name.setEnabled(false);
-        phone.setEnabled(false);
+        //phone.setEnabled(false);
     }
 
     private void defineNonEditableViews(View v) {
         email = (EditText) v.findViewById(R.id.user_email);
         name = (EditText) v.findViewById(R.id.user_name);
-        phone = (EditText) v.findViewById(R.id.user_phone);
+        //phone = (EditText) v.findViewById(R.id.user_phone);
 
         email.setText(mSession.getUser().getEmail());
         name.setText(mSession.getUser().getName());
-        phone.setText("");
+        //phone.setText("");
 
         setEditTextNonEditable();
     }

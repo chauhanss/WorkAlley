@@ -44,6 +44,7 @@ public class Constants {
     public static final String SPACE = "space";
     public static final String SESSION_COOKIES_ID = "sessionCookiesId";
     public static final String SP_NAME = "workAlleySharedPref";
+    public static final String SP_LOGIN_DETAILS = "workAlleySharedPrefLoginDetails";
     public static final int HOST_DETAILS_ACTIVITY_REQUEST_DETAILS = 12;
     public static final int RESULT_OK = 1;
 
@@ -64,5 +65,6 @@ public class Constants {
     public static final String SESSION_END_REQUEST = "SESSION_END_REQUEST";
     public static final String SESSION_END_CONFIRMED = "SESSION_END_CONFIRMED";
     public static final String SESSION_END_TOKEN = "SESSION_END_TOKEN";
+
 
 }

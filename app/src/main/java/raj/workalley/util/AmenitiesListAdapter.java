@@ -66,7 +66,7 @@ public class AmenitiesListAdapter extends RecyclerView.Adapter<AmenitiesListAdap
 
         @Override
         public void onClick(View v) {
-            amenitiesList.get(getPosition()).setActive(name.isChecked());
+            amenitiesList.get(getAdapterPosition()).setActive(name.isChecked());
         }
     }
 

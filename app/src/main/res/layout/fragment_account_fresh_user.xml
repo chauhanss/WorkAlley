@@ -17,7 +17,7 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <LinearLayout
+           <!-- <LinearLayout
                 android:id="@+id/wrapper"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -40,9 +40,9 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="Vishal Raj" />
-            </LinearLayout>
+            </LinearLayout>-->
 
-            <LinearLayout
+           <!-- <LinearLayout
                 android:id="@+id/wrapper4"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -66,7 +66,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="30 Sept 2016" />
-            </LinearLayout>
+            </LinearLayout>-->
 
             <LinearLayout
                 android:id="@+id/wrapper2"

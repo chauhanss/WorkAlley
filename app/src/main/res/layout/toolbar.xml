@@ -24,6 +24,7 @@
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
             android:layout_marginRight="@dimen/margin_20"
-            android:text="Skip" />
+            android:text="Skip"
+            android:visibility="gone" />
     </RelativeLayout>
 </android.support.v7.widget.Toolbar>

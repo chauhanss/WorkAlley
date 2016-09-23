@@ -66,15 +66,15 @@ public class Session {
         mContext = context;
         handler = new Handler(Looper.getMainLooper());
 
-        String mToken = SharedPrefsUtils.getStringPreference(mContext, Constants.ACCESS_TOKEN, Constants.SP_NAME);
+        String mToken = SharedPrefsUtils.getStringPreference(mContext, Constants.ACCESS_TOKEN, Constants.SP_LOGIN_DETAILS);
         if (mToken != null) {
             mSessionData.setToken(mToken);
         }
-        String userEmail = SharedPrefsUtils.getStringPreference(mContext, Constants.EMAIL, Constants.SP_NAME);
+        String userEmail = SharedPrefsUtils.getStringPreference(mContext, Constants.EMAIL, Constants.SP_LOGIN_DETAILS);
         if (userEmail != null) {
             mSessionData.setUserEmail(userEmail);
         }
-        String userPassword = SharedPrefsUtils.getStringPreference(mContext, Constants.PASSWORD, Constants.SP_NAME);
+        String userPassword = SharedPrefsUtils.getStringPreference(mContext, Constants.PASSWORD, Constants.SP_LOGIN_DETAILS);
         if (userPassword != null) {
             mSessionData.setUserPassword(userPassword);
         }
@@ -355,7 +355,7 @@ public class Session {
                     if (jsonResponse.has("token") && !jsonResponse.isNull("token")) {
                         String token = jsonResponse.getString("token");
                         setToken(token);
-                        SharedPrefsUtils.setStringPreference(mContext, "token", token, Constants.SP_NAME);
+                        SharedPrefsUtils.setStringPreference(mContext, "token", token, Constants.SP_LOGIN_DETAILS);
                     }
                     String sessionId = response.headers.get("set-cookie");
                     setSessionIdCookies(sessionId);
@@ -598,13 +598,13 @@ public class Session {
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                    SharedPrefsUtils.removePreferenceByKey(mContext, Constants.ACCESS_TOKEN, Constants.SP_NAME);
-                    SharedPrefsUtils.removePreferenceByKey(mContext, Constants.EMAIL, Constants.SP_NAME);
-                    SharedPrefsUtils.removePreferenceByKey(mContext, Constants.PASSWORD, Constants.SP_NAME);
+                    SharedPrefsUtils.removePreferenceByKey(mContext, Constants.ACCESS_TOKEN, Constants.SP_LOGIN_DETAILS);
+                    SharedPrefsUtils.removePreferenceByKey(mContext, Constants.EMAIL, Constants.SP_LOGIN_DETAILS);
+                    SharedPrefsUtils.removePreferenceByKey(mContext, Constants.PASSWORD, Constants.SP_LOGIN_DETAILS);
 
-                    SharedPrefsUtils.setStringPreference(mContext, Constants.ACCESS_TOKEN, token, Constants.SP_NAME);
-                    SharedPrefsUtils.setStringPreference(mContext, Constants.EMAIL, userName, Constants.SP_NAME);
-                    SharedPrefsUtils.setStringPreference(mContext, Constants.PASSWORD, password, Constants.SP_NAME);
+                    SharedPrefsUtils.setStringPreference(mContext, Constants.ACCESS_TOKEN, token, Constants.SP_LOGIN_DETAILS);
+                    SharedPrefsUtils.setStringPreference(mContext, Constants.EMAIL, userName, Constants.SP_LOGIN_DETAILS);
+                    SharedPrefsUtils.setStringPreference(mContext, Constants.PASSWORD, password, Constants.SP_LOGIN_DETAILS);
                     Session.getInstance(mContext).setToken(token);
                     Session.getInstance(mContext).setUserEmail(userName);
                     Session.getInstance(mContext).setUserPassword(password);
@@ -636,9 +636,9 @@ public class Session {
             @Override
             public void onSuccess(JSONObject jsonObject) {
                 reset();
-                SharedPrefsUtils.removePreferenceByKey(mContext, Constants.ACCESS_TOKEN, Constants.SP_NAME);
-                SharedPrefsUtils.removePreferenceByKey(mContext, Constants.EMAIL, Constants.SP_NAME);
-                SharedPrefsUtils.removePreferenceByKey(mContext, Constants.PASSWORD, Constants.SP_NAME);
+                SharedPrefsUtils.removePreferenceByKey(mContext, Constants.ACCESS_TOKEN, Constants.SP_LOGIN_DETAILS);
+                SharedPrefsUtils.removePreferenceByKey(mContext, Constants.EMAIL, Constants.SP_LOGIN_DETAILS);
+                SharedPrefsUtils.removePreferenceByKey(mContext, Constants.PASSWORD, Constants.SP_LOGIN_DETAILS);
                 eventBus.post(new CobbocEvent(CobbocEvent.LOGOUT, true, jsonObject));
             }
 
@@ -744,7 +744,7 @@ public class Session {
 
     public void getUserWorkspaceData(String userId) {
 
-        String getRequestUrl = "users/" + userId + "/spaces";
+        String getRequestUrl = "users/:" + userId ;
 
         getFetch(getRequestUrl, null, new Task() {
 

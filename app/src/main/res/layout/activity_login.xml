@@ -43,7 +43,8 @@
                 style="@style/FloatingEditText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/password" />
+                android:hint="@string/password"
+                android:inputType="textPassword" />
         </android.support.design.widget.TextInputLayout>
 
         <Button
@@ -55,7 +56,7 @@
             android:enabled="false"
             android:text="@string/login" />
 
-        <TextView
+      <!--  <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
@@ -67,7 +68,7 @@
             android:paddingRight="@dimen/margin_5"
             android:text="@string/forget_password"
             android:textColor="@color/white"
-            android:textSize="@dimen/text_size_10" />
+            android:textSize="@dimen/text_size_10" />-->
 
         <TextView
             android:id="@+id/create_new_account"

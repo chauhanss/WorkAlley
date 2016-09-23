@@ -52,6 +52,7 @@
                             android:id="@+id/number_of_seat"
                             style="@style/FloatingEditText"
                             android:layout_width="match_parent"
+                            android:inputType="number"
                             android:layout_height="wrap_content"
                             android:hint="@string/number_of_seat" />
                     </android.support.design.widget.TextInputLayout>
@@ -165,6 +166,7 @@
                                     style="@style/FloatingEditTextOppsite"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
+                                    android:inputType="number"
                                     android:hint="@string/pincode" />
                             </android.support.design.widget.TextInputLayout>
                         </LinearLayout>

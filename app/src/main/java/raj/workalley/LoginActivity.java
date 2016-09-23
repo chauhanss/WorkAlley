@@ -180,6 +180,7 @@ public class LoginActivity extends BaseActivity {
             case CobbocEvent.GET_USER_DETAILS:
                 Helper.dismissProgressDialog();
                 if (event.getStatus()) {
+                    //JSONObject jsonObject = (JSONObject) event.getValue();
                     Toast.makeText(mContext, "Details fetched successfully.", Toast.LENGTH_LONG).show();
                 } else {
                     Toast.makeText(mContext, "Details not fetched.", Toast.LENGTH_LONG).show();

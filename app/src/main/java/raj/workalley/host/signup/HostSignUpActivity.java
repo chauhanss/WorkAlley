@@ -7,6 +7,7 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -27,6 +28,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -71,7 +73,7 @@ public class HostSignUpActivity extends BaseActivity {
 
         RecyclerView amenitiesRecyclerView = (RecyclerView) findViewById(R.id.amenities_list);
         ArrayList<AmenitiesItem> amenitiesList = getAmenitiesList();
-        mAdapter = new AmenitiesListAdapter(amenitiesList,true);
+        mAdapter = new AmenitiesListAdapter(amenitiesList, true);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         amenitiesRecyclerView.setLayoutManager(mLayoutManager);
         amenitiesRecyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -230,13 +232,21 @@ public class HostSignUpActivity extends BaseActivity {
             case CobbocEvent.CREATE_WORKSPACE:
                 Helper.dismissProgressDialog();
                 if (event.getStatus()) {
+                    mSession.getHostWorkspaceData(mSession.getUser().get_id());
+                } else {
+                    Toast.makeText(getApplicationContext(), "Not able to login. Please check your details.", Toast.LENGTH_LONG).show();
+                }
+                break;
+
+            case CobbocEvent.GET_HOST_DETAILS:
+                Helper.dismissProgressDialog();
+                if (event.getStatus()) {
                     JSONObject jsonObject = (JSONObject) event.getValue();
                     WorkspaceList parsedResponse = (WorkspaceList) Session.getInstance(mContext).getParsedResponseFromGSON(jsonObject, Session.workAlleyModels.Workspaces);
                     Session.getInstance(mContext).setWorkspaces(parsedResponse);
                     Intent intent = new Intent(HostSignUpActivity.this, HomeActivity.class);
                     startActivity(intent);
-                } else {
-                    Toast.makeText(getApplicationContext(), "Not able to login. Please check your details.", Toast.LENGTH_LONG).show();
+                    finish();
                 }
                 break;
         }

@@ -35,6 +35,8 @@
             android:focusableInTouchMode="true"
             android:fontFamily="@string/font_roboto_light"
             android:hint="Search your comfort zone"
+            android:imeOptions="actionDone"
+            android:maxLines="1"
             android:textColor="@color/colorPrimaryDark"
             android:textColorHint="@color/colorPrimary"
             android:textSize="@dimen/text_size_16" />

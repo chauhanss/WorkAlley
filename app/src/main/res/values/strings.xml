@@ -41,4 +41,7 @@
     <string name="workspace_name">Workspace Name</string>
     <string name="waiting">Waiting for response</string>
     <string name="delete_workspace">Delete Workspace</string>
+    <string name="no_internet_connection">No Internet</string>
+    <string name="no_net_help_text">Please check your net connection</string>
+    <string name="retry">Retry</string>
 </resources>
