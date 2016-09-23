@@ -71,15 +71,15 @@ public class HostSignUpActivity extends BaseActivity {
         mSession = Session.getInstance(this);
         continueBtn = (Button) findViewById(R.id.host_continue);
 
-        RecyclerView amenitiesRecyclerView = (RecyclerView) findViewById(R.id.amenities_list);
+        final RecyclerView amenitiesRecyclerView = (RecyclerView) findViewById(R.id.amenities_list);
         ArrayList<AmenitiesItem> amenitiesList = getAmenitiesList();
-        mAdapter = new AmenitiesListAdapter(amenitiesList, true);
+        mAdapter = new AmenitiesListAdapter(amenitiesList, true, amenitiesRecyclerView);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         amenitiesRecyclerView.setLayoutManager(mLayoutManager);
         amenitiesRecyclerView.setItemAnimator(new DefaultItemAnimator());
         amenitiesRecyclerView.setAdapter(mAdapter);
 
-        findViewById(R.id.from_wrapper).setOnClickListener(new View.OnClickListener() {
+       /* findViewById(R.id.from_wrapper).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Calendar mcurrentTime = Calendar.getInstance();
@@ -115,7 +115,7 @@ public class HostSignUpActivity extends BaseActivity {
                 mTimePicker.show();
 
             }
-        });
+        });*/
 
        /* RecyclerView imageRecyclerView = (RecyclerView) findViewById(R.id.image_list);
         List<ImageItem> imageList = getImageList();
@@ -135,8 +135,8 @@ public class HostSignUpActivity extends BaseActivity {
                     new GeocoderTask().execute(address);
                 } else
                     Toast.makeText(getApplicationContext(), "Review Details", Toast.LENGTH_LONG).show();
-                String to = ((TextView) findViewById(R.id.to_time)).getText().toString();
-                String from = ((TextView) findViewById(R.id.from_time)).getText().toString();
+               /* String to = ((TextView) findViewById(R.id.to_time)).getText().toString();
+                String from = ((TextView) findViewById(R.id.from_time)).getText().toString();*/
             }
         });
 

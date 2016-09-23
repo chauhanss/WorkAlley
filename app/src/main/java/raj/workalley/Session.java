@@ -373,9 +373,9 @@ public class Session {
         myRequest.setShouldCache(false);
         myRequest.setRetryPolicy(new
 
-                        DefaultRetryPolicy(60000,
-                        DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                        DefaultRetryPolicy.DEFAULT_BACKOFF_MULT)
+                DefaultRetryPolicy(60000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT)
 
         );
 
@@ -451,8 +451,8 @@ public class Session {
         };
         myRequest.setShouldCache(false);
         myRequest.setRetryPolicy(new DefaultRetryPolicy(60000,
-                        DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                        DefaultRetryPolicy.DEFAULT_BACKOFF_MULT)
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT)
 
         );
 
@@ -519,8 +519,8 @@ public class Session {
         };
         myRequest.setShouldCache(false);
         myRequest.setRetryPolicy(new DefaultRetryPolicy(30000,
-                        DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                        DefaultRetryPolicy.DEFAULT_BACKOFF_MULT)
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT)
 
         );
 
@@ -744,7 +744,7 @@ public class Session {
 
     public void getUserWorkspaceData(String userId) {
 
-        String getRequestUrl = "users/:" + userId ;
+        String getRequestUrl = "users/:" + userId;
 
         getFetch(getRequestUrl, null, new Task() {
 
@@ -1041,6 +1041,7 @@ public class Session {
         }, Request.Method.PUT);
     }
 
+
     public void endSessionByHostConfirmed(final UserInfo user, String requestId, final String endToken) {
 
         String getRequestUrl = "requests/" + requestId + "/end";
@@ -1084,5 +1085,34 @@ public class Session {
         }, Request.Method.PUT);
     }
 
+    public void uploadImage(String spaceId) {
+
+        String getRequestUrl = "api/gallery/:" + spaceId;
+        JSONObject param2s = new JSONObject();
+        putFetch(getRequestUrl, param2s.toString(), new Task() {
+
+            @Override
+            public void onSuccess(JSONObject jsonObject) {
+                eventBus.post(new CobbocEvent(CobbocEvent.UPLOAD_IMAGE, true, jsonObject));
+            }
+
+            @Override
+            public void onSuccess(String response) {
+
+            }
+
+            @Override
+            public void onError(Throwable throwable, String errorMessage) {
+
+
+                eventBus.post(new CobbocEvent(CobbocEvent.UPLOAD_IMAGE, false, errorMessage));
+            }
+
+            @Override
+            public void onProgress(int percent) {
+
+            }
+        }, Request.Method.PUT);
+    }
 
 }

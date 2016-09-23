@@ -22,10 +22,14 @@ import raj.workalley.user.fresh.offers.OfferDummyItem;
 public class AmenitiesListAdapter extends RecyclerView.Adapter<AmenitiesListAdapter.AmenitiesViewHolder> {
     List<AmenitiesItem> amenitiesList;
     boolean enableCheckList;
+    RecyclerView recyclerView;
+    List<Integer> mSelectedPosition;
 
-    public AmenitiesListAdapter(ArrayList<AmenitiesItem> amenitiesList, boolean enableCheckList) {
+    public AmenitiesListAdapter(ArrayList<AmenitiesItem> amenitiesList, boolean enableCheckList, RecyclerView recyclerView) {
         this.amenitiesList = amenitiesList;
         this.enableCheckList = enableCheckList;
+        this.recyclerView = recyclerView;
+        mSelectedPosition = new ArrayList<>();
     }
 
 
@@ -33,7 +37,21 @@ public class AmenitiesListAdapter extends RecyclerView.Adapter<AmenitiesListAdap
     public AmenitiesViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.layout_amenities_item, parent, false);
-
+        if (enableCheckList)
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int thisPos = recyclerView.getChildAdapterPosition(v);
+                    if (v.isSelected()) {
+                        v.setSelected(false);
+                        mSelectedPosition.remove(new Integer(thisPos));
+                    } else {
+                        v.setSelected(true);
+                        mSelectedPosition.add(thisPos);
+                    }
+                    //amenitiesList.get(thisPos).setActive(v.isSelected());
+                }
+            });
         return new AmenitiesViewHolder(itemView);
     }
 
@@ -42,7 +60,19 @@ public class AmenitiesListAdapter extends RecyclerView.Adapter<AmenitiesListAdap
         AmenitiesItem amenities = amenitiesList.get(position);
         holder.name.setText(amenities.getAmenitiesName());
         holder.icon.setBackgroundResource(amenities.getAmenitiesIcon());
+        if (posInSelectedList(position)) {
+            holder.itemView.setSelected(true);
+        } else {
+            holder.itemView.setSelected(false);
+        }
+    }
 
+    private boolean posInSelectedList(int position) {
+        for (Integer i : mSelectedPosition) {
+            if (i == position)
+                return true;
+        }
+        return false;
     }
 
     @Override
@@ -50,31 +80,23 @@ public class AmenitiesListAdapter extends RecyclerView.Adapter<AmenitiesListAdap
         return amenitiesList.size();
     }
 
-    public class AmenitiesViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        public CheckBox name;
+    public class AmenitiesViewHolder extends RecyclerView.ViewHolder {
+        public TextView name;
         public ImageView icon;
+        View itemView;
 
         public AmenitiesViewHolder(View view) {
             super(view);
-            name = (CheckBox) view.findViewById(R.id.amenities_name);
+            name = (TextView) view.findViewById(R.id.amenities_name);
             icon = (ImageView) view.findViewById(R.id.amenities_icon);
-            name.setOnClickListener(this);
-            if (!enableCheckList) {
-                name.setEnabled(false);
-            }
-        }
-
-        @Override
-        public void onClick(View v) {
-            amenitiesList.get(getAdapterPosition()).setActive(name.isChecked());
+            itemView = view;
         }
     }
 
     public List<String> getSelectedItem() {
         List<String> list = new ArrayList<>();
-        for (AmenitiesItem item : amenitiesList) {
-            if (item.isActive())
-                list.add(item.getAmenitiesName());
+        for (Integer i : mSelectedPosition) {
+            list.add(amenitiesList.get(i).getAmenitiesName());
         }
         return list;
     }

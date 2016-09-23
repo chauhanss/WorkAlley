@@ -218,7 +218,7 @@ public class HostDetailsActivity extends BaseActivity {
 
         RecyclerView amenitiesRecyclerView = (RecyclerView) findViewById(R.id.workspace_amenities);
         ArrayList<AmenitiesItem> amenitiesList = getAmenitiesList();
-        AmenitiesListAdapter mAdapter = new AmenitiesListAdapter(amenitiesList, false);
+        AmenitiesListAdapter mAdapter = new AmenitiesListAdapter(amenitiesList, false, amenitiesRecyclerView);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         amenitiesRecyclerView.setLayoutManager(mLayoutManager);
         amenitiesRecyclerView.setItemAnimator(new DefaultItemAnimator());

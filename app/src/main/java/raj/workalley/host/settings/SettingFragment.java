@@ -108,7 +108,7 @@ public class SettingFragment extends Fragment {
         RecyclerView amenitiesRecyclerView = (RecyclerView) v.findViewById(R.id.amenities_list);
         ArrayList<AmenitiesItem> amenitiesList = getAmenitiesList();
         AmenitiesListAdapter mAdapter;
-        mAdapter = new AmenitiesListAdapter(amenitiesList, false);
+        mAdapter = new AmenitiesListAdapter(amenitiesList, false,amenitiesRecyclerView);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
         amenitiesRecyclerView.setLayoutManager(mLayoutManager);
         amenitiesRecyclerView.setItemAnimator(new DefaultItemAnimator());
