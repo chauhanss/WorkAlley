@@ -200,7 +200,7 @@ public class SettingFragment extends Fragment {
 
         email = (EditText) v.findViewById(R.id.email);
         name = (EditText) v.findViewById(R.id.name);
-        phone = (EditText) v.findViewById(R.id.phone);
+        //phone = (EditText) v.findViewById(R.id.phone);
         workspaceName = (EditText) v.findViewById(R.id.workspace_name);
         numberOfSeat = (EditText) v.findViewById(R.id.number_of_seat);
 

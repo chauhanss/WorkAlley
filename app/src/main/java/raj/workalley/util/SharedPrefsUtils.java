@@ -104,15 +104,15 @@ public class SharedPrefsUtils {
         return value;
     }
 
-    public static void setStringPreference(Context context, String key, String value, String file) {
+    public static boolean setStringPreference(Context context, String key, String value, String file) {
         SharedPreferences preferences = context.getSharedPreferences(file, Context.MODE_PRIVATE);
         if (preferences != null && !TextUtils.isEmpty(key)) {
             SharedPreferences.Editor editor = preferences.edit();
             editor.putString(key, value);
             editor.apply();
-            //return editor.commit();
+            return editor.commit();
         }
-        //return false;
+        return false;
     }
 
     public static boolean setHashSetPreference(Context context, String key, Set values, String file) {

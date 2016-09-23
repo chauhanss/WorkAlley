@@ -66,22 +66,22 @@
                         android:hint="@string/name" />
                 </android.support.design.widget.TextInputLayout>
 
-                <android.support.design.widget.TextInputLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="@dimen/margin_20"
-                    android:layout_marginRight="@dimen/margin_20"
-                    android:layout_marginTop="@dimen/margin_20">
+                <!-- <android.support.design.widget.TextInputLayout
+                     android:layout_width="match_parent"
+                     android:layout_height="wrap_content"
+                     android:layout_marginLeft="@dimen/margin_20"
+                     android:layout_marginRight="@dimen/margin_20"
+                     android:layout_marginTop="@dimen/margin_20">
 
-                    <EditText
-                        android:id="@+id/phone"
-                        style="@style/FloatingEditText"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="@string/phone"
-                        android:inputType="textPassword" />
-                </android.support.design.widget.TextInputLayout>
-
+                     <EditText
+                         android:id="@+id/phone"
+                         style="@style/FloatingEditText"
+                         android:layout_width="match_parent"
+                         android:layout_height="wrap_content"
+                         android:hint="@string/phone"
+                         android:inputType="textPassword" />
+                 </android.support.design.widget.TextInputLayout>
+ -->
                 <android.support.design.widget.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
