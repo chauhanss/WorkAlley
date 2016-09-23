@@ -125,7 +125,7 @@ public class DashboardFragment extends Fragment {
                     try {
                         JSONArray data = jsonObject.getJSONArray("data");
 
-                        numberOfSeats.setText(data.length());
+                        numberOfSeats.setText(data.length() + "");
 
                         ArrayList<String> adapterData = new ArrayList<>();
                         for (int i = 0; i < data.length(); i++) {

@@ -164,7 +164,6 @@ public class AccountFragment extends Fragment {
                                 workspaceAddress.setText(addressObject.getString("line1") + ", " + addressObject.getString("locality") + ", " + addressObject.getString("state") + ", " + addressObject.getString("city") + ", " + addressObject.getString("pincode"));
 
                                 if (!SharedPrefsUtils.hasKey(mContext, Constants.BOOKING_REQUEST_ID, Constants.SP_NAME)) {
-                                    endSession.setVisibility(View.GONE);
                                     requestLayout.findViewById(R.id.status).setVisibility(View.VISIBLE);
                                 }
                             }
