@@ -4,12 +4,37 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="@color/colorPrimary"
+        android:gravity="end">
+
+        <ImageView
+            android:layout_width="70dp"
+            android:layout_height="30dp"
+            android:gravity="bottom"
+            android:src="@drawable/logo" />
+    </android.support.v7.widget.Toolbar>
+
+    <android.support.design.widget.TabLayout
+        android:id="@+id/tab_strip"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/toolbar"
+        android:background="@color/colorPrimary"
+        app:layout_scrollFlags="scroll|enterAlways"
+        app:tabIndicatorColor="@color/white"
+        app:tabSelectedTextColor="@color/white"
+        app:tabTextColor="@color/white" />
 
     <android.support.v4.view.ViewPager
         android:id="@+id/viewPager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@+id/ntb_wrapper"
+        android:layout_below="@+id/tab_strip"
         android:layout_toEndOf="@+id/placeHolder"
         android:layout_toRightOf="@+id/placeHolder"
         android:background="@color/colorPrimary" />
@@ -25,6 +50,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
+        android:visibility="gone"
         app:cardBackgroundColor="@color/colorPrimary"
         app:cardElevation="2dp"
         app:cardUseCompatPadding="true">

@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -116,6 +117,11 @@ public class HomeActivity extends BaseActivity implements OnItemClickListener {
         pagerAdapter = new SimpleFragmentStatePagerAdapter(getSupportFragmentManager(), list);
         viewPager.setAdapter(pagerAdapter);
 
+        TabLayout tabsStrip = (TabLayout) findViewById(R.id.tab_strip);
+        if (tabsStrip != null) {
+            tabsStrip.setupWithViewPager(viewPager);
+        }
+
         final ArrayList<NavigationTabBar.Model> models = new ArrayList<>();
         models.add(
                 new NavigationTabBar.Model.Builder(
@@ -168,6 +174,7 @@ public class HomeActivity extends BaseActivity implements OnItemClickListener {
 
     public final class SimpleFragmentStatePagerAdapter extends FragmentStatePagerAdapter {
         private List<Fragment> fragmentList;
+        private String tabTitles[] = new String[]{"Explore", "Profile", "Active Sessions"};
 
         public SimpleFragmentStatePagerAdapter(FragmentManager fm, List<Fragment> fragmentList) {
             super(fm);
@@ -182,6 +189,11 @@ public class HomeActivity extends BaseActivity implements OnItemClickListener {
         @Override
         public int getCount() {
             return fragmentList.size();
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            return tabTitles[position];
         }
     }
 

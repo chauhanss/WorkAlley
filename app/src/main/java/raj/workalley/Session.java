@@ -373,9 +373,9 @@ public class Session {
         myRequest.setShouldCache(false);
         myRequest.setRetryPolicy(new
 
-                DefaultRetryPolicy(60000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT)
+                        DefaultRetryPolicy(60000,
+                        DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                        DefaultRetryPolicy.DEFAULT_BACKOFF_MULT)
 
         );
 
@@ -451,8 +451,8 @@ public class Session {
         };
         myRequest.setShouldCache(false);
         myRequest.setRetryPolicy(new DefaultRetryPolicy(60000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT)
+                        DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                        DefaultRetryPolicy.DEFAULT_BACKOFF_MULT)
 
         );
 
@@ -519,8 +519,8 @@ public class Session {
         };
         myRequest.setShouldCache(false);
         myRequest.setRetryPolicy(new DefaultRetryPolicy(30000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT)
+                        DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                        DefaultRetryPolicy.DEFAULT_BACKOFF_MULT)
 
         );
 
@@ -959,7 +959,7 @@ public class Session {
 
     public void getAllActiveSessionsOfUser(String userId) {
 
-        String getRequestUrl = "/requests/?user=" + userId + "&status=started";
+        String getRequestUrl = "/requests/?user=" + userId + "&status=started,requested";
 
         getFetch(getRequestUrl, null, new Task() {
 

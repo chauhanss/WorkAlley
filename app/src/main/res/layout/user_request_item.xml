@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/request_seat_layout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_marginTop="50dp"
+        android:id="@+id/no_data"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/margin_20"
+        android:text="No Active Requests! Pull to refresh data."
+        android:gravity="center"
+        android:visibility="gone"
+        android:textColor="@android:color/white"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/workspace_label"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/margin_20"
+        android:text="Workspace :"
+        android:textAllCaps="true"
+        android:textColor="@android:color/white"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/workspace_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/margin_20"
+        android:text="@string/workspace_name"
+        android:textColor="@android:color/white" />
+
+
+    <TextView
+        android:id="@+id/workspace_address"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/margin_20"
+        android:layout_marginRight="@dimen/margin_10"
+        android:layout_marginTop="@dimen/margin_10"
+        android:text="address"
+        android:textColor="@android:color/white" />
+
+    <TextView
+        android:id="@+id/status"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/margin_20"
+        android:layout_marginRight="@dimen/margin_10"
+        android:layout_marginTop="@dimen/margin_20"
+        android:gravity="center"
+        android:text="*Session end request submitted!"
+        android:textColor="@android:color/holo_red_dark"
+        android:textSize="@dimen/text_size_10"
+        android:visibility="gone" />
+
+    <Button
+        android:id="@+id/end_cancel_session_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="@dimen/margin_10"
+        android:background="@color/colorAccent"
+        android:paddingBottom="@dimen/margin_10"
+        android:paddingLeft="50dp"
+        android:paddingRight="50dp"
+        android:paddingTop="@dimen/margin_10"
+        android:text="End Session"
+        android:visibility="visible" />
+
+</LinearLayout>

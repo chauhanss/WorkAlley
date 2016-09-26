@@ -8,6 +8,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +19,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -24,11 +29,14 @@ import org.json.JSONObject;
 import org.w3c.dom.Text;
 
 import java.security.PublicKey;
+import java.util.ArrayList;
 
 import raj.workalley.CobbocEvent;
 import raj.workalley.Constants;
 import raj.workalley.R;
 import raj.workalley.Session;
+import raj.workalley.StringAdapter;
+import raj.workalley.UserRequestAdapter;
 import raj.workalley.user.fresh.UserInfo;
 import raj.workalley.util.Helper;
 import raj.workalley.util.SharedPrefsUtils;
@@ -42,8 +50,9 @@ public class AccountFragment extends Fragment {
     private Context mContext;
     private Session mSession;
     private UserInfo mUser;
-    private LinearLayout requestLayout;
     TextView endSession;
+    private RecyclerView sessionListView;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     public static AccountFragment newInstance() {
         AccountFragment fragment = new AccountFragment();
@@ -69,20 +78,33 @@ public class AccountFragment extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         mUser = mSession.getUser();
-        requestLayout = (LinearLayout) view.findViewById(R.id.request_seat_layout);
+        sessionListView = (RecyclerView) view.findViewById(R.id.session_list);
+        getAllActiveSessionsOfUser(mUser.get_id());
 
-        endSession = (TextView) requestLayout.findViewById(R.id.end_session_btn);
-        endSession.setOnClickListener(new View.OnClickListener() {
+        swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.pull_to_refresh);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
-            public void onClick(View v) {
-                if (Helper.isConnected(mContext)) {
-                    String bookingRequest = SharedPrefsUtils.getStringPreference(mContext, Constants.BOOKING_REQUEST_ID, Constants.SP_NAME);
-                    Helper.showProgressDialogSpinner(mContext, "Please Wait", "Ending Session", false);
-                    Session.getInstance(mContext).endSessionInWorkspaceRequest(bookingRequest);
-                } else
-                    Toast.makeText(mContext, "No internet", Toast.LENGTH_LONG).show();
+            public void onRefresh() {
+                getAllActiveSessionsOfUser(mUser.get_id());
             }
         });
+
+    }
+
+    public void endSession(String requestId) {
+        if (Helper.isConnected(mContext)) {
+            Helper.showProgressDialogSpinner(mContext, "Please Wait", "Ending Session", false);
+            Session.getInstance(mContext).endSessionInWorkspaceRequest(requestId);
+        } else
+            Toast.makeText(mContext, "No internet", Toast.LENGTH_LONG).show();
+    }
+
+    public void cancelBooking(String requestId) {
+        if (Helper.isConnected(mContext)) {
+            Helper.showProgressDialogSpinner(mContext, "Please wait", "Cancelling request", false);
+            mSession.cancelRequestedSeat(requestId);
+        } else
+            Toast.makeText(mContext, "No internet", Toast.LENGTH_LONG).show();
     }
 
     private BroadcastReceiver notificationListener = new BroadcastReceiver() {
@@ -91,7 +113,6 @@ public class AccountFragment extends Fragment {
 
             String message = intent.getStringExtra("message");
             if (message.equalsIgnoreCase(Constants.SESSION_END_CONFIRMED)) {
-                SharedPrefsUtils.removePreferenceByKey(mContext, Constants.BOOKING_REQUEST_ID, Constants.SP_NAME);
                 getAllActiveSessionsOfUser(mUser.get_id());
             } else if (message.equalsIgnoreCase(Constants.BOOKING_ACCEPT)) {
                 getAllActiveSessionsOfUser(mUser.get_id());
@@ -116,7 +137,6 @@ public class AccountFragment extends Fragment {
             EventBus.getDefault().register(this);
         }
         mContext.registerReceiver(notificationListener, new IntentFilter(Constants.REQUEST_RESPONSE));
-        getAllActiveSessionsOfUser(mUser.get_id());
     }
 
     @Override
@@ -139,36 +159,31 @@ public class AccountFragment extends Fragment {
         switch (event.getType()) {
             case CobbocEvent.ACTIVE_SESSIONS: {
                 Helper.dismissProgressDialog();
-
+                swipeRefreshLayout.setRefreshing(false);
                 if (event.getStatus()) {
                     try {
                         JSONObject object = (JSONObject) event.getValue();
 
                         JSONArray array = object.getJSONArray("data");
 
-                        if (array.length() > 0) {
-                            /**
-                             * one user can have only one active session at one time
-                             */
-                            JSONObject jsonObject = (JSONObject) array.get(0);
+                        ArrayList<String> adapterData = new ArrayList<>();
+                        for (int i = 0; i < array.length(); i++) {
+                            JSONObject jsonObject = (JSONObject) array.get(i);
+
 
                             if (jsonObject.has("space") && !jsonObject.isNull("space")) {
                                 JSONObject spaceObject = jsonObject.getJSONObject("space");
-                                requestLayout.setVisibility(View.VISIBLE);
 
-                                TextView workspaceName = (TextView) requestLayout.findViewById(R.id.workspace_name);
-                                workspaceName.setText(spaceObject.getString("name"));
 
                                 JSONObject addressObject = spaceObject.getJSONObject("address");
-                                TextView workspaceAddress = (TextView) requestLayout.findViewById(R.id.workspace_address);
-                                workspaceAddress.setText(addressObject.getString("line1") + ", " + addressObject.getString("locality") + ", " + addressObject.getString("state") + ", " + addressObject.getString("city") + ", " + addressObject.getString("pincode"));
+                                String address = addressObject.getString("line1") + ", " + addressObject.getString("locality") + ", " + addressObject.getString("state") + ", " + addressObject.getString("city") + ", " + addressObject.getString("pincode");
 
-                                if (!SharedPrefsUtils.hasKey(mContext, Constants.BOOKING_REQUEST_ID, Constants.SP_NAME)) {
-                                    requestLayout.findViewById(R.id.status).setVisibility(View.VISIBLE);
-                                }
+                                if (jsonObject.getString("status").equalsIgnoreCase("requested") || jsonObject.getString("status").equalsIgnoreCase("started"))
+                                    adapterData.add(spaceObject.getString("name") + "|" + address + "|" + jsonObject.getString("status") + "|" + jsonObject.getString("_id"));
                             }
-                        } else
-                            requestLayout.setVisibility(View.GONE);
+                        }
+
+                        setUpRecyclerView(adapterData);
 
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -178,17 +193,35 @@ public class AccountFragment extends Fragment {
 
             }
             break;
+            case CobbocEvent.CANCEL_BOOKING_REQUEST: {
+                Helper.dismissProgressDialog();
+                if (event.getStatus()) {
+                    getAllActiveSessionsOfUser(mUser.get_id());
+                } else
+                    Toast.makeText(mContext, "Some error occurred!", Toast.LENGTH_LONG).show();
+            }
+            break;
             case CobbocEvent.END_SESSION: {
                 Helper.dismissProgressDialog();
                 if (event.getStatus()) {
                     Toast.makeText(mContext, "Session end request submitted!", Toast.LENGTH_LONG).show();
-                    //          SharedPrefsUtils.removePreferenceByKey(mContext, Constants.BOOKING_REQUEST_ID, Constants.SP_NAME);
-                    endSession.setVisibility(View.GONE);
-                    requestLayout.findViewById(R.id.status).setVisibility(View.VISIBLE);
+                    getAllActiveSessionsOfUser(mUser.get_id());
                 } else
                     Toast.makeText(mContext, "Some error occurred!", Toast.LENGTH_LONG).show();
             }
         }
+    }
+
+    private void setUpRecyclerView(ArrayList<String> adapterData) {
+
+        if (adapterData.size() <= 0)
+            adapterData.add("No data! Pull to refresh.");
+
+        UserRequestAdapter stringAdapter = new UserRequestAdapter(this, mContext, adapterData);
+        sessionListView.setAdapter(stringAdapter);
+        final LinearLayoutManager linearLayoutManager = new LinearLayoutManager(mContext);
+        sessionListView.setLayoutManager(linearLayoutManager);
+
     }
 
     @Override

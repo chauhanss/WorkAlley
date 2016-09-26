@@ -7,7 +7,7 @@ android {
 
     defaultConfig {
         applicationId "raj.workalley"
-        minSdkVersion 16
+        minSdkVersion 19
         targetSdkVersion 23
         versionCode 1
         versionName "1.0"
@@ -35,5 +35,6 @@ dependencies {
     compile 'org.greenrobot:eventbus:3.0.0'
     compile 'com.github.devlight.navigationtabbar:navigationtabbar:1.2.5'
     compile 'com.github.nkzawa:socket.io-client:0.3.0'
+    compile 'com.android.support:design:24.0.0-beta1'
 
 }
