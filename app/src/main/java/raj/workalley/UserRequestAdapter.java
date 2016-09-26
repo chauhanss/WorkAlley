@@ -50,6 +50,10 @@ public class UserRequestAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
         if (displayString.contains("|")) {
             viewHolder.noData.setVisibility(View.GONE);
+            viewHolder.name.setVisibility(View.VISIBLE);
+            viewHolder.workspacePlaceholder.setVisibility(View.VISIBLE);
+            viewHolder.address.setVisibility(View.VISIBLE);
+            viewHolder.endCancelButton.setVisibility(View.VISIBLE);
             viewHolder.name.setText(displayString.substring(0, displayString.indexOf("|")));
 
             String intermediateString = displayString.substring(displayString.indexOf("|") + 1, displayString.length());
@@ -75,6 +79,9 @@ public class UserRequestAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         } else {
             viewHolder.noData.setVisibility(View.VISIBLE);
             viewHolder.name.setVisibility(View.GONE);
+            viewHolder.workspacePlaceholder.setVisibility(View.GONE);
+            viewHolder.address.setVisibility(View.GONE);
+            viewHolder.endCancelButton.setVisibility(View.GONE);
 
         }
 
@@ -87,14 +94,15 @@ public class UserRequestAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
     public class StringViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-        private TextView name, address, status, noData;
+        private TextView name, address, noData, workspacePlaceholder;
         private Button endCancelButton;
 
         public StringViewHolder(View v) {
             super(v);
             name = (TextView) v.findViewById(R.id.workspace_name);
+            workspacePlaceholder = (TextView) v.findViewById(R.id.workspace_label);
             address = (TextView) v.findViewById(R.id.workspace_address);
-            status = (TextView) v.findViewById(R.id.status);
+            //    status = (TextView) v.findViewById(R.id.status);
             endCancelButton = (Button) v.findViewById(R.id.end_cancel_session_btn);
             noData = (TextView) v.findViewById(R.id.no_data);
             endCancelButton.setOnClickListener(this);

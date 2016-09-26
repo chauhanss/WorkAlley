@@ -264,7 +264,7 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback, Loc
                     setWorkspaceDataOnMap();
                     break;
                 } else
-                    Toast.makeText(mContext, "Some error occurred!", Toast.LENGTH_LONG).show();
+                    Toast.makeText(mContext, event.getValue().toString(), Toast.LENGTH_LONG).show();
             }
         }
     }

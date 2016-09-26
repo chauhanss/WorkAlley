@@ -239,7 +239,8 @@ public class SettingFragment extends Fragment {
                     startActivity(intent);
                     SharedPrefsUtils.clearSharedPreferenceFile(getActivity());
                     break;
-                }
+                }else
+                    Toast.makeText(mContext, event.getValue().toString(), Toast.LENGTH_LONG).show();
             }
         }
     }

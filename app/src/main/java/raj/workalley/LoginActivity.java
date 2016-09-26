@@ -41,8 +41,7 @@ public class LoginActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         mSession = Session.getInstance(mContext);
 
-        if(mSession.isLoggedIn())
-        {
+        if (mSession.isLoggedIn()) {
 
         }
 
@@ -174,7 +173,7 @@ public class LoginActivity extends BaseActivity {
                        // finish();*/
                     }
                 } else {
-                    Toast.makeText(mContext, "Not able to login. Please check your details.", Toast.LENGTH_LONG).show();
+                    Toast.makeText(mContext, event.getValue().toString(), Toast.LENGTH_LONG).show();
                 }
                 break;
             case CobbocEvent.GET_USER_DETAILS:
@@ -205,7 +204,8 @@ public class LoginActivity extends BaseActivity {
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                }
+                } else
+                    Toast.makeText(mContext, event.getValue().toString(), Toast.LENGTH_LONG).show();
                 break;
         }
     }
