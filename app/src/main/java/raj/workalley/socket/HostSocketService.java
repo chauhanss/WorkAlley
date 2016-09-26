@@ -362,7 +362,7 @@ public class HostSocketService extends Service {
 
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
-                        .setSmallIcon(R.drawable.ic_account)
+                        .setSmallIcon(R.mipmap.ic_launcher)
                         .setContentText(messageText)
                         .setStyle(new NotificationCompat.BigTextStyle().bigText(messageText))
                         .setContentTitle(requestType)

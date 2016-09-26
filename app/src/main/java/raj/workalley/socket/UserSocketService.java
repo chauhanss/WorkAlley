@@ -138,7 +138,7 @@ public class UserSocketService extends Service {
     public void createNoti(int count) {
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
-                        .setSmallIcon(R.drawable.ic_account)
+                        .setSmallIcon(R.mipmap.ic_launcher)
                         .setContentTitle("userNotification " + count)
                         .setContentText("Hello World!");
 
