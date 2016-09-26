@@ -1,5 +1,9 @@
 package raj.workalley.util;
 
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
+import android.media.Image;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -60,6 +64,7 @@ public class AmenitiesListAdapter extends RecyclerView.Adapter<AmenitiesListAdap
         AmenitiesItem amenities = amenitiesList.get(position);
         holder.name.setText(amenities.getAmenitiesName());
         holder.icon.setBackgroundResource(amenities.getAmenitiesIcon());
+        //imageOverlay(holder.icon);
         if (posInSelectedList(position)) {
             holder.itemView.setSelected(true);
         } else {
@@ -99,5 +104,12 @@ public class AmenitiesListAdapter extends RecyclerView.Adapter<AmenitiesListAdap
             list.add(amenitiesList.get(i).getAmenitiesName());
         }
         return list;
+    }
+
+    private void imageOverlay(ImageView view) {
+        int highlightColor = Color.parseColor("#804B58");
+        PorterDuffColorFilter colorFilter = new PorterDuffColorFilter(highlightColor, PorterDuff.Mode.SRC_ATOP);
+        view.getDrawable().setColorFilter(colorFilter);
+        //contact.getDrawable().setColorFilter(colorFilter);
     }
 }

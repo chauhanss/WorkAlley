@@ -5,6 +5,7 @@
     android:layout_height="wrap_content"
     android:layout_margin="@dimen/margin_10"
     android:orientation="vertical"
+    app:cardBackgroundColor="@color/colorPrimary"
     app:cardCornerRadius="@dimen/margin_4"
     app:cardElevation="@dimen/margin_2"
     app:cardUseCompatPadding="true">
@@ -20,7 +21,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="BOOKING REQUEST FROM:"
-            android:textColor="@android:color/holo_orange_light" />
+            android:textColor="@color/white"
+            android:fontFamily="@string/font_roboto_medium"/>
 
         <TextView
             android:id="@+id/user_name"
@@ -44,20 +46,20 @@
 
             <Button
                 android:id="@+id/reject"
+                style="@style/ButtonStyle"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_margin="@dimen/margin_5"
+                android:layout_margin="@dimen/margin_2"
                 android:layout_weight="1"
-                android:background="@color/colorAccent"
                 android:text="REJECT" />
 
             <Button
                 android:id="@+id/accept"
+                style="@style/ButtonStyle"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_margin="@dimen/margin_5"
+                android:layout_margin="@dimen/margin_2"
                 android:layout_weight="1"
-                android:background="@color/colorAccent"
                 android:text="ACCEPT" />
 
         </LinearLayout>
