@@ -189,7 +189,7 @@ public class AccountFragment extends Fragment {
                         e.printStackTrace();
                     }
                 } else
-                    Toast.makeText(mContext, "Some error occurred!", Toast.LENGTH_LONG).show();
+                    Toast.makeText(mContext, event.getValue().toString(), Toast.LENGTH_LONG).show();
 
             }
             break;
@@ -198,7 +198,7 @@ public class AccountFragment extends Fragment {
                 if (event.getStatus()) {
                     getAllActiveSessionsOfUser(mUser.get_id());
                 } else
-                    Toast.makeText(mContext, "Some error occurred!", Toast.LENGTH_LONG).show();
+                    Toast.makeText(mContext, event.getValue().toString(), Toast.LENGTH_LONG).show();
             }
             break;
             case CobbocEvent.END_SESSION: {
@@ -207,7 +207,7 @@ public class AccountFragment extends Fragment {
                     Toast.makeText(mContext, "Session end request submitted!", Toast.LENGTH_LONG).show();
                     getAllActiveSessionsOfUser(mUser.get_id());
                 } else
-                    Toast.makeText(mContext, "Some error occurred!", Toast.LENGTH_LONG).show();
+                    Toast.makeText(mContext, event.getValue().toString(), Toast.LENGTH_LONG).show();
             }
         }
     }

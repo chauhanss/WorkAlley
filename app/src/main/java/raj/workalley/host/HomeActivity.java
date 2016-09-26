@@ -168,7 +168,6 @@ public class HomeActivity extends BaseActivity implements OnItemClickListener {
 
     private void initNavToolBar() {
         viewPager = (ViewPager) findViewById(R.id.viewPager);
-        final NavigationTabBar navigationTabBar = (NavigationTabBar) findViewById(R.id.ntb);
 
         List<Fragment> list = new ArrayList<>(3);
         list.add(SettingFragment.newInstance());
@@ -202,14 +201,14 @@ public class HomeActivity extends BaseActivity implements OnItemClickListener {
                 ).build()
         );
 
-        navigationTabBar.setModels(models);
+      //  navigationTabBar.setModels(models);
         //navigationTabBar.setViewPager(viewPager, 0);
 
         viewPager.addOnPageChangeListener(new AbstractPageChangedListener() {
             @Override
             public void onPageSelected(int position) {
                 super.onPageSelected(position);
-                navigationTabBar.getModels().get(position).hideBadge();
+                //navigationTabBar.getModels().get(position).hideBadge();
             }
 
             @Override

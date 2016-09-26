@@ -77,6 +77,13 @@ public class HomeActivity extends BaseActivity implements OnItemClickListener {
         mContext = this;
         mSession = Session.getInstance(this);
 
+        if (getIntent() != null) {
+            boolean swapToRequest = getIntent().getBooleanExtra("swapToRequestPage", false);
+
+            if(swapToRequest)
+                viewPager.setCurrentItem(2);
+        }
+
        /* List<ICategoryItem> items = new ArrayList<>();
         items.add(new CategoryItem(R.drawable.ic_map, "Map"));
         items.add(new CategoryItem(R.drawable.ic_offer, "Offers"));

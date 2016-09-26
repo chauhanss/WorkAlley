@@ -234,7 +234,7 @@ public class HostSignUpActivity extends BaseActivity {
                 if (event.getStatus()) {
                     mSession.getHostWorkspaceData(mSession.getUser().get_id());
                 } else {
-                    Toast.makeText(getApplicationContext(), "Not able to login. Please check your details.", Toast.LENGTH_LONG).show();
+                    Toast.makeText(mContext, event.getValue().toString(), Toast.LENGTH_LONG).show();
                 }
                 break;
 
@@ -247,7 +247,8 @@ public class HostSignUpActivity extends BaseActivity {
                     Intent intent = new Intent(HostSignUpActivity.this, HomeActivity.class);
                     startActivity(intent);
                     finish();
-                }
+                }else
+                    Toast.makeText(mContext, event.getValue().toString(), Toast.LENGTH_LONG).show();
                 break;
         }
     }

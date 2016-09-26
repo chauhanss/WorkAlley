@@ -7,6 +7,7 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -25,6 +26,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Handler;
 
 import raj.workalley.AmenitiesItem;
 import raj.workalley.BaseActivity;
@@ -33,6 +35,7 @@ import raj.workalley.Constants;
 import raj.workalley.R;
 import raj.workalley.Session;
 import raj.workalley.WorkspaceList;
+import raj.workalley.host.HomeActivity;
 import raj.workalley.user.fresh.UserInfo;
 import raj.workalley.util.AmenitiesListAdapter;
 import raj.workalley.util.Helper;
@@ -52,6 +55,7 @@ public class HostDetailsActivity extends BaseActivity {
     Button bookSeat;
     String workspaceId;
     UserInfo mUser = null;
+    private SwipeRefreshLayout swipeRefresh;
 
 
     @Override
@@ -113,16 +117,20 @@ public class HostDetailsActivity extends BaseActivity {
             }
         });
 
-        findViewById(R.id.refresh).setOnClickListener(new View.OnClickListener() {
+        swipeRefresh = (SwipeRefreshLayout) findViewById(R.id.pull_to_refresh);
+        swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
-            public void onClick(View v) {
+            public void onRefresh() {
                 if (SharedPrefsUtils.hasKey(mContext, Constants.BOOKING_REQUEST_ID, Constants.SP_NAME)) {
                     String requestId = SharedPrefsUtils.getStringPreference(mContext, Constants.BOOKING_REQUEST_ID, Constants.SP_NAME);
                     if (Helper.isConnected(mContext)) {
-                        Helper.showProgressDialogSpinner(mContext, "Please wait", "connecting server", false);
                         mSession.getUpdatedRequestStatus(requestId);
-                    } else
+                    } else {
+                        swipeRefresh.setRefreshing(false);
                         Toast.makeText(mContext, "No internet", Toast.LENGTH_LONG).show();
+                    }
+                }else{
+                    swipeRefresh.setRefreshing(false);
                 }
             }
         });
@@ -147,7 +155,6 @@ public class HostDetailsActivity extends BaseActivity {
 
             String requestType = value.substring(0, value.lastIndexOf("|"));
             String workspace = value.substring(value.lastIndexOf("|") + 1, value.length());
-            Log.d("SHRUTI", "request " + requestType + "workspace " + workspace);
 
             if (workspace.equalsIgnoreCase(workspaceId)) {
                 switch (requestType) {
@@ -177,7 +184,7 @@ public class HostDetailsActivity extends BaseActivity {
 
             requestStatus.setText("Request Pending! Please refresh to get updated data!");
             bookSeat.setText(REQUEST_CANCEL);
-            requestStatus.setTextColor(ContextCompat.getColor(mContext, android.R.color.holo_blue_dark));
+            requestStatus.setTextColor(ContextCompat.getColor(mContext, R.color.white));
         }
     }
 
@@ -189,7 +196,6 @@ public class HostDetailsActivity extends BaseActivity {
             EventBus.getDefault().register(mContext);
 
         mContext.registerReceiver(notificationListener, new IntentFilter(Constants.REQUEST_RESPONSE));
-
         // getLatestDataFromSharedPreference();
     }
 
@@ -263,6 +269,7 @@ public class HostDetailsActivity extends BaseActivity {
 
     @Subscribe
     public void onEventMainThread(CobbocEvent event) {
+        swipeRefresh.setRefreshing(false);
         switch (event.getType()) {
             case CobbocEvent.REQUEST_SEAT: {
                 Helper.dismissProgressDialog();
@@ -291,9 +298,19 @@ public class HostDetailsActivity extends BaseActivity {
                     requestStatus.setTextColor(ContextCompat.getColor(mContext, android.R.color.holo_blue_dark));
                     clearRejectAcceptSharedPreference();
 
+                    final android.os.Handler handler = new android.os.Handler();
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            Intent intent = new Intent(mContext, raj.workalley.user.fresh.HomeActivity.class);
+                            intent.putExtra("swapToRequestPage", true);
+                            startActivity(intent);
+                        }
+                    }, 500);
+
                     break;
                 } else
-                    Toast.makeText(mContext, "Some error occurred!", Toast.LENGTH_LONG).show();
+                    Toast.makeText(mContext, event.getValue().toString(), Toast.LENGTH_LONG).show();
             }
             case CobbocEvent.CANCEL_BOOKING_REQUEST: {
                 Helper.dismissProgressDialog();
@@ -308,12 +325,23 @@ public class HostDetailsActivity extends BaseActivity {
                     bookSeat.setText(REQUEST_BOOK);
                     requestStatus.setTextColor(ContextCompat.getColor(mContext, android.R.color.holo_blue_dark));
                     requestStatus.setText("*Request Canceled!");
+
+                    final android.os.Handler handler = new android.os.Handler();
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            Intent intent = new Intent(mContext, raj.workalley.user.fresh.HomeActivity.class);
+                            intent.putExtra("swapToRequestPage", true);
+                            startActivity(intent);
+                        }
+                    }, 500);
                 } else
-                    Toast.makeText(mContext, "Some error occurred!", Toast.LENGTH_LONG).show();
+                    Toast.makeText(mContext, event.getValue().toString(), Toast.LENGTH_LONG).show();
             }
             break;
             case CobbocEvent.LAST_STATUS: {
                 Helper.dismissProgressDialog();
+
                 if (event.getStatus()) {
                     try {
                         JSONObject object = (JSONObject) event.getValue();
@@ -354,12 +382,23 @@ public class HostDetailsActivity extends BaseActivity {
                         }
 
                         getLatestDataFromSharedPreference();
+
+                        final android.os.Handler handler = new android.os.Handler();
+                        handler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                Intent intent = new Intent(mContext, raj.workalley.user.fresh.HomeActivity.class);
+                                intent.putExtra("swapToRequestPage", true);
+                                startActivity(intent);
+                            }
+                        }, 500);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
 
 
-                }
+                } else
+                    Toast.makeText(mContext, event.getValue().toString(), Toast.LENGTH_LONG).show();
             }
             break;
         }

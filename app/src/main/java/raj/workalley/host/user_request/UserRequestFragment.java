@@ -239,7 +239,7 @@ public class UserRequestFragment extends Fragment {
                         e.printStackTrace();
                     }
                 } else
-                    Toast.makeText(mContext, "Some error occurred!", Toast.LENGTH_LONG).show();
+                    Toast.makeText(mContext, event.getValue().toString(), Toast.LENGTH_LONG).show();
                 break;
             case CobbocEvent.END_SESSION_CONFIRMED:
 
@@ -263,7 +263,7 @@ public class UserRequestFragment extends Fragment {
                     }
                     break;
                 } else
-                    Toast.makeText(mContext, "Some error occurred!", Toast.LENGTH_LONG).show();
+                    Toast.makeText(mContext, event.getValue().toString(), Toast.LENGTH_LONG).show();
         }
     }
 }
