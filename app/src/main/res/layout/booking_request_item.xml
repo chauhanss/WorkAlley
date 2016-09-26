@@ -21,6 +21,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="BOOKING REQUEST FROM:"
+            android:textSize="@dimen/text_size_18"
             android:textColor="@color/white"
             android:fontFamily="@string/font_roboto_medium"/>
 
@@ -29,10 +30,12 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
+            android:textSize="@dimen/text_size_16"
             android:text="mxhbchbdj" />
 
         <TextView
             android:id="@+id/user_email"
+            android:textSize="@dimen/text_size_16"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"

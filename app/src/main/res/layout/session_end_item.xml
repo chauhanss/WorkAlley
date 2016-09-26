@@ -22,6 +22,7 @@
             android:textColor="@android:color/holo_green_light" />
 
         <TextView
+            android:textSize="@dimen/text_size_16"
             android:id="@+id/user_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -29,6 +30,7 @@
             android:text="mxhbchbdj" />
 
         <TextView
+            android:textSize="@dimen/text_size_16"
             android:id="@+id/user_email"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

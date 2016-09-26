@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_margin="@dimen/margin_20"
-    android:background="@color/white"
+    android:background="@color/colorPrimary"
     android:orientation="vertical"
     android:visibility="gone">
 
@@ -14,7 +14,8 @@
         android:layout_margin="@dimen/margin_20"
         android:text="Workspace"
         android:textAllCaps="true"
-        android:textColor="@android:color/black"
+        android:textColor="@android:color/white"
+        android:textSize="@dimen/text_size_16"
         android:textStyle="bold" />
 
     <TextView
@@ -23,7 +24,8 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="@dimen/margin_20"
         android:text="@string/workspace_name"
-        android:textColor="@android:color/black" />
+        android:textColor="@android:color/white"
+        android:textSize="@dimen/text_size_16" />
 
 
     <TextView
@@ -34,7 +36,8 @@
         android:layout_marginRight="@dimen/margin_10"
         android:layout_marginTop="@dimen/margin_10"
         android:text="address"
-        android:textColor="@android:color/black" />
+        android:textColor="@android:color/white"
+        android:textSize="@dimen/text_size_16" />
 
     <TextView
         android:id="@+id/status"
@@ -43,24 +46,20 @@
         android:layout_marginLeft="@dimen/margin_20"
         android:layout_marginRight="@dimen/margin_10"
         android:layout_marginTop="@dimen/margin_20"
-        android:text="*Session end request submitted!"
         android:gravity="center"
-        android:visibility="gone"
+        android:text="*Session end request submitted!"
+        android:textColor="@android:color/holo_red_dark"
         android:textSize="@dimen/text_size_10"
-        android:textColor="@android:color/holo_red_dark" />
+        android:visibility="gone" />
 
     <Button
         android:id="@+id/end_session_btn"
+        style="@style/ButtonStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:visibility="visible"
-        android:layout_gravity="center"
-        android:background="@color/colorAccent"
-        android:paddingBottom="@dimen/margin_10"
-        android:layout_marginTop="@dimen/margin_10"
-        android:paddingLeft="50dp"
-        android:paddingRight="50dp"
-        android:paddingTop="@dimen/margin_10"
-        android:text="End Session" />
+        android:layout_marginBottom="@dimen/margin_20"
+        android:layout_marginTop="@dimen/margin_20"
+        android:text="End Session"
+        android:visibility="visible" />
 
-    </LinearLayout>
+</LinearLayout>

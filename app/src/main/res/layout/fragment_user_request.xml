@@ -16,6 +16,7 @@
             android:orientation="horizontal">
 
             <TextView
+                android:textSize="@dimen/text_size_16"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -24,6 +25,7 @@
                 android:titleTextColor="@color/white" />
 
             <TextView
+                android:textSize="@dimen/text_size_16"
                 android:id="@+id/refresh"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"

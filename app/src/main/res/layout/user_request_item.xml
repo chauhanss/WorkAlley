@@ -17,6 +17,7 @@
         android:orientation="vertical">
 
         <TextView
+            android:textSize="@dimen/text_size_16"
             android:id="@+id/no_data"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -29,6 +30,7 @@
             android:visibility="gone" />
 
         <TextView
+            android:textSize="@dimen/text_size_16"
             android:id="@+id/workspace_label"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -39,6 +41,7 @@
             android:textStyle="bold" />
 
         <TextView
+            android:textSize="@dimen/text_size_16"
             android:id="@+id/workspace_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -48,6 +51,7 @@
 
 
         <TextView
+            android:textSize="@dimen/text_size_16"
             android:id="@+id/workspace_address"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

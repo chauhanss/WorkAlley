@@ -55,6 +55,7 @@
                 android:paddingTop="@dimen/margin_30">
 
                 <TextView
+                    android:textSize="@dimen/text_size_16"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="@string/font_roboto_thin"
