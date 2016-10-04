@@ -200,9 +200,9 @@ public class SignUpActivity extends BaseActivity {
                         Intent intent = new Intent(SignUpActivity.this, raj.workalley.user.fresh.HomeActivity.class);
                         startActivity(intent);
                         finish();
-                    } else if (mSession.getUser().getRole().equalsIgnoreCase(Constants.PROVIDER)) {
+                    } /*else if (mSession.getUser().getRole().equalsIgnoreCase(Constants.PROVIDER)) {
                         mSession.getHostWorkspaceData(mSession.getUser().get_id());
-                    }
+                    }*/
 
                 } else {
                     Toast.makeText(mContext, event.getValue().toString(), Toast.LENGTH_LONG).show();

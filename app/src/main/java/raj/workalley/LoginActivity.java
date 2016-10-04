@@ -164,14 +164,14 @@ public class LoginActivity extends BaseActivity {
                         Intent intent = new Intent(LoginActivity.this, raj.workalley.user.fresh.HomeActivity.class);
                         startActivity(intent);
                         finish();
-                    } else if (mSession.getUser().getRole().equalsIgnoreCase(Constants.PROVIDER)) {
+                    } /*else if (mSession.getUser().getRole().equalsIgnoreCase(Constants.PROVIDER)) {
                         Helper.showProgressDialogSpinner(mContext, "Please Wait", "Connecting to server", false);
                         mSession.getHostWorkspaceData(mSession.getUser().get_id());
-                       /* mSession.getHostWorkspaceData(mSession.getUser().get_id());
+                       *//* mSession.getHostWorkspaceData(mSession.getUser().get_id());
                         Intent intent = new Intent(LoginActivity.this, HostSignUpActivity.class);
                         startActivity(intent);
-                       // finish();*/
-                    }
+                       // finish();*//*
+                    }*/
                 } else {
                     Toast.makeText(mContext, event.getValue().toString(), Toast.LENGTH_LONG).show();
                 }
