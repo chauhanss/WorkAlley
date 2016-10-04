@@ -178,8 +178,8 @@ public class AccountFragment extends Fragment {
                                 JSONObject addressObject = spaceObject.getJSONObject("address");
                                 String address = addressObject.getString("line1") + ", " + addressObject.getString("locality") + ", " + addressObject.getString("state") + ", " + addressObject.getString("city") + ", " + addressObject.getString("pincode");
 
-                                if (jsonObject.getString("status").equalsIgnoreCase("requested") || jsonObject.getString("status").equalsIgnoreCase("started"))
-                                    adapterData.add(spaceObject.getString("name") + "|" + address + "|" + jsonObject.getString("status") + "|" + jsonObject.getString("_id"));
+                                //                 if (jsonObject.getString("status").equalsIgnoreCase("requested") || jsonObject.getString("status").equalsIgnoreCase("started"))
+                                adapterData.add(spaceObject.getString("name") + "|" + address + "|" + jsonObject.getString("status") + "|" + jsonObject.get("updatedAt") + "|" + jsonObject.getString("_id"));
                             }
                         }
 

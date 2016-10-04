@@ -58,7 +58,7 @@ public class Session {
 
     public enum workAlleyModels {
         UserInfo,
-        Workspaces,
+        Workspaces, Workspace,
     }
 
     private Session(Context context) {
@@ -95,6 +95,7 @@ public class Session {
         private String token = null;
         private String userEmail = null;
         private String userPassword = null;
+        private String activeWorkspace = null;
 
         public String getUserEmail() {
             return userEmail;
@@ -154,6 +155,14 @@ public class Session {
         public void setWorkspaceList(WorkspaceList workspaceList) {
             this.workspaceList = workspaceList;
         }
+
+        public void setActiveWorkspace(String activeWorkspace) {
+            this.activeWorkspace = activeWorkspace;
+        }
+
+        public String getActiveWorkspace() {
+            return activeWorkspace;
+        }
     }
 
 
@@ -203,6 +212,14 @@ public class Session {
 
     public WorkspaceList getWorkspaces() {
         return mSessionData.getWorkspaceList();
+    }
+
+    public void setActiveWorkspace(String activeWorkspaceId) {
+        mSessionData.setActiveWorkspace(activeWorkspaceId);
+    }
+
+    public String getActiveWorkspace() {
+        return mSessionData.getActiveWorkspace();
     }
 
     public void reset() {
@@ -274,6 +291,11 @@ public class Session {
                 classType = new TypeToken<WorkspaceList>() {
                 }.getType();
                 fromJson = (WorkspaceList) gson.fromJson(jsonObject.toString(), classType);
+                break;
+            case Workspace:
+                classType = new TypeToken<WorkspaceList.Workspace>() {
+                }.getType();
+                fromJson = (WorkspaceList.Workspace) gson.fromJson(jsonObject.toString(), classType);
                 break;
         }
         return fromJson;
@@ -744,13 +766,27 @@ public class Session {
 
     public void getUserWorkspaceData(String userId) {
 
-        String getRequestUrl = "users/:" + userId;
+        String getRequestUrl = "/requests/?user=" + userId + "&status=started,requested";
 
         getFetch(getRequestUrl, null, new Task() {
 
             @Override
             public void onSuccess(JSONObject jsonObject) {
-                eventBus.post(new CobbocEvent(CobbocEvent.GET_USER_DETAILS, true, jsonObject));
+
+                try {
+                    if (jsonObject.has("data") && !jsonObject.isNull("data")) {
+                        JSONArray dataArray = (JSONArray) jsonObject.getJSONArray("data");
+
+                        if (dataArray.length() > 0)
+                            eventBus.post(new CobbocEvent(CobbocEvent.GET_USER_DETAILS, true, jsonObject));
+                        else
+                            eventBus.post(new CobbocEvent(CobbocEvent.GET_USER_DETAILS, false, jsonObject));
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    eventBus.post(new CobbocEvent(CobbocEvent.GET_USER_DETAILS, false, jsonObject));
+                }
+
             }
 
             @Override
@@ -788,6 +824,33 @@ public class Session {
             @Override
             public void onError(Throwable throwable, String errorMessage) {
                 eventBus.post(new CobbocEvent(CobbocEvent.GET_HOST_DETAILS, false, errorMessage));
+            }
+
+            @Override
+            public void onProgress(int percent) {
+
+            }
+        }, Request.Method.GET);
+    }
+
+    public void getWorkspaceInfoFromId(String workspaceId) {
+        String getRequestUrl = "spaces/" + workspaceId;
+
+        getFetch(getRequestUrl, null, new Task() {
+
+            @Override
+            public void onSuccess(JSONObject jsonObject) {
+                eventBus.post(new CobbocEvent(CobbocEvent.GET_WORKSPACE_FROM_ID, true, jsonObject));
+            }
+
+            @Override
+            public void onSuccess(String response) {
+
+            }
+
+            @Override
+            public void onError(Throwable throwable, String errorMessage) {
+                eventBus.post(new CobbocEvent(CobbocEvent.GET_WORKSPACE_FROM_ID, false, errorMessage));
             }
 
             @Override
@@ -959,7 +1022,7 @@ public class Session {
 
     public void getAllActiveSessionsOfUser(String userId) {
 
-        String getRequestUrl = "/requests/?user=" + userId + "&status=started,requested";
+        String getRequestUrl = "/requests/?user=" + userId;// + "&status=started,requested";
 
         getFetch(getRequestUrl, null, new Task() {
 

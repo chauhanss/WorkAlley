@@ -47,8 +47,6 @@ import raj.workalley.util.Helper;
 public class HomeActivity extends BaseActivity implements OnItemClickListener {
 
     private LoopBarView loopBarView;
-    Session session;
-
 
     private SimpleCategoriesAdapter categoriesAdapter;
     private SimpleFragmentStatePagerAdapter pagerAdapter;
@@ -68,60 +66,42 @@ public class HomeActivity extends BaseActivity implements OnItemClickListener {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_user);
-        session = Session.getInstance(this);
-        initNavToolBar();
-        startHostService();
-
-        //loopBarView = (LoopBarView) findViewById(R.id.endlessView);
-
         mContext = this;
         mSession = Session.getInstance(this);
+
+        initNavToolBar(0);
+        startHostService();
 
         if (getIntent() != null) {
             boolean swapToRequest = getIntent().getBooleanExtra("swapToRequestPage", false);
 
-            if(swapToRequest)
+            if (swapToRequest)
                 viewPager.setCurrentItem(2);
         }
-
-       /* List<ICategoryItem> items = new ArrayList<>();
-        items.add(new CategoryItem(R.drawable.ic_map, "Map"));
-        items.add(new CategoryItem(R.drawable.ic_offer, "Offers"));
-        items.add(new CategoryItem(R.drawable.ic_setting, "Settings"));
-        items.add(new CategoryItem(R.drawable.ic_account, "Account"));*/
-
-
-        /*categoriesAdapter = new SimpleCategoriesAdapter(items);
-        loopBarView.setCategoriesAdapter(categoriesAdapter);
-        loopBarView.addOnItemClickListener(this);
-*/
-
-
     }
 
     private void startHostService() {
-        /*HostSocketService.initSocket();
-        HostSocketService.connectToServer();
-        HostSocketService.setSessionCookiesId(session.getSessionIdCookies());
-        HostSocketService.sendCookies();
-        HostSocketService.authHost();*/
         Intent intent = new Intent(getBaseContext(), HostSocketService.class);
         Bundle b = new Bundle();
-        b.putString(Constants.SESSION_COOKIES_ID, session.getToken());
+        b.putString(Constants.SESSION_COOKIES_ID, mSession.getToken());
         intent.putExtras(b);
         startService(intent);
     }
 
-    private void initNavToolBar() {
+    public void initNavToolBar(int page) {
         viewPager = (ViewPager) findViewById(R.id.viewPager);
-        final NavigationTabBar navigationTabBar = (NavigationTabBar) findViewById(R.id.ntb);
 
         List<Fragment> list = new ArrayList<>(3);
-        list.add(MapFragment.newInstance());
+
+        if (mSession.getActiveWorkspace() == null)
+            list.add(MapFragment.newInstance());
+        else
+            list.add(CurrentWorkspace.newInstance());
         //list.add(OffersFragment.newInstance());
         list.add(SettingFragment.newInstance());
         list.add(AccountFragment.newInstance());
         pagerAdapter = new SimpleFragmentStatePagerAdapter(getSupportFragmentManager(), list);
+        viewPager.setOffscreenPageLimit(3);
         viewPager.setAdapter(pagerAdapter);
 
         TabLayout tabsStrip = (TabLayout) findViewById(R.id.tab_strip);
@@ -129,46 +109,12 @@ public class HomeActivity extends BaseActivity implements OnItemClickListener {
             tabsStrip.setupWithViewPager(viewPager);
         }
 
-        final ArrayList<NavigationTabBar.Model> models = new ArrayList<>();
-        models.add(
-                new NavigationTabBar.Model.Builder(
-                        getResources().getDrawable(R.drawable.ic_map),
-                        Color.parseColor("#EE946F")
-                ).build()
-        );
-       /* models.add(
-                new NavigationTabBar.Model.Builder(
-                        getResources().getDrawable(R.drawable.ic_offer),
-                        Color.parseColor("#EE946F")
-                ).build()
-        ); */
-        models.add(
-                new NavigationTabBar.Model.Builder(
-                        getResources().getDrawable(R.drawable.ic_setting),
-                        Color.parseColor("#EE946F")
-                ).build()
-        );
-        models.add(
-                new NavigationTabBar.Model.Builder(
-                        getResources().getDrawable(R.drawable.ic_account),
-                        Color.parseColor("#EE946F")
-                ).build()
-        );
-        navigationTabBar.setModels(models);
-        navigationTabBar.setViewPager(viewPager, 0);
+        viewPager.setCurrentItem(page);
+    }
 
-        viewPager.addOnPageChangeListener(new AbstractPageChangedListener() {
-            @Override
-            public void onPageSelected(int position) {
-                super.onPageSelected(position);
-                navigationTabBar.getModels().get(position).hideBadge();
-            }
-
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                Log.d("tag", "on page scrolled");
-            }
-        });
+    public void invalidatePager(int page) {
+        viewPager.setAdapter(null);
+        initNavToolBar(page);
     }
 
 
@@ -181,7 +127,7 @@ public class HomeActivity extends BaseActivity implements OnItemClickListener {
 
     public final class SimpleFragmentStatePagerAdapter extends FragmentStatePagerAdapter {
         private List<Fragment> fragmentList;
-        private String tabTitles[] = new String[]{"Explore", "Profile", "Active Sessions"};
+        private String tabTitles[] = new String[]{"Dashboard", "Profile", "Account"};
 
         public SimpleFragmentStatePagerAdapter(FragmentManager fm, List<Fragment> fragmentList) {
             super(fm);
@@ -203,24 +149,6 @@ public class HomeActivity extends BaseActivity implements OnItemClickListener {
             return tabTitles[position];
         }
     }
-
-    public abstract class AbstractPageChangedListener implements ViewPager.OnPageChangeListener {
-        @Override
-        public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
-        }
-
-        @Override
-        public void onPageSelected(int position) {
-
-        }
-
-        @Override
-        public void onPageScrollStateChanged(int state) {
-
-        }
-    }
-
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {

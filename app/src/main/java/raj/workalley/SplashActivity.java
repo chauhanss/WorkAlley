@@ -11,6 +11,7 @@ import android.widget.Toast;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -87,9 +88,6 @@ public class SplashActivity extends BaseActivity {
 
                     if (mSession.getUser().getRole().equalsIgnoreCase(Constants.USER)) {
                         mSession.getUserWorkspaceData(mSession.getUser().get_id());
-                        Intent intent = new Intent(SplashActivity.this, raj.workalley.user.fresh.HomeActivity.class);
-                        startActivity(intent);
-                        finish();
                     } else if (mSession.getUser().getRole().equalsIgnoreCase(Constants.PROVIDER)) {
                         Helper.showProgressDialogSpinner(mContext, "Please Wait", "Connecting to server", false);
                         mSession.getHostWorkspaceData(mSession.getUser().get_id());
@@ -103,14 +101,34 @@ public class SplashActivity extends BaseActivity {
                     Toast.makeText(mContext, event.getValue().toString(), Toast.LENGTH_LONG).show();
                 }
                 break;
-            case CobbocEvent.GET_USER_DETAILS:
+            case CobbocEvent.GET_USER_DETAILS: {
                 Helper.dismissProgressDialog();
                 if (event.getStatus()) {
-                    Toast.makeText(mContext, "Details fetched successfully.", Toast.LENGTH_LONG).show();
-                } else {
-                    Toast.makeText(mContext, "Details not fetched.", Toast.LENGTH_LONG).show();
-                }
-                break;
+                    try {
+                        JSONObject jsonObject = (JSONObject) event.getValue();
+                        if (jsonObject.has("data") && !jsonObject.isNull("data")) {
+
+                            JSONArray dataArray = (JSONArray) jsonObject.getJSONArray("data");
+                            JSONObject dataObject = (JSONObject) dataArray.get(0);
+
+                            SharedPrefsUtils.setStringPreference(mContext, Constants.BOOKING_REQUEST_ID, dataObject.getString("_id"), Constants.SP_NAME);
+
+                            if (dataObject.has("space") && !dataObject.isNull("space")) {
+                                JSONObject space = (JSONObject) dataObject.getJSONObject("space");
+                                mSession.setActiveWorkspace(space.getString("_id"));
+                            }
+
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }else
+                    mSession.setActiveWorkspace(null);
+                Intent intent = new Intent(this, raj.workalley.user.fresh.HomeActivity.class);
+                startActivity(intent);
+                finish();
+            }
+            break;
             case CobbocEvent.GET_HOST_DETAILS:
                 Helper.dismissProgressDialog();
                 if (event.getStatus()) {

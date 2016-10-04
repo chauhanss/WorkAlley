@@ -9,6 +9,9 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import raj.workalley.user.fresh.account.AccountFragment;
@@ -62,10 +65,26 @@ public class UserRequestAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             String intermediateString2 = intermediateString.substring(intermediateString.indexOf("|") + 1, intermediateString.length());
             String status = intermediateString2.substring(0, intermediateString2.indexOf("|"));
 
+            String lastUpdated = intermediateString2.substring(intermediateString2.indexOf("|") + 1, intermediateString2.lastIndexOf("|"));
+
+            String formattedDate = null;
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+            try {
+                Date date = format.parse(lastUpdated);
+                CharSequence date1 = android.text.format.DateFormat.format("dd MMM yy hh:mm:ss", date);
+                if (date1 != null)
+                    formattedDate = date1.toString();
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+            viewHolder.lastUpdatedTime.setText(formattedDate);
+
             //   viewHolder.status.setTag(intermediateString2.substring(intermediateString.indexOf("|") + 1, intermediateString2.length()));
 
             viewHolder.endCancelButton.setVisibility(View.VISIBLE);
 
+            viewHolder.status.setVisibility(View.GONE);
             switch (status) {
                 case "requested":
                     viewHolder.endCancelButton.setText("CANCEL BOOK REQUEST");
@@ -74,9 +93,14 @@ public class UserRequestAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                     viewHolder.endCancelButton.setText("END SESSION");
                     break;
                 default:
+                    viewHolder.status.setVisibility(View.VISIBLE);
+                    viewHolder.status.setText("Request " + status);
                     viewHolder.endCancelButton.setVisibility(View.GONE);
+                    break;
             }
-        } else {
+        } else
+
+        {
             viewHolder.noData.setVisibility(View.VISIBLE);
             viewHolder.name.setVisibility(View.GONE);
             viewHolder.workspacePlaceholder.setVisibility(View.GONE);
@@ -94,7 +118,7 @@ public class UserRequestAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
     public class StringViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-        private TextView name, address, noData, workspacePlaceholder;
+        private TextView name, address, noData, workspacePlaceholder, status, lastUpdatedTime;
         private Button endCancelButton;
 
         public StringViewHolder(View v) {
@@ -102,10 +126,11 @@ public class UserRequestAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             name = (TextView) v.findViewById(R.id.workspace_name);
             workspacePlaceholder = (TextView) v.findViewById(R.id.workspace_label);
             address = (TextView) v.findViewById(R.id.workspace_address);
-            //    status = (TextView) v.findViewById(R.id.status);
+            status = (TextView) v.findViewById(R.id.status);
             endCancelButton = (Button) v.findViewById(R.id.end_cancel_session_btn);
             noData = (TextView) v.findViewById(R.id.no_data);
             endCancelButton.setOnClickListener(this);
+            lastUpdatedTime = (TextView) v.findViewById(R.id.time);
         }
 
         @Override
@@ -113,7 +138,8 @@ public class UserRequestAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             String request = (String) list.get(getPosition());
             String requestId = request.substring(request.lastIndexOf("|") + 1, request.length());
 
-            String intermediateString = request.substring(0, request.lastIndexOf("|"));
+            String intermediateString1 = request.substring(0, request.lastIndexOf("|"));
+            String intermediateString = intermediateString1.substring(0, intermediateString1.lastIndexOf("|"));
             String status = intermediateString.substring(intermediateString.lastIndexOf("|") + 1, intermediateString.length());
 
             switch (status) {

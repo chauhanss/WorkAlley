@@ -1,4 +1,4 @@
-package raj.workalley.user.fresh.host_details;
+package raj.workalley.user.fresh;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -11,8 +11,9 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -23,83 +24,65 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.logging.Handler;
 
 import raj.workalley.AmenitiesItem;
-import raj.workalley.BaseActivity;
+import raj.workalley.BaseFragment;
 import raj.workalley.CobbocEvent;
 import raj.workalley.Constants;
 import raj.workalley.R;
 import raj.workalley.Session;
 import raj.workalley.WorkspaceList;
-import raj.workalley.host.HomeActivity;
-import raj.workalley.user.fresh.UserInfo;
 import raj.workalley.util.AmenitiesListAdapter;
 import raj.workalley.util.Helper;
 import raj.workalley.util.SharedPrefsUtils;
 
 /**
- * Created by vishal.raj on 9/7/16.
+ * Created by shruti.vig on 10/3/16.
  */
-public class HostDetailsActivity extends BaseActivity {
+public class CurrentWorkspace extends BaseFragment {
+
+    private Context mContext;
+    private Session mSession;
+    private UserInfo mUser;
+    private WorkspaceList.Workspace mWorkspace;
+    Button bookSeat;
+    private SwipeRefreshLayout swipeRefresh;
+    String workspaceId;
 
     private static final String REQUEST_CANCEL = "CANCEL REQUEST";
     private static final String REQUEST_BOOK = "BOOK A SEAT";
     private static final String REQUEST_END = "SESSION IN PROGRESS";
-    Session mSession;
-    Context mContext;
-    WorkspaceList.Workspace mWorkspace = null;
-    Button bookSeat;
-    String workspaceId;
-    UserInfo mUser = null;
-    private SwipeRefreshLayout swipeRefresh;
+    private View rootView;
+
+    public static CurrentWorkspace newInstance() {
+        CurrentWorkspace fragment = new CurrentWorkspace();
+        return fragment;
+    }
 
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_host_details);
-        mContext = this;
-        mSession = Session.getInstance(mContext);
-        mUser = mSession.getUser();
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
-        if (getIntent() != null) {
-            workspaceId = getIntent().getStringExtra(Constants.WORKSPACE_ID);
-            WorkspaceList workspaces = mSession.getWorkspaces();
+        this.rootView = view;
 
-            if (workspaces != null && workspaces.getWorkspaceData() != null && workspaces.getWorkspaceData().size() > 0) {
-                for (WorkspaceList.Workspace workspace : workspaces.getWorkspaceData()) {
+        workspaceId = mSession.getActiveWorkspace();
 
-                    if (workspaceId.equalsIgnoreCase(workspace.get_id())) {
-                        mWorkspace = workspace;
-                    }
-                }
-            }
+        if (Helper.isConnected(mContext)) {
+            Helper.showProgressDialogSpinner(mContext, "Please wait", "connecting server", false);
+            mSession.getWorkspaceInfoFromId(workspaceId);
+        } else
+            Toast.makeText(mContext, "No internet", Toast.LENGTH_LONG).show();
 
-            if (mWorkspace == null) {
-                Toast.makeText(mContext, "NO Workspace match!", Toast.LENGTH_LONG).show();
-                return;
-            } else
-                makeHostDataRequest();
-        }
-        bookSeat = (Button) findViewById(R.id.book_seat);
-        bookSeat.setText(REQUEST_BOOK);
+
+        bookSeat = (Button) view.findViewById(R.id.book_seat);
+        bookSeat.setText(REQUEST_CANCEL);
 
         bookSeat.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
                 switch (bookSeat.getText().toString()) {
-                    case REQUEST_BOOK:
-                        if (Helper.isConnected(mContext)) {
-                            Helper.showProgressDialogSpinner(mContext, "Please wait", "connecting server", false);
-                            mSession.requestSeat(mSession.getUser().get_id(), workspaceId);
-                        } else
-                            Toast.makeText(mContext, "No internet", Toast.LENGTH_LONG).show();
-                        break;
                     case REQUEST_CANCEL:
                         if (SharedPrefsUtils.hasKey(mContext, Constants.BOOKING_REQUEST_ID, Constants.SP_NAME)) {
                             String requestId = SharedPrefsUtils.getStringPreference(mContext, Constants.BOOKING_REQUEST_ID, Constants.SP_NAME);
@@ -110,14 +93,12 @@ public class HostDetailsActivity extends BaseActivity {
                                 Toast.makeText(mContext, "No internet", Toast.LENGTH_LONG).show();
                         }
                         break;
-                    case REQUEST_END:
-                        break;
                 }
 
             }
         });
 
-        swipeRefresh = (SwipeRefreshLayout) findViewById(R.id.pull_to_refresh);
+        swipeRefresh = (SwipeRefreshLayout) view.findViewById(R.id.pull_to_refresh);
         swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -146,9 +127,8 @@ public class HostDetailsActivity extends BaseActivity {
         }
     };
 
-
     public void getLatestDataFromSharedPreference() {
-        TextView requestStatus = (TextView) findViewById(R.id.request_status);
+
         if (SharedPrefsUtils.hasKey(mContext, mUser.get_id(), Constants.SP_NAME)) {
 
             String value = SharedPrefsUtils.getStringPreference(mContext, mUser.get_id(), Constants.SP_NAME);
@@ -160,72 +140,82 @@ public class HostDetailsActivity extends BaseActivity {
                 switch (requestType) {
                     case Constants.BOOKING_ACCEPT:
                         bookSeat.setText(REQUEST_END);
-                        requestStatus.setTextColor(ContextCompat.getColor(mContext, android.R.color.holo_green_dark));
-                        requestStatus.setText("*Your request to book a seat for this workspace has been accepted!");
-                        //start session
+                        mSession.setActiveWorkspace(workspace);
+                        ((HomeActivity) mContext).invalidatePager(0);
                         break;
                     case Constants.BOOKING_REJECT:
                         bookSeat.setText(REQUEST_BOOK);
-                        requestStatus.setTextColor(ContextCompat.getColor(mContext, android.R.color.holo_red_dark));
-                        requestStatus.setText("*Sorry! Your request to book a seat for this workspace has been rejected!");
                         SharedPrefsUtils.removePreferenceByKey(mContext, Constants.BOOKING_REQUEST_ID, Constants.SP_NAME);
                         SharedPrefsUtils.removePreferenceByKey(mContext, mUser.get_id(), Constants.SP_NAME);
+                        mSession.setActiveWorkspace(null);
+                        ((HomeActivity) mContext).invalidatePager(0);
                         break;
                     case Constants.SESSION_END_CONFIRMED:
                         bookSeat.setText(REQUEST_BOOK);
-                        requestStatus.setText("");
                         SharedPrefsUtils.removePreferenceByKey(mContext, Constants.BOOKING_REQUEST_ID, Constants.SP_NAME);
                         SharedPrefsUtils.removePreferenceByKey(mContext, mUser.get_id(), Constants.SP_NAME);
+                        mSession.setActiveWorkspace(null);
+                        ((HomeActivity) mContext).invalidatePager(0);
                         break;
                 }
             }
 
         } else if (SharedPrefsUtils.hasKey(mContext, Constants.BOOKING_REQUEST_ID, Constants.SP_NAME)) {
-
-            requestStatus.setText("Request Pending! Please refresh to get updated data!");
             bookSeat.setText(REQUEST_CANCEL);
-            requestStatus.setTextColor(ContextCompat.getColor(mContext, R.color.white));
         }
     }
 
+    @Nullable
     @Override
-    protected void onResume() {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        super.onCreateView(inflater, container, savedInstanceState);
+        View v = inflater.inflate(R.layout.activity_host_details, null);
+        return v;
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        mContext = context;
+        mSession = Session.getInstance(mContext);
+        mUser = mSession.getUser();
+
+    }
+
+    @Override
+    public void onResume() {
         super.onResume();
 
-        if (!EventBus.getDefault().isRegistered(mContext))
-            EventBus.getDefault().register(mContext);
+        if (!EventBus.getDefault().isRegistered(this))
+            EventBus.getDefault().register(this);
 
         mContext.registerReceiver(notificationListener, new IntentFilter(Constants.REQUEST_RESPONSE));
         // getLatestDataFromSharedPreference();
     }
 
     @Override
-    protected void onPause() {
+    public void onPause() {
         super.onPause();
 
-        if (EventBus.getDefault().isRegistered(mContext))
-            EventBus.getDefault().unregister(mContext);
+        if (EventBus.getDefault().isRegistered(this))
+            EventBus.getDefault().unregister(this);
         mContext.unregisterReceiver(notificationListener);
     }
 
-    private void makeHostDataRequest() {
-        setUpAndDisplayData();
-    }
-
-    private void setUpAndDisplayData() {
-        TextView name = (TextView) findViewById(R.id.workspace_name);
+    private void setUpAndDisplayData(View v) {
+        TextView name = (TextView) v.findViewById(R.id.workspace_name);
         name.setText(mWorkspace.getName());
 
-        TextView address = (TextView) findViewById(R.id.workspace_address);
+        TextView address = (TextView) v.findViewById(R.id.workspace_address);
         address.setText(mWorkspace.getAddress().getFullAddress());
 
-        TextView email = (TextView) findViewById(R.id.workspace_email);
+        TextView email = (TextView) v.findViewById(R.id.workspace_email);
         email.setText(mWorkspace.getOwner().getEmail());
 
-        RecyclerView amenitiesRecyclerView = (RecyclerView) findViewById(R.id.workspace_amenities);
+        RecyclerView amenitiesRecyclerView = (RecyclerView) v.findViewById(R.id.workspace_amenities);
         ArrayList<AmenitiesItem> amenitiesList = getAmenitiesList();
         AmenitiesListAdapter mAdapter = new AmenitiesListAdapter(amenitiesList, false, amenitiesRecyclerView);
-        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(mContext, LinearLayoutManager.HORIZONTAL, false);
         amenitiesRecyclerView.setLayoutManager(mLayoutManager);
         amenitiesRecyclerView.setItemAnimator(new DefaultItemAnimator());
         amenitiesRecyclerView.setAdapter(mAdapter);
@@ -288,30 +278,19 @@ public class HostDetailsActivity extends BaseActivity {
                     finish(); */
 
                     try {
-                        JSONObject spaceObject = (JSONObject) jsonObject.getJSONObject("space");
-                        mSession.setActiveWorkspace(spaceObject.getString("_id"));
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                    try {
                         SharedPrefsUtils.setStringPreference(mContext, Constants.BOOKING_REQUEST_ID, jsonObject.getString("_id"), Constants.SP_NAME);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                    TextView requestStatus = (TextView) findViewById(R.id.request_status);
-                    requestStatus.setText("Request Pending! Please refresh to get updated data!");
                     bookSeat.setText(REQUEST_CANCEL);
-                    requestStatus.setTextColor(ContextCompat.getColor(mContext, android.R.color.holo_blue_dark));
                     clearRejectAcceptSharedPreference();
 
                     final android.os.Handler handler = new android.os.Handler();
                     handler.postDelayed(new Runnable() {
                         @Override
                         public void run() {
-                            Intent intent = new Intent(mContext, raj.workalley.user.fresh.HomeActivity.class);
-                            intent.putExtra("swapToRequestPage", true);
-                            startActivity(intent);
-                            finish();
+                            mSession.setActiveWorkspace(null);
+                            ((HomeActivity) mContext).invalidatePager(2);
                         }
                     }, 500);
 
@@ -327,22 +306,9 @@ public class HostDetailsActivity extends BaseActivity {
                      * Remove id as new request will have new request id
                      */
                     SharedPrefsUtils.removePreferenceByKey(mContext, Constants.BOOKING_REQUEST_ID, Constants.SP_NAME);
-
-                    TextView requestStatus = (TextView) findViewById(R.id.request_status);
                     bookSeat.setText(REQUEST_BOOK);
-                    requestStatus.setTextColor(ContextCompat.getColor(mContext, android.R.color.holo_blue_dark));
-                    requestStatus.setText("*Request Canceled!");
-
-                    final android.os.Handler handler = new android.os.Handler();
-                    handler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            Intent intent = new Intent(mContext, raj.workalley.user.fresh.HomeActivity.class);
-                            intent.putExtra("swapToRequestPage", true);
-                            startActivity(intent);
-                            finish();
-                        }
-                    }, 500);
+                    mSession.setActiveWorkspace(null);
+                    ((HomeActivity) mContext).invalidatePager(0);
                 } else
                     Toast.makeText(mContext, event.getValue().toString(), Toast.LENGTH_LONG).show();
             }
@@ -364,10 +330,9 @@ public class HostDetailsActivity extends BaseActivity {
                                 if (!SharedPrefsUtils.hasKey(mContext, Constants.BOOKING_REQUEST_ID, Constants.SP_NAME)) {
 
                                     SharedPrefsUtils.setStringPreference(mContext, Constants.BOOKING_REQUEST_ID, requestId, Constants.SP_NAME);
-                                    TextView requestStatus = (TextView) findViewById(R.id.request_status);
-                                    requestStatus.setText("Request Pending! Please refresh to get updated data!");
                                     bookSeat.setText(REQUEST_CANCEL);
-                                    requestStatus.setTextColor(ContextCompat.getColor(mContext, android.R.color.holo_blue_dark));
+                                    mSession.setActiveWorkspace(space.getString("_id"));
+                                    ((HomeActivity) mContext).invalidatePager(0);
                                     clearRejectAcceptSharedPreference();
                                 }
                                 break;
@@ -376,31 +341,24 @@ public class HostDetailsActivity extends BaseActivity {
                                 break;
                             case "rejected":
                                 SharedPrefsUtils.setStringPreference(mContext, user.getString("_id"), Constants.BOOKING_REJECT + "|" + space.getString("_id"), Constants.SP_NAME);
+                                mSession.setActiveWorkspace(null);
+                                ((HomeActivity) mContext).invalidatePager(0);
                                 break;
                             case "ended":
                                 SharedPrefsUtils.setStringPreference(mContext, user.getString("_id"), Constants.SESSION_END_CONFIRMED + "|" + space.getString("_id"), Constants.SP_NAME);
+                                mSession.setActiveWorkspace(null);
+                                ((HomeActivity) mContext).invalidatePager(0);
                                 break;
                             case "canceled":
                                 SharedPrefsUtils.removePreferenceByKey(mContext, Constants.BOOKING_REQUEST_ID, Constants.SP_NAME);
-                                TextView requestStatus = (TextView) findViewById(R.id.request_status);
                                 bookSeat.setText(REQUEST_BOOK);
-                                requestStatus.setTextColor(ContextCompat.getColor(mContext, android.R.color.holo_blue_dark));
-                                requestStatus.setText("*Request Canceled!");
+                                mSession.setActiveWorkspace(null);
+                                ((HomeActivity) mContext).invalidatePager(0);
                                 break;
                         }
 
                         getLatestDataFromSharedPreference();
 
-                        final android.os.Handler handler = new android.os.Handler();
-                        handler.postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                Intent intent = new Intent(mContext, raj.workalley.user.fresh.HomeActivity.class);
-                                intent.putExtra("swapToRequestPage", true);
-                                startActivity(intent);
-                                finish();
-                            }
-                        }, 500);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -410,6 +368,17 @@ public class HostDetailsActivity extends BaseActivity {
                     Toast.makeText(mContext, event.getValue().toString(), Toast.LENGTH_LONG).show();
             }
             break;
+            case CobbocEvent.GET_WORKSPACE_FROM_ID:
+                Helper.dismissProgressDialog();
+
+                if (event.getStatus()) {
+
+                    JSONObject data = (JSONObject) event.getValue();
+                    mWorkspace = (WorkspaceList.Workspace) mSession.getParsedResponseFromGSON(data, Session.workAlleyModels.Workspace);
+                    setUpAndDisplayData(rootView);
+                }
+
+                break;
         }
     }
 

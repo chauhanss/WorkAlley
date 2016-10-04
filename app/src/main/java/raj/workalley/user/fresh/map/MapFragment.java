@@ -239,6 +239,7 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback, Loc
                 intent.putExtra(Constants.WORKSPACE_ID, mMarkersMap.get(marker.getId()));
                 //        getActivity().startActivityForResult(intent, Constants.HOST_DETAILS_ACTIVITY_REQUEST_DETAILS);
                 getActivity().startActivity(intent);
+                getActivity().finish();
             }
         }, 500);
         return false;
