@@ -96,6 +96,7 @@ public class Session {
         private String userEmail = null;
         private String userPassword = null;
         private String activeWorkspace = null;
+        private String activeWorkspaceRequestId = null;
 
         public String getUserEmail() {
             return userEmail;
@@ -163,6 +164,14 @@ public class Session {
         public String getActiveWorkspace() {
             return activeWorkspace;
         }
+
+        public String getActiveWorkspaceRequestId() {
+            return activeWorkspaceRequestId;
+        }
+
+        public void setActiveWorkspaceRequestId(String requestId) {
+            this.activeWorkspaceRequestId = requestId;
+        }
     }
 
 
@@ -216,6 +225,14 @@ public class Session {
 
     public void setActiveWorkspace(String activeWorkspaceId) {
         mSessionData.setActiveWorkspace(activeWorkspaceId);
+    }
+
+    public String getActiveWorkspaceRequestId() {
+        return mSessionData.getActiveWorkspaceRequestId();
+    }
+
+    public void setActiveWorkspaceRequestId(String requestId) {
+        mSessionData.setActiveWorkspaceRequestId(requestId);
     }
 
     public String getActiveWorkspace() {
@@ -729,7 +746,7 @@ public class Session {
 
     }
 
-    public void requestSeat(String userId, String hostId) {
+    public void requestSeat(String userId, String hostId, final int fragmentId) {
         JSONObject params = new JSONObject();
         try {
             params.put(Constants.USER_ID, userId);
@@ -742,6 +759,11 @@ public class Session {
 
             @Override
             public void onSuccess(JSONObject jsonObject) {
+                try {
+                    jsonObject.put(Constants.FRAGMENT_Id, fragmentId);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
                 eventBus.post(new CobbocEvent(CobbocEvent.REQUEST_SEAT, true, jsonObject));
             }
 
@@ -833,13 +855,18 @@ public class Session {
         }, Request.Method.GET);
     }
 
-    public void getWorkspaceInfoFromId(String workspaceId) {
+    public void getWorkspaceInfoFromId(String workspaceId, final int fragmentId) {
         String getRequestUrl = "spaces/" + workspaceId;
 
         getFetch(getRequestUrl, null, new Task() {
 
             @Override
             public void onSuccess(JSONObject jsonObject) {
+                try {
+                    jsonObject.put(Constants.FRAGMENT_Id, fragmentId);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
                 eventBus.post(new CobbocEvent(CobbocEvent.GET_WORKSPACE_FROM_ID, true, jsonObject));
             }
 
@@ -860,13 +887,18 @@ public class Session {
         }, Request.Method.GET);
     }
 
-    public void getAllActiveWorkspace() {
+    public void getAllActiveWorkspace(final int fragmentId) {
         String getRequestUrl = "spaces";
 
         getFetch(getRequestUrl, null, new Task() {
 
             @Override
             public void onSuccess(JSONObject jsonObject) {
+                try {
+                    jsonObject.put(Constants.FRAGMENT_Id, fragmentId);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
                 eventBus.post(new CobbocEvent(CobbocEvent.GET_ALL_WORKSPACES, true, jsonObject));
             }
 
@@ -992,7 +1024,7 @@ public class Session {
         }, Request.Method.GET);
     }
 
-    public void cancelRequestedSeat(String requestId) {
+    public void cancelRequestedSeat(String requestId, final int fragmentId) {
 
         String getRequestUrl = "/requests/" + requestId + "/cancel";
 
@@ -1000,6 +1032,11 @@ public class Session {
 
             @Override
             public void onSuccess(JSONObject jsonObject) {
+                try {
+                    jsonObject.put(Constants.FRAGMENT_Id, fragmentId);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
                 eventBus.post(new CobbocEvent(CobbocEvent.CANCEL_BOOKING_REQUEST, true, jsonObject));
             }
 
@@ -1020,7 +1057,7 @@ public class Session {
         }, Request.Method.PUT);
     }
 
-    public void getAllActiveSessionsOfUser(String userId) {
+    public void getAllActiveSessionsOfUser(String userId, final int fragementId) {
 
         String getRequestUrl = "/requests/?user=" + userId;// + "&status=started,requested";
 
@@ -1028,6 +1065,11 @@ public class Session {
 
             @Override
             public void onSuccess(JSONObject jsonObject) {
+                try {
+                    jsonObject.put(Constants.FRAGMENT_Id, fragementId);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
                 eventBus.post(new CobbocEvent(CobbocEvent.ACTIVE_SESSIONS, true, jsonObject));
             }
 
@@ -1048,7 +1090,7 @@ public class Session {
         }, Request.Method.GET);
     }
 
-    public void getUpdatedRequestStatus(String requestId) {
+    public void getUpdatedRequestStatus(String requestId, final int fragmentId) {
 
         String getRequestUrl = "/requests/" + requestId;
 
@@ -1056,6 +1098,11 @@ public class Session {
 
             @Override
             public void onSuccess(JSONObject jsonObject) {
+                try {
+                    jsonObject.put(Constants.FRAGMENT_Id, fragmentId);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
                 eventBus.post(new CobbocEvent(CobbocEvent.LAST_STATUS, true, jsonObject));
             }
 
@@ -1076,7 +1123,7 @@ public class Session {
         }, Request.Method.GET);
     }
 
-    public void endSessionInWorkspaceRequest(String requestId) {
+    public void endSessionInWorkspaceRequest(String requestId, final int fragmentId) {
 
         String getRequestUrl = "requests/" + requestId + "/request-end";
 
@@ -1084,6 +1131,11 @@ public class Session {
 
             @Override
             public void onSuccess(JSONObject jsonObject) {
+                try {
+                    jsonObject.put(Constants.FRAGMENT_Id, fragmentId);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
                 eventBus.post(new CobbocEvent(CobbocEvent.END_SESSION, true, jsonObject));
             }
 

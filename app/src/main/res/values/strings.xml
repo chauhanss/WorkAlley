@@ -44,4 +44,5 @@
     <string name="no_internet_connection">No Internet</string>
     <string name="no_net_help_text">Please check your net connection</string>
     <string name="retry">Retry</string>
+    <string name="available_seats">Seats available : %s</string>
 </resources>

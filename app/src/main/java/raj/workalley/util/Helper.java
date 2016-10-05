@@ -20,6 +20,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import raj.workalley.Constants;
 import raj.workalley.R;
 
@@ -61,6 +65,24 @@ public class Helper {
         progressDialog.setCancelable(isCancellable);
         progressDialog.setCanceledOnTouchOutside(false);
         progressDialog.show();
+    }
+
+    public static String getFormattedDate(String lastUpdated) {
+        String formattedDate = null;
+
+        if (lastUpdated == null)
+            return "";
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+        try {
+            Date date = format.parse(lastUpdated);
+            CharSequence date1 = android.text.format.DateFormat.format("dd MMM yy hh:mm:ss", date);
+            if (date1 != null)
+                formattedDate = date1.toString();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        return formattedDate;
     }
 
     public static void dismissProgressDialog() {

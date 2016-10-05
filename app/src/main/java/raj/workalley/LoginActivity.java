@@ -56,13 +56,6 @@ public class LoginActivity extends BaseActivity {
         mLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-             /*   if (mUserName.getText().toString().equalsIgnoreCase("user")) {
-                    Intent intent = new Intent(LoginActivity.this, raj.workalley.user.fresh.HomeActivity.class);
-                    startActivity(intent);
-                } else if (mUserName.getText().toString().equalsIgnoreCase("host")) {
-                    Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
-                    startActivity(intent);
-                }  */
                 if (isEmailFormat(mUserName) && Helper.isConnected(mContext)) {
                     makeLoginCall();
                 } else
@@ -163,16 +156,21 @@ public class LoginActivity extends BaseActivity {
 
                     if (mSession.getUser().getRole().equalsIgnoreCase(Constants.USER)) {
                         mSession.getUserWorkspaceData(mSession.getUser().get_id());
-                    } else if (mSession.getUser().getRole().equalsIgnoreCase(Constants.PROVIDER)) {
+      /*              } else if (mSession.getUser().getRole().equalsIgnoreCase(Constants.PROVIDER)) {
+                        Intent intent = new Intent(LoginActivity.this, raj.workalley.user.fresh.HomeActivity.class);
+                        startActivity(intent);
+                        finish();
+                    } /*else if (mSession.getUser().getRole().equalsIgnoreCase(Constants.PROVIDER)) {
                         Helper.showProgressDialogSpinner(mContext, "Please Wait", "Connecting to server", false);
                         mSession.getHostWorkspaceData(mSession.getUser().get_id());
-                       /* mSession.getHostWorkspaceData(mSession.getUser().get_id());
+                       *//* mSession.getHostWorkspaceData(mSession.getUser().get_id());
                         Intent intent = new Intent(LoginActivity.this, HostSignUpActivity.class);
                         startActivity(intent);
-                       // finish();*/
+                       // finish();*//*
+                    }*/
+                    } else {
+                        Toast.makeText(mContext, event.getValue().toString(), Toast.LENGTH_LONG).show();
                     }
-                } else {
-                    Toast.makeText(mContext, event.getValue().toString(), Toast.LENGTH_LONG).show();
                 }
                 break;
             case CobbocEvent.GET_USER_DETAILS: {
@@ -203,28 +201,6 @@ public class LoginActivity extends BaseActivity {
                 finish();
             }
             break;
-            case CobbocEvent.GET_HOST_DETAILS:
-                Helper.dismissProgressDialog();
-                if (event.getStatus()) {
-
-                    JSONObject jsonObject = (JSONObject) event.getValue();
-                    try {
-                        if (jsonObject.getJSONArray(Constants.DATA).length() == 0) {
-                            Intent intent = new Intent(LoginActivity.this, HostSignUpActivity.class);
-                            startActivity(intent);
-                        } else {
-                            WorkspaceList parsedResponse = (WorkspaceList) Session.getInstance(mContext).getParsedResponseFromGSON(jsonObject, Session.workAlleyModels.Workspaces);
-                            Session.getInstance(mContext).setWorkspaces(parsedResponse);
-                            Intent intent = new Intent(LoginActivity.this, raj.workalley.host.HomeActivity.class);
-                            startActivity(intent);
-                            finish();
-                        }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                } else
-                    Toast.makeText(mContext, event.getValue().toString(), Toast.LENGTH_LONG).show();
-                break;
         }
     }
 

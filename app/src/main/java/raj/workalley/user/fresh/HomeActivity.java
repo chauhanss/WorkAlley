@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
@@ -23,6 +24,7 @@ import com.gigamole.navigationtabbar.ntb.NavigationTabBar;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -60,6 +62,9 @@ public class HomeActivity extends BaseActivity implements OnItemClickListener {
     private int orientation;
     @LoopBarView.GravityAttr
     private int endlessGravity = LoopBarView.SELECTION_GRAVITY_START;
+    private MapFragment mMapFragment;
+    private SettingFragment mSettingsFragment;
+    private AccountFragment mAccountFragment;
 
 
     @Override
@@ -69,8 +74,7 @@ public class HomeActivity extends BaseActivity implements OnItemClickListener {
         mContext = this;
         mSession = Session.getInstance(this);
 
-        initNavToolBar(0);
-        startHostService();
+        initNavToolBar();
 
         if (getIntent() != null) {
             boolean swapToRequest = getIntent().getBooleanExtra("swapToRequestPage", false);
@@ -80,7 +84,23 @@ public class HomeActivity extends BaseActivity implements OnItemClickListener {
         }
     }
 
-    private void startHostService() {
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        if (!EventBus.getDefault().isRegistered(mContext))
+            EventBus.getDefault().register(mContext);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        if (EventBus.getDefault().isRegistered(mContext))
+            EventBus.getDefault().unregister(mContext);
+    }
+
+    public void startHostService() {
         Intent intent = new Intent(getBaseContext(), HostSocketService.class);
         Bundle b = new Bundle();
         b.putString(Constants.SESSION_COOKIES_ID, mSession.getToken());
@@ -88,33 +108,41 @@ public class HomeActivity extends BaseActivity implements OnItemClickListener {
         startService(intent);
     }
 
-    public void initNavToolBar(int page) {
+    public void stopSocketService() {
+        Intent intent = new Intent(getBaseContext(), HostSocketService.class);
+        stopService(intent);
+    }
+
+    public void initNavToolBar() {
         viewPager = (ViewPager) findViewById(R.id.viewPager);
 
         List<Fragment> list = new ArrayList<>(3);
 
-        if (mSession.getActiveWorkspace() == null)
-            list.add(MapFragment.newInstance());
-        else
-            list.add(CurrentWorkspace.newInstance());
-        //list.add(OffersFragment.newInstance());
-        list.add(SettingFragment.newInstance());
-        list.add(AccountFragment.newInstance());
+        mMapFragment = MapFragment.newInstance();
+        list.add(mMapFragment);
+
+        mSettingsFragment = SettingFragment.newInstance();
+        list.add(mSettingsFragment);
+
+        mAccountFragment = AccountFragment.newInstance();
+        list.add(mAccountFragment);
         pagerAdapter = new SimpleFragmentStatePagerAdapter(getSupportFragmentManager(), list);
-        viewPager.setOffscreenPageLimit(3);
+        viewPager.setOffscreenPageLimit(2);
         viewPager.setAdapter(pagerAdapter);
 
         TabLayout tabsStrip = (TabLayout) findViewById(R.id.tab_strip);
         if (tabsStrip != null) {
             tabsStrip.setupWithViewPager(viewPager);
         }
+    }
 
+    public void setCurrentPage(int page) {
         viewPager.setCurrentItem(page);
     }
 
     public void invalidatePager(int page) {
-        viewPager.setAdapter(null);
-        initNavToolBar(page);
+        mMapFragment.invalidateMapFragment(mSession.getActiveWorkspace());
+        setCurrentPage(page);
     }
 
 
@@ -124,6 +152,14 @@ public class HomeActivity extends BaseActivity implements OnItemClickListener {
         viewPager.setCurrentItem(position);
     }
 
+    @Override
+    public void onBackPressed() {
+
+        if (viewPager.getCurrentItem() == 0) {
+            mMapFragment.onBackPressed();
+        } else
+            super.onBackPressed();
+    }
 
     public final class SimpleFragmentStatePagerAdapter extends FragmentStatePagerAdapter {
         private List<Fragment> fragmentList;
@@ -158,6 +194,31 @@ public class HomeActivity extends BaseActivity implements OnItemClickListener {
                 workspaceName = b.getString(Constants.WORKSPACE_NAME);
                 viewPager.setCurrentItem(3, true);
                 //startUserService();
+            }
+        }
+    }
+
+    @Subscribe
+    public void onEventMainThread(CobbocEvent event) {
+        JSONObject jsonObject = (JSONObject) event.getValue();
+        if (jsonObject.has(Constants.FRAGMENT_Id) && !jsonObject.isNull(Constants.FRAGMENT_Id)) {
+            try {
+                int fragmentId = jsonObject.getInt(Constants.FRAGMENT_Id);
+
+                switch (fragmentId) {
+                    case 0:
+                        mMapFragment.onEventMainThread(event);
+                        break;
+                    case 1:
+                        mSettingsFragment.onEventMainThread(event);
+                        break;
+                    case 2:
+                        mAccountFragment.onEventMainThread(event);
+                        break;
+                }
+
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
         }
     }

@@ -29,7 +29,9 @@ import org.json.JSONObject;
 import org.w3c.dom.Text;
 
 import java.security.PublicKey;
+import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 import raj.workalley.CobbocEvent;
 import raj.workalley.Constants;
@@ -37,6 +39,7 @@ import raj.workalley.R;
 import raj.workalley.Session;
 import raj.workalley.StringAdapter;
 import raj.workalley.UserRequestAdapter;
+import raj.workalley.user.fresh.HomeActivity;
 import raj.workalley.user.fresh.UserInfo;
 import raj.workalley.util.Helper;
 import raj.workalley.util.SharedPrefsUtils;
@@ -94,7 +97,7 @@ public class AccountFragment extends Fragment {
     public void endSession(String requestId) {
         if (Helper.isConnected(mContext)) {
             Helper.showProgressDialogSpinner(mContext, "Please Wait", "Ending Session", false);
-            Session.getInstance(mContext).endSessionInWorkspaceRequest(requestId);
+            Session.getInstance(mContext).endSessionInWorkspaceRequest(requestId, 2);
         } else
             Toast.makeText(mContext, "No internet", Toast.LENGTH_LONG).show();
     }
@@ -102,7 +105,7 @@ public class AccountFragment extends Fragment {
     public void cancelBooking(String requestId) {
         if (Helper.isConnected(mContext)) {
             Helper.showProgressDialogSpinner(mContext, "Please wait", "Cancelling request", false);
-            mSession.cancelRequestedSeat(requestId);
+            mSession.cancelRequestedSeat(requestId, 2);
         } else
             Toast.makeText(mContext, "No internet", Toast.LENGTH_LONG).show();
     }
@@ -124,18 +127,12 @@ public class AccountFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
-        if (EventBus.getDefault().isRegistered(this)) {
-            EventBus.getDefault().unregister(this);
-        }
         mContext.unregisterReceiver(notificationListener);
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        if (!EventBus.getDefault().isRegistered(this)) {
-            EventBus.getDefault().register(this);
-        }
         mContext.registerReceiver(notificationListener, new IntentFilter(Constants.REQUEST_RESPONSE));
     }
 
@@ -149,7 +146,7 @@ public class AccountFragment extends Fragment {
     public void getAllActiveSessionsOfUser(String userId) {
         if (Helper.isConnected(mContext)) {
             Helper.showProgressDialogSpinner(mContext, "Please Wait", "Fetching Requests", false);
-            Session.getInstance(mContext).getAllActiveSessionsOfUser(userId);
+            Session.getInstance(mContext).getAllActiveSessionsOfUser(userId,2);
         } else
             Toast.makeText(mContext, "No internet", Toast.LENGTH_LONG).show();
     }
@@ -183,6 +180,7 @@ public class AccountFragment extends Fragment {
                             }
                         }
 
+
                         setUpRecyclerView(adapterData);
 
                     } catch (JSONException e) {
@@ -195,6 +193,8 @@ public class AccountFragment extends Fragment {
             break;
             case CobbocEvent.CANCEL_BOOKING_REQUEST: {
                 Helper.dismissProgressDialog();
+                mSession.setActiveWorkspace(null);
+                mSession.setActiveWorkspaceRequestId(null);
                 if (event.getStatus()) {
                     getAllActiveSessionsOfUser(mUser.get_id());
                 } else
@@ -205,6 +205,8 @@ public class AccountFragment extends Fragment {
                 Helper.dismissProgressDialog();
                 if (event.getStatus()) {
                     Toast.makeText(mContext, "Session end request submitted!", Toast.LENGTH_LONG).show();
+                    String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
+                    SharedPrefsUtils.setStringPreference(mContext, "SESSION END REQUESTED", currentDateTimeString, Constants.SP_NAME);
                     getAllActiveSessionsOfUser(mUser.get_id());
                 } else
                     Toast.makeText(mContext, event.getValue().toString(), Toast.LENGTH_LONG).show();

@@ -24,7 +24,6 @@ public class RequestReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        Log.d("SHRUTI", "Received");
 
         if (intent != null) {
 
@@ -68,7 +67,7 @@ public class RequestReceiver extends BroadcastReceiver {
                             SharedPrefsUtils.setStringPreference(context, userInfo.getString("_id"), requestType + "|" + bundle.getString("workspace_id"), Constants.SP_NAME);
                             //          SharedPrefsUtils.setStringPreference(context, Constants.BOOKING_REJECT, userInfo.toString(), Constants.SP_NAME);
 
-                            sendBroadcastToActivity(context, requestType, null);
+                            sendBroadcastToActivity(context, requestType, bundle.getString(Constants.REQUEST_ID));
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -123,7 +122,7 @@ public class RequestReceiver extends BroadcastReceiver {
                              */
                             SharedPrefsUtils.setStringPreference(context, userInfo.getString("_id"), bundle.getString(Constants.REQUEST_ID), Constants.SP_NAME);
                             SharedPrefsUtils.setStringPreference(context, userInfo.getString("_id"), requestType + "|" + bundle.getString("workspace_id"), Constants.SP_NAME);
-                            sendBroadcastToActivity(context, requestType, null);
+                            sendBroadcastToActivity(context, requestType, bundle.getString(Constants.REQUEST_ID));
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }

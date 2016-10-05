@@ -67,4 +67,5 @@ public class Constants {
     public static final String SESSION_END_TOKEN = "SESSION_END_TOKEN";
 
 
+    public static String FRAGMENT_Id = "fragmentId";
 }

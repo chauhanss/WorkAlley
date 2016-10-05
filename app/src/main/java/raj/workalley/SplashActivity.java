@@ -88,17 +88,23 @@ public class SplashActivity extends BaseActivity {
 
                     if (mSession.getUser().getRole().equalsIgnoreCase(Constants.USER)) {
                         mSession.getUserWorkspaceData(mSession.getUser().get_id());
-                    } else if (mSession.getUser().getRole().equalsIgnoreCase(Constants.PROVIDER)) {
+   /*                 } else if (mSession.getUser().getRole().equalsIgnoreCase(Constants.PROVIDER)) {
+                        Intent intent = new Intent(SplashActivity.this, raj.workalley.user.fresh.HomeActivity.class);
+                        startActivity(intent);
+                        finish();
+                    } /*else if (mSession.getUser().getRole().equalsIgnoreCase(Constants.PROVIDER)) {
+>>>>>>> a653b3ddf9d86adbd553c1d0852ab134e0c53f96
                         Helper.showProgressDialogSpinner(mContext, "Please Wait", "Connecting to server", false);
                         mSession.getHostWorkspaceData(mSession.getUser().get_id());
-                       /* mSession.getHostWorkspaceData(mSession.getUser().get_id());
+                       *//* mSession.getHostWorkspaceData(mSession.getUser().get_id());
                         Intent intent = new Intent(LoginActivity.this, HostSignUpActivity.class);
                         startActivity(intent);
-                       // finish();*/
+                       // finish();*//*
+                    }*/
+                    } else {
+                        startActivity(new Intent(this, LoginActivity.class));
+                        Toast.makeText(mContext, event.getValue().toString(), Toast.LENGTH_LONG).show();
                     }
-                } else {
-                    startActivity(new Intent(this, LoginActivity.class));
-                    Toast.makeText(mContext, event.getValue().toString(), Toast.LENGTH_LONG).show();
                 }
                 break;
             case CobbocEvent.GET_USER_DETAILS: {
@@ -111,18 +117,19 @@ public class SplashActivity extends BaseActivity {
                             JSONArray dataArray = (JSONArray) jsonObject.getJSONArray("data");
                             JSONObject dataObject = (JSONObject) dataArray.get(0);
 
-                            SharedPrefsUtils.setStringPreference(mContext, Constants.BOOKING_REQUEST_ID, dataObject.getString("_id"), Constants.SP_NAME);
+                            //     SharedPrefsUtils.setStringPreference(mContext, Constants.BOOKING_REQUEST_ID, dataObject.getString("_id"), Constants.SP_NAME);
 
                             if (dataObject.has("space") && !dataObject.isNull("space")) {
                                 JSONObject space = (JSONObject) dataObject.getJSONObject("space");
                                 mSession.setActiveWorkspace(space.getString("_id"));
+                                mSession.setActiveWorkspaceRequestId(dataObject.getString("_id"));
                             }
 
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                }else
+                } else
                     mSession.setActiveWorkspace(null);
                 Intent intent = new Intent(this, raj.workalley.user.fresh.HomeActivity.class);
                 startActivity(intent);

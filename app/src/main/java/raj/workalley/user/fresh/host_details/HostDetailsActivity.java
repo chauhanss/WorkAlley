@@ -96,7 +96,7 @@ public class HostDetailsActivity extends BaseActivity {
                     case REQUEST_BOOK:
                         if (Helper.isConnected(mContext)) {
                             Helper.showProgressDialogSpinner(mContext, "Please wait", "connecting server", false);
-                            mSession.requestSeat(mSession.getUser().get_id(), workspaceId);
+                            mSession.requestSeat(mSession.getUser().get_id(), workspaceId,4);
                         } else
                             Toast.makeText(mContext, "No internet", Toast.LENGTH_LONG).show();
                         break;
@@ -105,7 +105,7 @@ public class HostDetailsActivity extends BaseActivity {
                             String requestId = SharedPrefsUtils.getStringPreference(mContext, Constants.BOOKING_REQUEST_ID, Constants.SP_NAME);
                             if (Helper.isConnected(mContext)) {
                                 Helper.showProgressDialogSpinner(mContext, "Please wait", "connecting server", false);
-                                mSession.cancelRequestedSeat(requestId);
+                                mSession.cancelRequestedSeat(requestId,4);
                             } else
                                 Toast.makeText(mContext, "No internet", Toast.LENGTH_LONG).show();
                         }
@@ -124,7 +124,7 @@ public class HostDetailsActivity extends BaseActivity {
                 if (SharedPrefsUtils.hasKey(mContext, Constants.BOOKING_REQUEST_ID, Constants.SP_NAME)) {
                     String requestId = SharedPrefsUtils.getStringPreference(mContext, Constants.BOOKING_REQUEST_ID, Constants.SP_NAME);
                     if (Helper.isConnected(mContext)) {
-                        mSession.getUpdatedRequestStatus(requestId);
+                        mSession.getUpdatedRequestStatus(requestId,4);
                     } else {
                         swipeRefresh.setRefreshing(false);
                         Toast.makeText(mContext, "No internet", Toast.LENGTH_LONG).show();
