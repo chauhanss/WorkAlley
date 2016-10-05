@@ -1,11 +1,15 @@
-package raj.workalley;
+package raj.workalley.user.fresh.login_signup;
 
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.support.annotation.Nullable;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -16,19 +20,24 @@ import org.greenrobot.eventbus.Subscribe;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-
-import raj.workalley.host.HomeActivity;
+import raj.workalley.BaseFragment;
+import raj.workalley.CobbocEvent;
+import raj.workalley.Constants;
+import raj.workalley.LoginActivity;
+import raj.workalley.R;
+import raj.workalley.Session;
+import raj.workalley.SignUpActivity;
+import raj.workalley.WorkspaceList;
 import raj.workalley.host.signup.HostSignUpActivity;
-
+import raj.workalley.user.fresh.HomeActivity;
 import raj.workalley.user.fresh.UserInfo;
-
-import raj.workalley.user.fresh.offers.OfferActivity;
 import raj.workalley.util.Helper;
 
 /**
- * Created by vishal.raj on 9/2/16.
+ * Created by vishal.raj on 10/4/16.
  */
-public class LoginActivity extends BaseActivity {
+public class LoginFragment extends BaseFragment {
+
     private Button mLogin;
     private TextView mCreateNewAccount;
     private Context mContext;
@@ -36,20 +45,23 @@ public class LoginActivity extends BaseActivity {
     private EditText mUserName;
     private Session mSession;
 
+
+    public static LoginFragment newInstance() {
+        LoginFragment fragment = new LoginFragment();
+        return fragment;
+    }
+
+    @Nullable
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        super.onCreateView(inflater, container, savedInstanceState);
+        View view = inflater.inflate(R.layout.activity_login, null);
+        view.findViewById(R.id.wrapper_image).setVisibility(View.GONE);
+        view.findViewById(R.id.skip_login).setVisibility(View.GONE);
+        mContext = getActivity();
         mSession = Session.getInstance(mContext);
 
-        if (mSession.isLoggedIn()) {
-
-        }
-
-        setContentView(R.layout.activity_login);
-        mContext = this;
-
-
-        initializeLayouts();
+        initializeLayouts(view);
 
         mLogin.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -68,18 +80,10 @@ public class LoginActivity extends BaseActivity {
             }
         });
 
-        findViewById(R.id.skip_login).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(LoginActivity.this, raj.workalley.user.fresh.HomeActivity.class);
-                startActivity(intent);
-            }
-        });
-
         mCreateNewAccount.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(LoginActivity.this, SignUpActivity.class);
+                Intent intent = new Intent(getActivity(), SignUpActivity.class);
                 startActivity(intent);
             }
         });
@@ -88,18 +92,19 @@ public class LoginActivity extends BaseActivity {
         mPassword.addTextChangedListener(new FieldTextWatcher());
         mUserName.addTextChangedListener(new FieldTextWatcher());
 
+        return view;
     }
 
     private void makeLoginCall() {
-        Helper.showProgressDialogSpinner(mContext, "Please Wait", "Connecting to server", false);
+        Helper.showProgressDialogSpinner(getActivity(), "Please Wait", "Connecting to server", false);
         mSession.login(mUserName.getText().toString().trim(), mPassword.getText().toString().trim());
     }
 
-    private void initializeLayouts() {
-        mLogin = (Button) findViewById(R.id.login_button);
-        mCreateNewAccount = (TextView) findViewById(R.id.create_new_account);
-        mPassword = (EditText) findViewById(R.id.password);
-        mUserName = (EditText) findViewById(R.id.user_name);
+    private void initializeLayouts(View view) {
+        mLogin = (Button) view.findViewById(R.id.login_button);
+        mCreateNewAccount = (TextView) view.findViewById(R.id.create_new_account);
+        mPassword = (EditText) view.findViewById(R.id.password);
+        mUserName = (EditText) view.findViewById(R.id.user_name);
     }
 
     private boolean isEmailFormat(EditText userName) {
@@ -138,8 +143,9 @@ public class LoginActivity extends BaseActivity {
             return false;
     }
 
+
     @Override
-    protected void onPause() {
+    public void onPause() {
         super.onPause();
         if (EventBus.getDefault().isRegistered(this)) {
             EventBus.getDefault().unregister(this);
@@ -148,7 +154,7 @@ public class LoginActivity extends BaseActivity {
 
 
     @Override
-    protected void onResume() {
+    public void onResume() {
         super.onResume();
         if (!EventBus.getDefault().isRegistered(this)) {
             EventBus.getDefault().register(this);
@@ -169,9 +175,7 @@ public class LoginActivity extends BaseActivity {
 
                     if (mSession.getUser().getRole().equalsIgnoreCase(Constants.USER)) {
                         mSession.getUserWorkspaceData(mSession.getUser().get_id());
-                        Intent intent = new Intent(LoginActivity.this, raj.workalley.user.fresh.HomeActivity.class);
-                        startActivity(intent);
-                        finish();
+                        ((HomeActivity) getActivity()).recreateThis();
                     } /*else if (mSession.getUser().getRole().equalsIgnoreCase(Constants.PROVIDER)) {
                         Helper.showProgressDialogSpinner(mContext, "Please Wait", "Connecting to server", false);
                         mSession.getHostWorkspaceData(mSession.getUser().get_id());
@@ -200,14 +204,14 @@ public class LoginActivity extends BaseActivity {
                     JSONObject jsonObject = (JSONObject) event.getValue();
                     try {
                         if (jsonObject.getJSONArray(Constants.DATA).length() == 0) {
-                            Intent intent = new Intent(LoginActivity.this, HostSignUpActivity.class);
+                            Intent intent = new Intent(getActivity(), HostSignUpActivity.class);
                             startActivity(intent);
                         } else {
                             WorkspaceList parsedResponse = (WorkspaceList) Session.getInstance(mContext).getParsedResponseFromGSON(jsonObject, Session.workAlleyModels.Workspaces);
                             Session.getInstance(mContext).setWorkspaces(parsedResponse);
-                            Intent intent = new Intent(LoginActivity.this, raj.workalley.host.HomeActivity.class);
+                            Intent intent = new Intent(getActivity(), raj.workalley.host.HomeActivity.class);
                             startActivity(intent);
-                            finish();
+                            getActivity().finish();
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -216,12 +220,5 @@ public class LoginActivity extends BaseActivity {
                     Toast.makeText(mContext, event.getValue().toString(), Toast.LENGTH_LONG).show();
                 break;
         }
-    }
-
-
-
-    @Override
-    public void onBackPressed() {
-
     }
 }

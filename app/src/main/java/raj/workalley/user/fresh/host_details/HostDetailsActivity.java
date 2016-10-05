@@ -35,7 +35,6 @@ import raj.workalley.Constants;
 import raj.workalley.R;
 import raj.workalley.Session;
 import raj.workalley.WorkspaceList;
-import raj.workalley.host.HomeActivity;
 import raj.workalley.user.fresh.UserInfo;
 import raj.workalley.util.AmenitiesListAdapter;
 import raj.workalley.util.Helper;
@@ -91,27 +90,32 @@ public class HostDetailsActivity extends BaseActivity {
         bookSeat.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                switch (bookSeat.getText().toString()) {
-                    case REQUEST_BOOK:
-                        if (Helper.isConnected(mContext)) {
-                            Helper.showProgressDialogSpinner(mContext, "Please wait", "connecting server", false);
-                            mSession.requestSeat(mSession.getUser().get_id(), workspaceId);
-                        } else
-                            Toast.makeText(mContext, "No internet", Toast.LENGTH_LONG).show();
-                        break;
-                    case REQUEST_CANCEL:
-                        if (SharedPrefsUtils.hasKey(mContext, Constants.BOOKING_REQUEST_ID, Constants.SP_NAME)) {
-                            String requestId = SharedPrefsUtils.getStringPreference(mContext, Constants.BOOKING_REQUEST_ID, Constants.SP_NAME);
+                if (mSession.getUser() == null) {
+                    Intent intent = new Intent(mContext, raj.workalley.user.fresh.HomeActivity.class);
+                    intent.putExtra("swapToRequestPage", true);
+                    startActivity(intent);
+                } else {
+                    switch (bookSeat.getText().toString()) {
+                        case REQUEST_BOOK:
                             if (Helper.isConnected(mContext)) {
                                 Helper.showProgressDialogSpinner(mContext, "Please wait", "connecting server", false);
-                                mSession.cancelRequestedSeat(requestId);
+                                mSession.requestSeat(mSession.getUser().get_id(), workspaceId);
                             } else
                                 Toast.makeText(mContext, "No internet", Toast.LENGTH_LONG).show();
-                        }
-                        break;
-                    case REQUEST_END:
-                        break;
+                            break;
+                        case REQUEST_CANCEL:
+                            if (SharedPrefsUtils.hasKey(mContext, Constants.BOOKING_REQUEST_ID, Constants.SP_NAME)) {
+                                String requestId = SharedPrefsUtils.getStringPreference(mContext, Constants.BOOKING_REQUEST_ID, Constants.SP_NAME);
+                                if (Helper.isConnected(mContext)) {
+                                    Helper.showProgressDialogSpinner(mContext, "Please wait", "connecting server", false);
+                                    mSession.cancelRequestedSeat(requestId);
+                                } else
+                                    Toast.makeText(mContext, "No internet", Toast.LENGTH_LONG).show();
+                            }
+                            break;
+                        case REQUEST_END:
+                            break;
+                    }
                 }
 
             }
@@ -129,7 +133,7 @@ public class HostDetailsActivity extends BaseActivity {
                         swipeRefresh.setRefreshing(false);
                         Toast.makeText(mContext, "No internet", Toast.LENGTH_LONG).show();
                     }
-                }else{
+                } else {
                     swipeRefresh.setRefreshing(false);
                 }
             }
@@ -237,7 +241,7 @@ public class HostDetailsActivity extends BaseActivity {
         ArrayList<String> amenityList = mWorkspace.getAmenities();
         ArrayList<AmenitiesItem> list = new ArrayList<>();
         for (String amenity : amenityList) {
-            switch (amenity.toLowerCase()) {
+            switch (amenity.trim()) {
                 case "Ac":
                     AmenitiesItem item1 = new AmenitiesItem("Ac", R.drawable.ic_ac, false);
                     list.add(item1);

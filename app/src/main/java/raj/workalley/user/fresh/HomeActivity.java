@@ -36,6 +36,7 @@ import raj.workalley.Session;
 import raj.workalley.WorkspaceList;
 import raj.workalley.socket.HostSocketService;
 import raj.workalley.user.fresh.account.AccountFragment;
+import raj.workalley.user.fresh.login_signup.LoginFragment;
 import raj.workalley.user.fresh.map.MapFragment;
 import raj.workalley.user.fresh.settings.SettingFragment;
 import raj.workalley.user.fresh.offers.OffersFragment;
@@ -45,10 +46,8 @@ import raj.workalley.util.Helper;
  * Created by vishal.raj on 9/3/16.
  */
 public class HomeActivity extends BaseActivity implements OnItemClickListener {
-
     private LoopBarView loopBarView;
-    Session session;
-
+    // private boolean isUserLoggedIn;
 
     private SimpleCategoriesAdapter categoriesAdapter;
     private SimpleFragmentStatePagerAdapter pagerAdapter;
@@ -57,6 +56,7 @@ public class HomeActivity extends BaseActivity implements OnItemClickListener {
     private ViewPager viewPager;
     private Session mSession;
     private Context mContext;
+    public Intent startIntent;
 
     @Orientation
     private int orientation;
@@ -68,19 +68,20 @@ public class HomeActivity extends BaseActivity implements OnItemClickListener {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_user);
-        session = Session.getInstance(this);
+        startIntent = getIntent();
+        mContext = this;
+        mSession = Session.getInstance(this);
+        // isUserLoggedIn = mSession.getUser() == null ? false : true;
         initNavToolBar();
         startHostService();
 
         //loopBarView = (LoopBarView) findViewById(R.id.endlessView);
 
-        mContext = this;
-        mSession = Session.getInstance(this);
 
         if (getIntent() != null) {
             boolean swapToRequest = getIntent().getBooleanExtra("swapToRequestPage", false);
 
-            if(swapToRequest)
+            if (swapToRequest)
                 viewPager.setCurrentItem(2);
         }
 
@@ -107,7 +108,7 @@ public class HomeActivity extends BaseActivity implements OnItemClickListener {
         HostSocketService.authHost();*/
         Intent intent = new Intent(getBaseContext(), HostSocketService.class);
         Bundle b = new Bundle();
-        b.putString(Constants.SESSION_COOKIES_ID, session.getToken());
+        b.putString(Constants.SESSION_COOKIES_ID, mSession.getToken());
         intent.putExtras(b);
         startService(intent);
     }
@@ -119,8 +120,12 @@ public class HomeActivity extends BaseActivity implements OnItemClickListener {
         List<Fragment> list = new ArrayList<>(3);
         list.add(MapFragment.newInstance());
         //list.add(OffersFragment.newInstance());
-        list.add(SettingFragment.newInstance());
-        list.add(AccountFragment.newInstance());
+        if (mSession.isLoggedIn()) {
+            list.add(SettingFragment.newInstance());
+            list.add(AccountFragment.newInstance());
+        } else {
+            list.add(LoginFragment.newInstance());
+        }
         pagerAdapter = new SimpleFragmentStatePagerAdapter(getSupportFragmentManager(), list);
         viewPager.setAdapter(pagerAdapter);
 
@@ -181,7 +186,8 @@ public class HomeActivity extends BaseActivity implements OnItemClickListener {
 
     public final class SimpleFragmentStatePagerAdapter extends FragmentStatePagerAdapter {
         private List<Fragment> fragmentList;
-        private String tabTitles[] = new String[]{"Explore", "Profile", "Active Sessions"};
+        private String tabTitlesForLoggedUsr[] = new String[]{"Explore", "Profile", "Active Sessions"};
+        private String tabTitlesForNoUsr[] = new String[]{"Explore", "Login"};
 
         public SimpleFragmentStatePagerAdapter(FragmentManager fm, List<Fragment> fragmentList) {
             super(fm);
@@ -200,7 +206,9 @@ public class HomeActivity extends BaseActivity implements OnItemClickListener {
 
         @Override
         public CharSequence getPageTitle(int position) {
-            return tabTitles[position];
+            if (mSession.isLoggedIn())
+                return tabTitlesForLoggedUsr[position];
+            return tabTitlesForNoUsr[position];
         }
     }
 
@@ -221,6 +229,14 @@ public class HomeActivity extends BaseActivity implements OnItemClickListener {
         }
     }
 
+    public Intent getStartIntent() {
+        return startIntent;
+    }
+
+    public void recreateThis() {
+        viewPager.setAdapter(null);
+        initNavToolBar();
+    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
