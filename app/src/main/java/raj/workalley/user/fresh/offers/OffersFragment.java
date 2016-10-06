@@ -12,7 +12,7 @@ import android.view.ViewGroup;
 import java.util.ArrayList;
 import java.util.List;
 
-import raj.workalley.BaseFragment;
+import raj.workalley.Fragment.BaseFragment;
 import raj.workalley.R;
 
 /**

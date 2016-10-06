@@ -1,4 +1,4 @@
-package raj.workalley;
+package raj.workalley.Adapter;
 
 import android.content.Context;
 import android.support.v4.app.Fragment;
@@ -14,7 +14,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-import raj.workalley.user.fresh.account.AccountFragment;
+import raj.workalley.Fragment.AccountFragment;
+import raj.workalley.R;
 
 /**
  * Created by shruti.vig on 9/20/16.

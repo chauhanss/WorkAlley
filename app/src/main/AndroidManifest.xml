@@ -40,7 +40,7 @@
         </activity>
         <activity android:name=".SignUpActivity" />
         <activity
-            android:name=".user.fresh.HomeActivity"
+            android:name=".HomeActivity"
             android:windowSoftInputMode="adjustPan" />
 
         <activity android:name=".host.HomeActivity" />

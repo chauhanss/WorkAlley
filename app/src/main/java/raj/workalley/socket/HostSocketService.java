@@ -380,7 +380,7 @@ public class HostSocketService extends Service {
     public void onDestroy() {
         Log.e("here", "service stopped");
         super.onDestroy();
-        startService(new Intent(this, HostSocketService.class));
+      //  startService(new Intent(this, HostSocketService.class));
     }
 
     @Nullable

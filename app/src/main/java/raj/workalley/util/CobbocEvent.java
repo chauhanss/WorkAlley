@@ -1,4 +1,4 @@
-package raj.workalley;
+package raj.workalley.util;
 
 /**
  * Created by sagar on 29/03/16.
@@ -22,6 +22,8 @@ public class CobbocEvent {
     public static final int UPLOAD_IMAGE = 16;
     public static final int GET_WORKSPACE_FROM_ID = 17;
 
+    private int FRAGMENT;
+
     private boolean STATUS;
 
     private int TYPE;
@@ -42,6 +44,13 @@ public class CobbocEvent {
         VALUE = value;
     }
 
+    public CobbocEvent(int type, boolean status, Object value, int fragmentId) {
+        TYPE = type;
+        STATUS = status;
+        VALUE = value;
+        FRAGMENT = fragmentId;
+    }
+
     public CobbocEvent(int type, boolean status, int value) {
         TYPE = type;
         STATUS = status;
@@ -59,5 +68,9 @@ public class CobbocEvent {
 
     public Object getValue() {
         return VALUE;
+    }
+
+    public int getFragment() {
+        return FRAGMENT;
     }
 }

@@ -1,46 +1,37 @@
-package raj.workalley.user.fresh.account;
+package raj.workalley.Fragment;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 
-import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
-import java.security.PublicKey;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
-import raj.workalley.CobbocEvent;
+import raj.workalley.util.CobbocEvent;
 import raj.workalley.Constants;
 import raj.workalley.R;
 import raj.workalley.Session;
-import raj.workalley.StringAdapter;
-import raj.workalley.UserRequestAdapter;
-import raj.workalley.user.fresh.HomeActivity;
-import raj.workalley.user.fresh.UserInfo;
+import raj.workalley.Adapter.UserRequestAdapter;
+import raj.workalley.Model.UserInfo;
 import raj.workalley.util.Helper;
 import raj.workalley.util.SharedPrefsUtils;
 import raj.workalley.user.fresh.offers.OfferActivity;

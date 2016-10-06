@@ -1,4 +1,4 @@
-package raj.workalley.user.fresh;
+package raj.workalley.Model;
 
 import java.io.Serializable;
 

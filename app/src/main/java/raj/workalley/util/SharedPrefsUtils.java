@@ -3,19 +3,13 @@ package raj.workalley.util;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.text.TextUtils;
-import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
 import java.util.Set;
 
 import raj.workalley.Constants;
-import raj.workalley.user.fresh.UserInfo;
 
 /**
  * Created by vishal.raj on 9/5/16.

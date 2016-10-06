@@ -11,7 +11,6 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -23,20 +22,16 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.logging.Handler;
 
-import raj.workalley.AmenitiesItem;
+import raj.workalley.HomeActivity;
+import raj.workalley.Model.AmenitiesItem;
 import raj.workalley.BaseActivity;
-import raj.workalley.CobbocEvent;
+import raj.workalley.util.CobbocEvent;
 import raj.workalley.Constants;
 import raj.workalley.R;
 import raj.workalley.Session;
-import raj.workalley.WorkspaceList;
-import raj.workalley.host.HomeActivity;
-import raj.workalley.user.fresh.UserInfo;
+import raj.workalley.Model.WorkspaceList;
+import raj.workalley.Model.UserInfo;
 import raj.workalley.util.AmenitiesListAdapter;
 import raj.workalley.util.Helper;
 import raj.workalley.util.SharedPrefsUtils;
@@ -96,7 +91,7 @@ public class HostDetailsActivity extends BaseActivity {
                     case REQUEST_BOOK:
                         if (Helper.isConnected(mContext)) {
                             Helper.showProgressDialogSpinner(mContext, "Please wait", "connecting server", false);
-                            mSession.requestSeat(mSession.getUser().get_id(), workspaceId,4);
+                            mSession.requestSeat(mSession.getUser().get_id(), workspaceId, 4);
                         } else
                             Toast.makeText(mContext, "No internet", Toast.LENGTH_LONG).show();
                         break;
@@ -105,7 +100,7 @@ public class HostDetailsActivity extends BaseActivity {
                             String requestId = SharedPrefsUtils.getStringPreference(mContext, Constants.BOOKING_REQUEST_ID, Constants.SP_NAME);
                             if (Helper.isConnected(mContext)) {
                                 Helper.showProgressDialogSpinner(mContext, "Please wait", "connecting server", false);
-                                mSession.cancelRequestedSeat(requestId,4);
+                                mSession.cancelRequestedSeat(requestId, 4);
                             } else
                                 Toast.makeText(mContext, "No internet", Toast.LENGTH_LONG).show();
                         }
@@ -113,7 +108,6 @@ public class HostDetailsActivity extends BaseActivity {
                     case REQUEST_END:
                         break;
                 }
-
             }
         });
 
@@ -124,7 +118,7 @@ public class HostDetailsActivity extends BaseActivity {
                 if (SharedPrefsUtils.hasKey(mContext, Constants.BOOKING_REQUEST_ID, Constants.SP_NAME)) {
                     String requestId = SharedPrefsUtils.getStringPreference(mContext, Constants.BOOKING_REQUEST_ID, Constants.SP_NAME);
                     if (Helper.isConnected(mContext)) {
-                        mSession.getUpdatedRequestStatus(requestId,4);
+                        mSession.getUpdatedRequestStatus(requestId, 4);
                     } else {
                         swipeRefresh.setRefreshing(false);
                         Toast.makeText(mContext, "No internet", Toast.LENGTH_LONG).show();
@@ -237,7 +231,7 @@ public class HostDetailsActivity extends BaseActivity {
         ArrayList<String> amenityList = mWorkspace.getAmenities();
         ArrayList<AmenitiesItem> list = new ArrayList<>();
         for (String amenity : amenityList) {
-            switch (amenity.toLowerCase()) {
+            switch (amenity.trim()) {
                 case "Ac":
                     AmenitiesItem item1 = new AmenitiesItem("Ac", R.drawable.ic_ac, false);
                     list.add(item1);
@@ -308,7 +302,7 @@ public class HostDetailsActivity extends BaseActivity {
                     handler.postDelayed(new Runnable() {
                         @Override
                         public void run() {
-                            Intent intent = new Intent(mContext, raj.workalley.user.fresh.HomeActivity.class);
+                            Intent intent = new Intent(mContext, HomeActivity.class);
                             intent.putExtra("swapToRequestPage", true);
                             startActivity(intent);
                             finish();
@@ -337,7 +331,7 @@ public class HostDetailsActivity extends BaseActivity {
                     handler.postDelayed(new Runnable() {
                         @Override
                         public void run() {
-                            Intent intent = new Intent(mContext, raj.workalley.user.fresh.HomeActivity.class);
+                            Intent intent = new Intent(mContext, HomeActivity.class);
                             intent.putExtra("swapToRequestPage", true);
                             startActivity(intent);
                             finish();
@@ -395,7 +389,7 @@ public class HostDetailsActivity extends BaseActivity {
                         handler.postDelayed(new Runnable() {
                             @Override
                             public void run() {
-                                Intent intent = new Intent(mContext, raj.workalley.user.fresh.HomeActivity.class);
+                                Intent intent = new Intent(mContext, HomeActivity.class);
                                 intent.putExtra("swapToRequestPage", true);
                                 startActivity(intent);
                                 finish();

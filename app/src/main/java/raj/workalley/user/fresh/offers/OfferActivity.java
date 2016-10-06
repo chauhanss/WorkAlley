@@ -12,7 +12,7 @@ import raj.workalley.Constants;
 import raj.workalley.R;
 import raj.workalley.Session;
 import raj.workalley.socket.HostSocketService;
-import raj.workalley.user.fresh.HomeActivity;
+import raj.workalley.HomeActivity;
 
 /**
  * Created by vishal.raj on 9/3/16.

@@ -1,11 +1,11 @@
-package raj.workalley;
+package raj.workalley.Model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import raj.workalley.user.fresh.UserInfo;
+import raj.workalley.Model.UserInfo;
 
 /**
  * Created by shruti.vig on 9/12/16.

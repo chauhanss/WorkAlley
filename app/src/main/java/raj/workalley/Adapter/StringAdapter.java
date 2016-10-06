@@ -1,4 +1,4 @@
-package raj.workalley;
+package raj.workalley.Adapter;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
@@ -8,6 +8,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import java.util.List;
+
+import raj.workalley.R;
 
 /**
  * Created by shruti.vig on 9/20/16.

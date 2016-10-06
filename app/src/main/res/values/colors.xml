@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#8F5B5D</color>
-    <color name="colorPrimaryDark">#663c46</color>
-    <color name="colorAccent">#CC9900</color>
-    <color name="colorAccentBackground">#EE946F</color>
+    <color name="colorPrimary">#0c2356</color>
+    <color name="colorPrimaryDark">#071533</color>
+    <color name="colorAccent">#1bf0f1</color>
+    <color name="colorAccentBackground">#1bf0f1</color>
 
     <color name="white">#ffffff</color>
     <color name="transparent">@android:color/transparent</color>
     <color name="transparentColor">#44804B58</color>
 
-    <color name="gradient1">#B07E67</color>
-    <color name="gradient2">#804B58</color>
+    <color name="gradient1">#0c2356</color>
+    <color name="gradient2">#A7AFC1</color>
 </resources>

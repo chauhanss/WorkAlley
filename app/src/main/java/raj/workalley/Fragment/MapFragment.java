@@ -1,4 +1,4 @@
-package raj.workalley.user.fresh.map;
+package raj.workalley.Fragment;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;
@@ -10,7 +10,6 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -26,6 +25,7 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -39,31 +39,27 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 import java.io.IOException;
 import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.logging.Handler;
 
-import raj.workalley.AmenitiesItem;
-import raj.workalley.BaseFragment;
-import raj.workalley.CobbocEvent;
+import raj.workalley.Model.AmenitiesItem;
+import raj.workalley.util.CobbocEvent;
 import raj.workalley.Constants;
 import raj.workalley.R;
 import raj.workalley.Session;
-import raj.workalley.UserRequestAdapter;
-import raj.workalley.WorkspaceList;
-import raj.workalley.user.fresh.HomeActivity;
-import raj.workalley.user.fresh.host_details.HostDetailsActivity;
+import raj.workalley.Model.WorkspaceList;
+import raj.workalley.HomeActivity;
 import raj.workalley.util.AmenitiesListAdapter;
 import raj.workalley.util.Helper;
 import raj.workalley.util.SharedPrefsUtils;
@@ -91,6 +87,7 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback, Loc
     private String workspaceId;
     private TextView bookSeat;
     private TextView lastStatus;
+    private TextView currentTimer;
 
     public static MapFragment newInstance() {
         MapFragment fragment = new MapFragment();
@@ -186,6 +183,12 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback, Loc
     private void setDataInWorkspaceView(String status, String updatedAt) {
 
         if (mWorkspace != null) {
+            LinearLayout bottomLayout = (LinearLayout) rootView.findViewById(R.id.bottom_layout);
+            if (!mSession.isLoggedIn())
+                bottomLayout.setVisibility(View.GONE);
+            else
+                bottomLayout.setVisibility(View.VISIBLE);
+
             TextView workspaceName = (TextView) rootView.findViewById(R.id.current_workspace_name);
             workspaceName.setText(mWorkspace.getName());
 
@@ -209,20 +212,26 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback, Loc
             bookSeat = (TextView) rootView.findViewById(R.id.book_seat);
             bookSeat.setOnClickListener(seatStatusClickListener);
 
+            currentTimer = (TextView) rootView.findViewById(R.id.session_timer);
+
+
             lastStatus = (TextView) rootView.findViewById(R.id.last_update);
             lastStatus.setVisibility(View.GONE);
             switch (status) {
                 case "requested":
+                    ((HomeActivity) mContext).startHostService();
                     bookSeat.setText(REQUEST_CANCEL);
                     lastStatus.setVisibility(View.VISIBLE);
                     lastStatus.setText("Seat booked on: " + Helper.getFormattedDate(updatedAt));
                     break;
                 case END_REQUEST:
+                    ((HomeActivity) mContext).startHostService();
                     bookSeat.setText(END_REQUEST);
                     lastStatus.setVisibility(View.VISIBLE);
                     lastStatus.setText("Session end requested on: " + updatedAt);
                     break;
                 case "started":
+                    ((HomeActivity) mContext).startHostService();
                     if (SharedPrefsUtils.hasKey(mContext, END_REQUEST, Constants.SP_NAME)) {
 
                         updatedAt = SharedPrefsUtils.getStringPreference(mContext, END_REQUEST, Constants.SP_NAME);
@@ -310,6 +319,7 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback, Loc
         if (isVisibleToUser && mSession != null) {
             currentWorkspace = (FrameLayout) rootView.findViewById(R.id.current_workspace);
             currentWorkspace.setVisibility(View.GONE);
+            searchLayout.setVisibility(View.VISIBLE);
             invalidateMapFragment(mSession.getActiveWorkspace());
         }
     }
@@ -433,6 +443,7 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback, Loc
             String message = intent.getStringExtra("message");
             String requestID = intent.getStringExtra("USER");
             String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
+
             if (message.equalsIgnoreCase(Constants.SESSION_END_CONFIRMED)) {
                 if (requestID.equalsIgnoreCase(mSession.getActiveWorkspaceRequestId())) {
                     setDataInWorkspaceView(Constants.SESSION_END_CONFIRMED, currentDateTimeString);

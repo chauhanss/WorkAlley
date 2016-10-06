@@ -4,7 +4,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -12,8 +11,6 @@ import org.json.JSONObject;
 import java.util.HashSet;
 import java.util.Set;
 
-import raj.workalley.user.fresh.UserInfo;
-import raj.workalley.user.fresh.host_details.HostDetailsActivity;
 import raj.workalley.util.SharedPrefsUtils;
 
 /**
@@ -32,27 +29,6 @@ public class RequestReceiver extends BroadcastReceiver {
 
             if (requestType != null) {
                 switch (requestType) {
-                    case Constants.BOOKING_REQUEST:
-                        try {
-                            JSONObject userInfo = new JSONObject(bundle.getString(USER));
-
-                            Set<String> requestSet = new HashSet<>();
-                            requestSet.add(userInfo.toString());
-
-                            /**
-                             * Mapped request id with user id as the key.
-                             * This can be done because host will receive only one request from one user.
-                             * Request can be retrieved later using that user's id.
-                             */
-                            SharedPrefsUtils.setStringPreference(context, userInfo.getString("_id"), bundle.getString(Constants.REQUEST_ID), Constants.SP_NAME);
-                            SharedPrefsUtils.setHashSetPreference(context, Constants.BOOKING_REQUEST, requestSet, Constants.SP_NAME);
-                            sendBroadcastToActivity(context, requestType, null);
-
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-
-                        break;
                     case Constants.BOOKING_REJECT:
                     case Constants.BOOKING_ACCEPT:
                         try {
@@ -73,45 +49,6 @@ public class RequestReceiver extends BroadcastReceiver {
                         }
 
                         break;
-
-                    case Constants.BOOKING_CANCELED: {
-                        JSONObject userInfo = null;
-                        try {
-                            userInfo = new JSONObject(bundle.getString(USER));
-                            SharedPrefsUtils.setStringPreference(context, userInfo.getString("_id"), bundle.getString(Constants.REQUEST_ID), Constants.SP_NAME);
-                            sendBroadcastToActivity(context, requestType, userInfo.toString());
-
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-
-                    break;
-                    case Constants.SESSION_END_REQUEST: {
-                        JSONObject userInfo = null;
-                        try {
-                            userInfo = new JSONObject(bundle.getString(USER));
-
-                            Set<String> requestSet = new HashSet<>();
-                            requestSet.add(userInfo.toString());
-
-                            Set<String> endTokenSet = new HashSet<>();
-                            endTokenSet.add(userInfo.getString("_id") + "|" + bundle.getString("endToken"));
-
-                            /**
-                             * here saving pipe separated user id and end token
-                             * for key SESSION_END_TOKEN
-                             * user id is required because multiple session end requests can be there.
-                             */
-                            SharedPrefsUtils.setStringPreference(context, userInfo.getString("_id"), bundle.getString(Constants.REQUEST_ID), Constants.SP_NAME);
-                            SharedPrefsUtils.setHashSetPreference(context, Constants.SESSION_END_TOKEN, endTokenSet, Constants.SP_NAME);
-                            SharedPrefsUtils.setHashSetPreference(context, Constants.SESSION_END_REQUEST, requestSet, Constants.SP_NAME);
-                            sendBroadcastToActivity(context, requestType, null);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                    break;
                     case Constants.SESSION_END_CONFIRMED: {
                         try {
                             JSONObject userInfo = new JSONObject(bundle.getString(USER));

@@ -3,22 +3,18 @@ package raj.workalley.util;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
-import android.media.Image;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import raj.workalley.AmenitiesItem;
+import raj.workalley.Model.AmenitiesItem;
 import raj.workalley.R;
-import raj.workalley.host.signup.HostSignUpActivity;
-import raj.workalley.user.fresh.offers.OfferDummyItem;
 
 /**
  * Created by vishal.raj on 9/7/16.

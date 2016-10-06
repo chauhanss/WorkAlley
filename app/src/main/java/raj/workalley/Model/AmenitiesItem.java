@@ -1,4 +1,4 @@
-package raj.workalley;
+package raj.workalley.Model;
 
 /**
  * Created by shruti.vig on 9/12/16.

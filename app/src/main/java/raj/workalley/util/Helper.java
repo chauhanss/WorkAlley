@@ -82,7 +82,10 @@ public class Helper {
             e.printStackTrace();
         }
 
-        return formattedDate;
+        if (formattedDate == null)
+            return lastUpdated;
+        else
+            return formattedDate;
     }
 
     public static void dismissProgressDialog() {

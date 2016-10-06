@@ -1,6 +1,5 @@
-package raj.workalley.user.fresh.settings;
+package raj.workalley.Fragment;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -15,15 +14,12 @@ import android.widget.Toast;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
-import org.json.JSONObject;
 
-import raj.workalley.CobbocEvent;
+import raj.workalley.util.CobbocEvent;
 import raj.workalley.LoginActivity;
 import raj.workalley.R;
 import raj.workalley.Session;
-import raj.workalley.WorkspaceList;
 import raj.workalley.util.Helper;
-import raj.workalley.util.SharedPrefsUtils;
 
 /**
  * Created by vishal.raj on 9/5/16.

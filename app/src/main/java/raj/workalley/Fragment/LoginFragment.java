@@ -1,32 +1,39 @@
-package raj.workalley;
+package raj.workalley.Fragment;
 
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import raj.workalley.Model.UserInfo;
-
 import raj.workalley.util.CobbocEvent;
+import raj.workalley.Constants;
+import raj.workalley.R;
+import raj.workalley.Session;
+import raj.workalley.SignUpActivity;
+import raj.workalley.HomeActivity;
+import raj.workalley.Model.UserInfo;
 import raj.workalley.util.Helper;
-import raj.workalley.util.SharedPrefsUtils;
 
 /**
- * Created by vishal.raj on 9/2/16.
+ * Created by vishal.raj on 10/4/16.
  */
-public class LoginActivity extends BaseActivity {
+public class LoginFragment extends BaseFragment {
+
     private Button mLogin;
     private TextView mCreateNewAccount;
     private Context mContext;
@@ -34,20 +41,37 @@ public class LoginActivity extends BaseActivity {
     private EditText mUserName;
     private Session mSession;
 
+
+    public static LoginFragment newInstance() {
+        LoginFragment fragment = new LoginFragment();
+        return fragment;
+    }
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        LinearLayout loginLayout = (LinearLayout) view.findViewById(R.id.login_layout);
+
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+
+        layoutParams.setMargins(150, 250, 150, 0);
+
+        loginLayout.setLayoutParams(layoutParams);
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        super.onCreateView(inflater, container, savedInstanceState);
+        View view = inflater.inflate(R.layout.activity_login, null);
+        view.findViewById(R.id.wrapper_image).setVisibility(View.GONE);
+        view.findViewById(R.id.skip_login).setVisibility(View.GONE);
+        mContext = getActivity();
         mSession = Session.getInstance(mContext);
 
-        if (mSession.isLoggedIn()) {
-
-        }
-
-        setContentView(R.layout.activity_login);
-        mContext = this;
-
-
-        initializeLayouts();
+        initializeLayouts(view);
 
         mLogin.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -61,53 +85,31 @@ public class LoginActivity extends BaseActivity {
             }
         });
 
-        findViewById(R.id.skip_login).setOnClickListener(new View.OnClickListener() {
+        mCreateNewAccount.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                mSession.reset();
-                Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
+                Intent intent = new Intent(getActivity(), SignUpActivity.class);
                 startActivity(intent);
-                finish();
             }
         });
 
-        mCreateNewAccount.setOnClickListener(new View.OnClickListener()
 
-                                             {
-                                                 @Override
-                                                 public void onClick(View v) {
-                                                     Intent intent = new Intent(LoginActivity.this, SignUpActivity.class);
-                                                     startActivity(intent);
-                                                 }
-                                             }
+        mPassword.addTextChangedListener(new FieldTextWatcher());
+        mUserName.addTextChangedListener(new FieldTextWatcher());
 
-        );
-
-
-        mPassword.addTextChangedListener(new
-
-                        FieldTextWatcher()
-
-        );
-        mUserName.addTextChangedListener(new
-
-                        FieldTextWatcher()
-
-        );
-
+        return view;
     }
 
     private void makeLoginCall() {
-        Helper.showProgressDialogSpinner(mContext, "Please Wait", "Connecting to server", false);
-        mSession.login(mUserName.getText().toString().trim(), mPassword.getText().toString().trim(), -1);
+        Helper.showProgressDialogSpinner(getActivity(), "Please Wait", "Connecting to server", false);
+        mSession.login(mUserName.getText().toString().trim(), mPassword.getText().toString().trim(), 3);
     }
 
-    private void initializeLayouts() {
-        mLogin = (Button) findViewById(R.id.login_button);
-        mCreateNewAccount = (TextView) findViewById(R.id.create_new_account);
-        mPassword = (EditText) findViewById(R.id.password);
-        mUserName = (EditText) findViewById(R.id.user_name);
+    private void initializeLayouts(View view) {
+        mLogin = (Button) view.findViewById(R.id.login_button);
+        mCreateNewAccount = (TextView) view.findViewById(R.id.create_new_account);
+        mPassword = (EditText) view.findViewById(R.id.password);
+        mUserName = (EditText) view.findViewById(R.id.user_name);
     }
 
     private boolean isEmailFormat(EditText userName) {
@@ -146,21 +148,16 @@ public class LoginActivity extends BaseActivity {
             return false;
     }
 
+
     @Override
-    protected void onPause() {
+    public void onPause() {
         super.onPause();
-        if (EventBus.getDefault().isRegistered(this)) {
-            EventBus.getDefault().unregister(this);
-        }
     }
 
 
     @Override
-    protected void onResume() {
+    public void onResume() {
         super.onResume();
-        if (!EventBus.getDefault().isRegistered(this)) {
-            EventBus.getDefault().register(this);
-        }
     }
 
 
@@ -176,8 +173,7 @@ public class LoginActivity extends BaseActivity {
                     mSession.setUser(parsedResponse);
 
                     if (mSession.getUser().getRole().equalsIgnoreCase(Constants.USER)) {
-                        mSession.getUserWorkspaceData(mSession.getUser().get_id(),-1);
-
+                        mSession.getUserWorkspaceData(mSession.getUser().get_id(), 3);
                     }
                 } else {
                     Toast.makeText(mContext, event.getValue().toString(), Toast.LENGTH_LONG).show();
@@ -205,9 +201,9 @@ public class LoginActivity extends BaseActivity {
                     }
                 } else
                     mSession.setActiveWorkspace(null);
-                Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
-                startActivity(intent);
-                finish();
+
+                ((HomeActivity) getActivity()).recreateThis();
+
             }
             break;
         }

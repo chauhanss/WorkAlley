@@ -15,11 +15,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import raj.workalley.host.HomeActivity;
-import raj.workalley.host.signup.HostSignUpActivity;
-import raj.workalley.user.fresh.UserInfo;
+import raj.workalley.Model.UserInfo;
+import raj.workalley.util.CobbocEvent;
 import raj.workalley.util.Helper;
-import raj.workalley.util.SharedPrefsUtils;
 
 /**
  * Created by vishal.raj on 9/20/16.
@@ -70,7 +68,7 @@ public class SplashActivity extends BaseActivity {
             finish();
         } else {
             Helper.showProgressDialogSpinner(mContext, "Please Wait", "Connecting to server", false);
-            mSession.login(mSession.getUserEmail(), mSession.getUserPassword());
+            mSession.login(mSession.getUserEmail(), mSession.getUserPassword(), -1);
         }
     }
 
@@ -87,20 +85,8 @@ public class SplashActivity extends BaseActivity {
                     mSession.setUser(parsedResponse);
 
                     if (mSession.getUser().getRole().equalsIgnoreCase(Constants.USER)) {
-                        mSession.getUserWorkspaceData(mSession.getUser().get_id());
-   /*                 } else if (mSession.getUser().getRole().equalsIgnoreCase(Constants.PROVIDER)) {
-                        Intent intent = new Intent(SplashActivity.this, raj.workalley.user.fresh.HomeActivity.class);
-                        startActivity(intent);
-                        finish();
-                    } /*else if (mSession.getUser().getRole().equalsIgnoreCase(Constants.PROVIDER)) {
->>>>>>> a653b3ddf9d86adbd553c1d0852ab134e0c53f96
-                        Helper.showProgressDialogSpinner(mContext, "Please Wait", "Connecting to server", false);
-                        mSession.getHostWorkspaceData(mSession.getUser().get_id());
-                       *//* mSession.getHostWorkspaceData(mSession.getUser().get_id());
-                        Intent intent = new Intent(LoginActivity.this, HostSignUpActivity.class);
-                        startActivity(intent);
-                       // finish();*//*
-                    }*/
+                        mSession.getUserWorkspaceData(mSession.getUser().get_id(),-1);
+
                     } else {
                         startActivity(new Intent(this, LoginActivity.class));
                         Toast.makeText(mContext, event.getValue().toString(), Toast.LENGTH_LONG).show();
@@ -131,33 +117,11 @@ public class SplashActivity extends BaseActivity {
                     }
                 } else
                     mSession.setActiveWorkspace(null);
-                Intent intent = new Intent(this, raj.workalley.user.fresh.HomeActivity.class);
+                Intent intent = new Intent(this, HomeActivity.class);
                 startActivity(intent);
                 finish();
             }
             break;
-            case CobbocEvent.GET_HOST_DETAILS:
-                Helper.dismissProgressDialog();
-                if (event.getStatus()) {
-
-                    JSONObject jsonObject = (JSONObject) event.getValue();
-                    try {
-                        if (jsonObject.getJSONArray(Constants.DATA).length() == 0) {
-                            Intent intent = new Intent(SplashActivity.this, HostSignUpActivity.class);
-                            startActivity(intent);
-                        } else {
-                            WorkspaceList parsedResponse = (WorkspaceList) Session.getInstance(mContext).getParsedResponseFromGSON(jsonObject, Session.workAlleyModels.Workspaces);
-                            Session.getInstance(mContext).setWorkspaces(parsedResponse);
-                            Intent intent = new Intent(SplashActivity.this, raj.workalley.host.HomeActivity.class);
-                            startActivity(intent);
-                            finish();
-                        }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                } else
-                    Toast.makeText(mContext, event.getValue().toString(), Toast.LENGTH_LONG).show();
-                break;
         }
     }
 

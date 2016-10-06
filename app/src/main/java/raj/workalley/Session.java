@@ -1,7 +1,6 @@
 package raj.workalley;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
@@ -17,7 +16,6 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -30,15 +28,14 @@ import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
-import java.net.CookieHandler;
-import java.net.CookieManager;
-import java.net.CookiePolicy;
 import java.net.SocketTimeoutException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import raj.workalley.user.fresh.UserInfo;
+import raj.workalley.Model.UserInfo;
+import raj.workalley.Model.WorkspaceList;
+import raj.workalley.util.CobbocEvent;
 import raj.workalley.util.SharedPrefsUtils;
 
 /**
@@ -147,6 +144,11 @@ public class Session {
             token = null;
             userEmail = null;
             userPassword = null;
+            activeWorkspace = null;
+            sessionIdCookies = null;
+            activeWorkspaceRequestId = null;
+            workspaceList = null;
+            user = null;
         }
 
         public WorkspaceList getWorkspaceList() {
@@ -614,7 +616,7 @@ public class Session {
         }, Request.Method.POST);
     }
 
-    public void login(final String userName, final String password) {
+    public void login(final String userName, final String password, final int fragmentId) {
         JSONObject params = new JSONObject();
         try {
             params.put(Constants.EMAIL, userName);
@@ -648,6 +650,12 @@ public class Session {
                     Session.getInstance(mContext).setUserEmail(userName);
                     Session.getInstance(mContext).setUserPassword(password);
                 }
+
+                try {
+                    jsonObject.put(Constants.FRAGMENT_Id, fragmentId);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
                 eventBus.post(new CobbocEvent(CobbocEvent.LOGIN, true, jsonObject));
             }
 
@@ -658,7 +666,7 @@ public class Session {
 
             @Override
             public void onError(Throwable throwable, String errorMessage) {
-                eventBus.post(new CobbocEvent(CobbocEvent.LOGIN, false, errorMessage));
+                eventBus.post(new CobbocEvent(CobbocEvent.LOGIN, false, errorMessage, fragmentId));
             }
 
             @Override
@@ -774,7 +782,7 @@ public class Session {
 
             @Override
             public void onError(Throwable throwable, String errorMessage) {
-                eventBus.post(new CobbocEvent(CobbocEvent.REQUEST_SEAT, false, errorMessage));
+                eventBus.post(new CobbocEvent(CobbocEvent.REQUEST_SEAT, false, errorMessage, fragmentId));
             }
 
             @Override
@@ -786,7 +794,7 @@ public class Session {
 
     }
 
-    public void getUserWorkspaceData(String userId) {
+    public void getUserWorkspaceData(String userId, final int fragmentId) {
 
         String getRequestUrl = "/requests/?user=" + userId + "&status=started,requested";
 
@@ -799,14 +807,15 @@ public class Session {
                     if (jsonObject.has("data") && !jsonObject.isNull("data")) {
                         JSONArray dataArray = (JSONArray) jsonObject.getJSONArray("data");
 
+                        jsonObject.put(Constants.FRAGMENT_Id, fragmentId);
                         if (dataArray.length() > 0)
                             eventBus.post(new CobbocEvent(CobbocEvent.GET_USER_DETAILS, true, jsonObject));
                         else
-                            eventBus.post(new CobbocEvent(CobbocEvent.GET_USER_DETAILS, false, jsonObject));
+                            eventBus.post(new CobbocEvent(CobbocEvent.GET_USER_DETAILS, false, jsonObject, fragmentId));
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
-                    eventBus.post(new CobbocEvent(CobbocEvent.GET_USER_DETAILS, false, jsonObject));
+                    eventBus.post(new CobbocEvent(CobbocEvent.GET_USER_DETAILS, false, jsonObject, fragmentId));
                 }
 
             }
@@ -877,7 +886,7 @@ public class Session {
 
             @Override
             public void onError(Throwable throwable, String errorMessage) {
-                eventBus.post(new CobbocEvent(CobbocEvent.GET_WORKSPACE_FROM_ID, false, errorMessage));
+                eventBus.post(new CobbocEvent(CobbocEvent.GET_WORKSPACE_FROM_ID, false, errorMessage, fragmentId));
             }
 
             @Override
@@ -909,7 +918,7 @@ public class Session {
 
             @Override
             public void onError(Throwable throwable, String errorMessage) {
-                eventBus.post(new CobbocEvent(CobbocEvent.GET_ALL_WORKSPACES, false, errorMessage));
+                eventBus.post(new CobbocEvent(CobbocEvent.GET_ALL_WORKSPACES, false, errorMessage, fragmentId));
             }
 
             @Override
@@ -1047,7 +1056,7 @@ public class Session {
 
             @Override
             public void onError(Throwable throwable, String errorMessage) {
-                eventBus.post(new CobbocEvent(CobbocEvent.CANCEL_BOOKING_REQUEST, false, errorMessage));
+                eventBus.post(new CobbocEvent(CobbocEvent.CANCEL_BOOKING_REQUEST, false, errorMessage, fragmentId));
             }
 
             @Override
@@ -1080,7 +1089,7 @@ public class Session {
 
             @Override
             public void onError(Throwable throwable, String errorMessage) {
-                eventBus.post(new CobbocEvent(CobbocEvent.ACTIVE_SESSIONS, false, errorMessage));
+                eventBus.post(new CobbocEvent(CobbocEvent.ACTIVE_SESSIONS, false, errorMessage, fragementId));
             }
 
             @Override
@@ -1113,7 +1122,7 @@ public class Session {
 
             @Override
             public void onError(Throwable throwable, String errorMessage) {
-                eventBus.post(new CobbocEvent(CobbocEvent.LAST_STATUS, false, errorMessage));
+                eventBus.post(new CobbocEvent(CobbocEvent.LAST_STATUS, false, errorMessage, fragmentId));
             }
 
             @Override
@@ -1146,7 +1155,7 @@ public class Session {
 
             @Override
             public void onError(Throwable throwable, String errorMessage) {
-                eventBus.post(new CobbocEvent(CobbocEvent.END_SESSION, false, errorMessage));
+                eventBus.post(new CobbocEvent(CobbocEvent.END_SESSION, false, errorMessage, fragmentId));
             }
 
             @Override
