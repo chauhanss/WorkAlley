@@ -105,9 +105,10 @@ public class SettingFragment extends Fragment {
                     Toast.makeText(getActivity(), "logout", Toast.LENGTH_LONG).show();
                     Intent intent = new Intent(getActivity(), LoginActivity.class);
                     startActivity(intent);
-        //            SharedPrefsUtils.clearSharedPreferenceFile(getActivity());
+                    getActivity().finish();
+                    //            SharedPrefsUtils.clearSharedPreferenceFile(getActivity());
                     break;
-                }else
+                } else
                     Toast.makeText(mContext, event.getValue().toString(), Toast.LENGTH_LONG).show();
             }
         }

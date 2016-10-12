@@ -75,7 +75,7 @@ public class Helper {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
         try {
             Date date = format.parse(lastUpdated);
-            CharSequence date1 = android.text.format.DateFormat.format("dd MMM yy hh:mm:ss", date);
+            CharSequence date1 = android.text.format.DateFormat.format("dd MMM yy HH:mm:ss", date);
             if (date1 != null)
                 formattedDate = date1.toString();
         } catch (ParseException e) {

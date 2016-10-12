@@ -88,14 +88,14 @@ public class UserRequestAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             viewHolder.status.setVisibility(View.GONE);
             switch (status) {
                 case "requested":
-                    viewHolder.endCancelButton.setText("CANCEL BOOK REQUEST");
+                    viewHolder.endCancelButton.setText("CANCEL BOOKING REQUEST");
                     break;
                 case "started":
                     viewHolder.endCancelButton.setText("END SESSION");
                     break;
                 default:
                     viewHolder.status.setVisibility(View.VISIBLE);
-                    viewHolder.status.setText("Request " + status);
+                    viewHolder.status.setText("Session " + status);
                     viewHolder.endCancelButton.setVisibility(View.GONE);
                     break;
             }

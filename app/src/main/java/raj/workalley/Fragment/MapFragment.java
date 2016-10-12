@@ -1,8 +1,10 @@
 package raj.workalley.Fragment;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.location.Address;
@@ -14,6 +16,7 @@ import android.support.v7.widget.CardView;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -87,7 +90,9 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback, Loc
     private String workspaceId;
     private TextView bookSeat;
     private TextView lastStatus;
-    private TextView currentTimer;
+    private TextView sessionTimer;
+    private Date currentTime = Calendar.getInstance().getTime();
+    private String updatedTime;
 
     public static MapFragment newInstance() {
         MapFragment fragment = new MapFragment();
@@ -212,13 +217,15 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback, Loc
             bookSeat = (TextView) rootView.findViewById(R.id.book_seat);
             bookSeat.setOnClickListener(seatStatusClickListener);
 
-            currentTimer = (TextView) rootView.findViewById(R.id.session_timer);
-
+            sessionTimer = (TextView) rootView.findViewById(R.id.session_timer);
 
             lastStatus = (TextView) rootView.findViewById(R.id.last_update);
             lastStatus.setVisibility(View.GONE);
+
+
             switch (status) {
                 case "requested":
+                    sessionTimer.setVisibility(View.GONE);
                     ((HomeActivity) mContext).startHostService();
                     bookSeat.setText(REQUEST_CANCEL);
                     lastStatus.setVisibility(View.VISIBLE);
@@ -226,6 +233,7 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback, Loc
                     break;
                 case END_REQUEST:
                     ((HomeActivity) mContext).startHostService();
+                    sessionTimer.setVisibility(View.GONE);
                     bookSeat.setText(END_REQUEST);
                     lastStatus.setVisibility(View.VISIBLE);
                     lastStatus.setText("Session end requested on: " + updatedAt);
@@ -233,12 +241,14 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback, Loc
                 case "started":
                     ((HomeActivity) mContext).startHostService();
                     if (SharedPrefsUtils.hasKey(mContext, END_REQUEST, Constants.SP_NAME)) {
-
+                        sessionTimer.setVisibility(View.GONE);
                         updatedAt = SharedPrefsUtils.getStringPreference(mContext, END_REQUEST, Constants.SP_NAME);
                         bookSeat.setText(END_REQUEST);
                         lastStatus.setVisibility(View.VISIBLE);
                         lastStatus.setText("Session end requested on: " + updatedAt);
                     } else {
+                        sessionTimer.setVisibility(View.VISIBLE);
+                        updatedTime = Helper.getFormattedDate(updatedAt);
                         bookSeat.setText(REQUEST_END);
                         lastStatus.setVisibility(View.VISIBLE);
                         lastStatus.setText("Session started on: " + Helper.getFormattedDate(updatedAt));
@@ -249,7 +259,7 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback, Loc
                 default:
                     mSession.setActiveWorkspace(null);
                     mSession.setActiveWorkspaceRequestId(null);
-
+                    sessionTimer.setVisibility(View.GONE);
                     ((HomeActivity) mContext).stopSocketService();
 
                     if (SharedPrefsUtils.hasKey(mContext, END_REQUEST, Constants.SP_NAME))
@@ -258,22 +268,35 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback, Loc
                     break;
             }
 
+            if (mSession.getActiveWorkspace() == null) {
+
+                TextView availableSeats = (TextView) rootView.findViewById(R.id.session_seat_available);
+                availableSeats.setText(getString(R.string.available_seats, 5));
+                availableSeats.setVisibility(View.VISIBLE);
+            } else {
+                setSessionTimer();
+                TextView availableSeats = (TextView) rootView.findViewById(R.id.session_seat_available);
+                availableSeats.setVisibility(View.GONE);
+            }
+
         }
+    }
 
-        if (mSession.getActiveWorkspace() == null) {
-            TextView sessionTimer = (TextView) rootView.findViewById(R.id.session_timer);
-            sessionTimer.setVisibility(View.GONE);
+    public void setSessionTimer() {
+        if (currentTime != null && updatedTime != null && !updatedTime.isEmpty()) {
+            Date updatedDate = new Date(updatedTime);
+            long difference = currentTime.getTime() - updatedDate.getTime();
 
-            TextView availableSeats = (TextView) rootView.findViewById(R.id.session_seat_available);
-            availableSeats.setText(getString(R.string.available_seats, 5));
-            availableSeats.setVisibility(View.VISIBLE);
-        } else {
-            TextView sessionTimer = (TextView) rootView.findViewById(R.id.session_timer);
-            sessionTimer.setVisibility(View.VISIBLE);
+            int days = (int) (difference / (1000 * 60 * 60 * 24));
+            int hours = (int) ((difference - (1000 * 60 * 60 * 24 * days)) / (1000 * 60 * 60));
+            int min = (int) (difference - (1000 * 60 * 60 * 24 * days) - (1000 * 60 * 60 * hours)) / (1000 * 60);
 
-            TextView availableSeats = (TextView) rootView.findViewById(R.id.session_seat_available);
-            availableSeats.setVisibility(View.GONE);
+            sessionTimer.setText("Time elapsed: " + formatTime(days) + ":" + formatTime(hours) + ":" + formatTime(min));
         }
+    }
+
+    public String formatTime(int time) {
+        return String.format("%02d", time);
     }
 
     View.OnClickListener seatStatusClickListener = new View.OnClickListener() {
@@ -283,33 +306,78 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback, Loc
             Button button = (Button) v;
             switch (button.getText().toString()) {
                 case REQUEST_BOOK:
-                    if (Helper.isConnected(mContext)) {
-                        Helper.showProgressDialogSpinner(mContext, "Please wait", "connecting server", false);
-                        mSession.requestSeat(mSession.getUser().get_id(), workspaceId, 0);
-                    } else
-                        Toast.makeText(mContext, "No internet", Toast.LENGTH_LONG).show();
+
+                    new AlertDialog.Builder(mContext, AlertDialog.THEME_HOLO_LIGHT)
+                            .setTitle("Exit Application")
+                            .setMessage("Are you sure you want to request a seat in this workspace?")
+                            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    if (Helper.isConnected(mContext)) {
+                                        Helper.showProgressDialogSpinner(mContext, "Please wait", "connecting server", false);
+                                        mSession.requestSeat(mSession.getUser().get_id(), workspaceId, 0);
+                                    } else
+                                        Toast.makeText(mContext, "No internet", Toast.LENGTH_LONG).show();
+                                }
+
+                            })
+                            .setNegativeButton("No", null)
+                            .show();
+
                     break;
                 case REQUEST_END:
+                    new AlertDialog.Builder(mContext, AlertDialog.THEME_HOLO_LIGHT)
+                            .setTitle("Exit Application")
+                            .setMessage("Are you sure you want to end your session at this workspace?")
+                            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    if (!SharedPrefsUtils.hasKey(mContext, END_REQUEST, Constants.SP_NAME)) {
+                                        if (Helper.isConnected(mContext)) {
+                                            Helper.showProgressDialogSpinner(mContext, "Please Wait", "Ending Session", false);
+                                            Session.getInstance(mContext).endSessionInWorkspaceRequest(mSession.getActiveWorkspaceRequestId(), 0);
+                                        } else
+                                            Toast.makeText(mContext, "No internet", Toast.LENGTH_LONG).show();
+                                    } else {
+                                        setDataInWorkspaceView(END_REQUEST, SharedPrefsUtils.getStringPreference(mContext, END_REQUEST, Constants.SP_NAME));
+                                    }
+                                }
 
-                    if (!SharedPrefsUtils.hasKey(mContext, END_REQUEST, Constants.SP_NAME)) {
-                        if (Helper.isConnected(mContext)) {
-                            Helper.showProgressDialogSpinner(mContext, "Please Wait", "Ending Session", false);
-                            Session.getInstance(mContext).endSessionInWorkspaceRequest(mSession.getActiveWorkspaceRequestId(), 0);
-                        } else
-                            Toast.makeText(mContext, "No internet", Toast.LENGTH_LONG).show();
-                    } else {
-                        setDataInWorkspaceView(END_REQUEST, SharedPrefsUtils.getStringPreference(mContext, END_REQUEST, Constants.SP_NAME));
-                    }
+                            })
+                            .setNegativeButton("No", null)
+                            .show();
                     break;
 
                 case REQUEST_CANCEL:
-                    if (Helper.isConnected(mContext)) {
-                        Helper.showProgressDialogSpinner(mContext, "Please wait", "connecting server", false);
-                        mSession.cancelRequestedSeat(mSession.getActiveWorkspaceRequestId(), 0);
-                    } else
-                        Toast.makeText(mContext, "No internet", Toast.LENGTH_LONG).show();
+
+                    new AlertDialog.Builder(mContext, AlertDialog.THEME_HOLO_LIGHT)
+                            .setTitle("Exit Application")
+                            .setMessage("Are you sure you want to cancel your booking request?")
+                            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    if (Helper.isConnected(mContext)) {
+                                        Helper.showProgressDialogSpinner(mContext, "Please wait", "connecting server", false);
+                                        mSession.cancelRequestedSeat(mSession.getActiveWorkspaceRequestId(), 0);
+                                    } else
+                                        Toast.makeText(mContext, "No internet", Toast.LENGTH_LONG).show();
+                                }
+
+                            })
+                            .setNegativeButton("No", null)
+                            .show();
+
                     break;
             }
+        }
+    };
+
+    private BroadcastReceiver mtimeInfoReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context c, Intent i) {
+            Calendar calendar = Calendar.getInstance();
+            currentTime = calendar.getTime();
+            setSessionTimer();
         }
     };
 
@@ -391,7 +459,7 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback, Loc
         ArrayList<String> amenityList = mWorkspace.getAmenities();
         ArrayList<AmenitiesItem> list = new ArrayList<>();
         for (String amenity : amenityList) {
-            switch (amenity.toLowerCase()) {
+            switch (amenity) {
                 case "Ac":
                     AmenitiesItem item1 = new AmenitiesItem("Ac", R.drawable.ic_ac, false);
                     list.add(item1);
@@ -427,6 +495,7 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback, Loc
         super.onPause();
         Helper.hideKeyboardIfShown((Activity) mContext, locationSearch);
         mContext.unregisterReceiver(notificationListener);
+        mContext.unregisterReceiver(mtimeInfoReceiver);
     }
 
 
@@ -434,6 +503,7 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback, Loc
     public void onResume() {
         super.onResume();
         mContext.registerReceiver(notificationListener, new IntentFilter(Constants.REQUEST_RESPONSE));
+        mContext.registerReceiver(mtimeInfoReceiver, new IntentFilter(Intent.ACTION_TIME_TICK));
     }
 
     private BroadcastReceiver notificationListener = new BroadcastReceiver() {
@@ -442,7 +512,11 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback, Loc
 
             String message = intent.getStringExtra("message");
             String requestID = intent.getStringExtra("USER");
-            String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
+            //     String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
+
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+            Date date = new Date();
+            String currentDateTimeString = dateFormat.format(date);
 
             if (message.equalsIgnoreCase(Constants.SESSION_END_CONFIRMED)) {
                 if (requestID.equalsIgnoreCase(mSession.getActiveWorkspaceRequestId())) {
@@ -647,7 +721,19 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback, Loc
                 showMapLayout();
             } else
                 ((HomeActivity) mContext).finish();
-        } else
-            ((HomeActivity) mContext).finish();
+        } else {
+            new AlertDialog.Builder(mContext, AlertDialog.THEME_HOLO_LIGHT)
+                    .setTitle("Exit Application")
+                    .setMessage("Are you sure you want to exit WorkAlley?")
+                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            ((HomeActivity) mContext).finish();
+                        }
+
+                    })
+                    .setNegativeButton("No", null)
+                    .show();
+        }
     }
 }

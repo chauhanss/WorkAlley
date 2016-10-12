@@ -1,7 +1,9 @@
 package raj.workalley;
 
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
@@ -172,8 +174,20 @@ public class HomeActivity extends BaseActivity implements OnItemClickListener {
 
         if (viewPager.getCurrentItem() == 0) {
             mMapFragment.onBackPressed();
-        } else
-            super.onBackPressed();
+        } else{
+            new AlertDialog.Builder(this, AlertDialog.THEME_HOLO_LIGHT)
+                    .setTitle("Exit Application")
+                    .setMessage("Are you sure you want to exit WorkAlley?")
+                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                           finish();
+                        }
+
+                    })
+                    .setNegativeButton("No", null)
+                    .show();
+        }
     }
 
     public final class SimpleFragmentStatePagerAdapter extends FragmentStatePagerAdapter {
